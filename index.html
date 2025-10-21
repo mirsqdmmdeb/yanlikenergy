@@ -1,117 +1,248 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Yanlik 2.1 (Leopar)</title>
-  <meta name="description" content="Yanlik 2.1 (Leopar) — Ultimate edition">
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yanlik 2.1 (Leopar)</title>
+<style>
+:root {
+  --bg: #0b132b;
+  --text: #e0e0e0;
+  --accent: #00b4d8;
+  --bot: #1b263b;
+  --user: #2a3a5e;
+}
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background-color: var(--bg);
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+header {
+  background-color: #000;
+  color: var(--accent);
+  text-align: center;
+  padding: 20px;
+  font-size: 1.8em;
+  letter-spacing: 1px;
+  border-bottom: 2px solid var(--accent);
+}
+nav {
+  display: flex;
+  justify-content: center;
+  background-color: #111;
+  border-bottom: 1px solid var(--accent);
+}
+nav button {
+  flex: 1;
+  padding: 15px;
+  background: none;
+  border: none;
+  color: var(--text);
+  font-size: 1em;
+  cursor: pointer;
+  transition: 0.3s;
+}
+nav button:hover, nav button.active {
+  background-color: var(--accent);
+  color: #000;
+}
+section {
+  flex: 1;
+  display: none;
+  padding: 20px;
+  overflow-y: auto;
+}
+section.active {
+  display: block;
+  animation: fadeIn 0.5s ease;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+/* Chat Bölümü */
+.chat-box {
+  background-color: var(--bot);
+  border: 1px solid var(--accent);
+  border-radius: 10px;
+  padding: 15px;
+  height: 400px;
+  overflow-y: auto;
+}
+.message {
+  margin: 10px 0;
+  padding: 10px 15px;
+  border-radius: 12px;
+  max-width: 75%;
+  animation: fadeIn 0.4s ease;
+}
+.user { background: var(--user); margin-left: auto; text-align: right; }
+.bot { background: var(--accent); color: #000; margin-right: auto; }
+.input-area {
+  margin-top: 10px;
+  display: flex;
+  gap: 10px;
+}
+input[type="text"] {
+  flex: 1;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  outline: none;
+}
+button.send-btn {
+  background-color: var(--accent);
+  color: #000;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+}
+/* Ayarlar */
+.settings label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 15px 0;
+  font-size: 1.1em;
+}
+.settings input, select {
+  transform: scale(1.2);
+}
+/* Hakkında */
+.about {
+  text-align: center;
+  margin-top: 50px;
+}
+.about h2 {
+  color: var(--accent);
+}
+.about p {
+  opacity: 0.8;
+}
+footer {
+  background: #000;
+  text-align: center;
+  padding: 10px;
+  border-top: 2px solid var(--accent);
+  font-size: 0.85em;
+  color: #aaa;
+}
+</style>
 </head>
-<body data-theme="navy">
-  <header class="topbar">
-    <div class="brand">Yanlik 2.1 <span class="codename">(Leopar)</span></div>
-    <div class="actions">
-      <button id="dev-open" class="btn tiny">DEV</button>
-      <button id="theme-toggle" class="btn tiny">Tema</button>
-      <button id="about-open" class="btn tiny">Hakkında</button>
-    </div>
-  </header>
+<body>
 
-  <div class="wrap">
-    <nav class="side">
-      <div class="logo">Y</div>
-      <ul>
-        <li data-page="chat" class="active">💬 Sohbet</li>
-        <li data-page="settings">⚙️ Ayarlar</li>
-        <li data-page="memory">📚 Hafıza</li>
-        <li data-page="energy">⚡ Energy</li>
-        <li data-page="about">ℹ️ Hakkında</li>
-      </ul>
-      <div class="version">v2.1 • Leopar — mirsqdmmdevs</div>
-    </nav>
+<header>🦁 Yanlik 2.1 <span style="color:#888;">(Leopar)</span></header>
 
-    <main class="main">
-      <section id="chat" class="page active">
-        <div class="chat-card">
-          <div id="chat-box" class="chat-box" aria-live="polite"></div>
-          <div class="composer">
-            <input id="user-input" placeholder="Mesaj yaz... (örn: merhaba /energy on /tkm taş)" autocomplete="off">
-            <button id="send-btn" class="send">Gönder</button>
-          </div>
-          <div class="hint small">Komutlar: <code>/tkm</code> <code>/zar</code> <code>/rapor</code> • Gizli: <code>energy on</code></div>
-        </div>
-      </section>
+<nav>
+  <button class="active" onclick="showTab('chat')">💬 Sohbet</button>
+  <button onclick="showTab('settings')">⚙️ Ayarlar</button>
+  <button onclick="showTab('about')">📘 Hakkında</button>
+</nav>
 
-      <section id="settings" class="page">
-        <div class="card">
-          <h3>Ayarlar</h3>
-          <div class="grid">
-            <div class="card small">
-              <label>Yazma hızı: <span id="speed-display">6</span></label>
-              <input id="speed-range" type="range" min="2" max="12" value="6">
-            </div>
-            <div class="card small">
-              <label>Bot gecikmesi (s): <span id="delay-display">5</span></label>
-              <input id="delay-range" type="range" min="0" max="12" value="5">
-            </div>
-            <div class="card small">
-              <label><input id="toggle-type" type="checkbox" checked> Yazma efekti</label><br/>
-              <label><input id="toggle-glitch" type="checkbox"> Energy glitch</label><br/>
-              <div style="margin-top:8px">
-                <button id="reset-memory" class="btn tiny">Hafızayı sıfırla</button>
-                <button id="export-json" class="btn tiny">Dışa aktar</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section id="memory" class="page">
-        <div class="card">
-          <h3>Hafıza (son kayıtlar)</h3>
-          <div id="memory-list" class="memory-list"></div>
-        </div>
-      </section>
-
-      <section id="energy" class="page">
-        <div class="card">
-          <h3>Energy (Easter Egg)</h3>
-          <p class="small">Gizli komut: <code>energy on</code> / <code>energy off</code> veya butondan aç.</p>
-          <button id="energy-toggle" class="btn">Energy Aç/Kapat</button>
-          <div id="energy-out" class="small" style="margin-top:8px"></div>
-        </div>
-      </section>
-
-      <section id="about" class="page">
-        <div class="card">
-          <h3>Hakkında</h3>
-          <pre id="about-term" class="about-term"></pre>
-          <button id="about-run" class="btn tiny">Terminal Başlat</button>
-        </div>
-      </section>
-    </main>
+<!-- Chat -->
+<section id="chat" class="active">
+  <div class="chat-box" id="chatBox">
+    <div class="message bot">Merhaba! Ben Yanlik 2.1 (Leopar). Sana nasıl yardımcı olabilirim?</div>
   </div>
-
-  <footer class="footer">© 2025 Yanlik 2.1 (Leopar) — mirsqdmmdevs</footer>
-
-  <!-- 404 overlay -->
-  <div id="overlay-404" class="overlay hidden" aria-hidden="true">
-    <div class="overlay-card">
-      <div class="glitch-title" data-text="[Yanlik-404]">[Yanlik-404]</div>
-      <p class="small">Bağlantı kayboldu. Sayfaya dön.</p>
-      <button id="overlay-close" class="btn tiny">Sohbete geri dön</button>
-    </div>
+  <div class="input-area">
+    <input type="text" id="userInput" placeholder="Mesajını yaz...">
+    <button class="send-btn" onclick="sendMessage()">Gönder</button>
   </div>
+</section>
 
-  <!-- sound (online CDN) -->
-  <audio id="notify" preload="auto" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_c7d902.mp3?filename=message-14715.mp3"></audio>
+<!-- Ayarlar -->
+<section id="settings" class="settings">
+  <label>
+    Tema:
+    <select id="themeSelect" onchange="changeTheme(this.value)">
+      <option value="default">Varsayılan (Lacivert)</option>
+      <option value="dark">Koyu</option>
+      <option value="light">Açık</option>
+    </select>
+  </label>
+  <label>
+    Ses Efektleri:
+    <input type="checkbox" id="soundToggle" checked>
+  </label>
+</section>
 
-  <!-- Modules -->
-  <script type="module" src="./script.js"></script>
-  <script type="module" src="./settings.js"></script>
-  <script type="module" src="./about.js"></script>
-  <script type="module" src="./energy.js"></script>
-  <script type="module" src="./dialogue.js"></script>
-  <script type="module" src="./state.js"></script>
+<!-- Hakkında -->
+<section id="about" class="about">
+  <h2>Yanlik 2.1 (Leopar)</h2>
+  <p>Bu sürüm, sade nostaljiyi modern animasyonlarla birleştirir.<br>
+  Geliştirici: <strong>mirsqdmmdevs</strong></p>
+  <p>✨ Özellikler: Gecikmeli cevap, otomatik yanıtlar, tema, ses efektleri.</p>
+</section>
+
+<footer>&copy; 2025 Yanlik. Tüm hakları saklıdır.</footer>
+
+<script>
+function showTab(id){
+  document.querySelectorAll("section").forEach(s => s.classList.remove("active"));
+  document.querySelectorAll("nav button").forEach(b => b.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  event.target.classList.add("active");
+}
+
+const chatBox = document.getElementById('chatBox');
+const input = document.getElementById('userInput');
+const soundToggle = document.getElementById('soundToggle');
+const emojis = ["😎","🤔","😏","🌞","🧐","🎉","😄","👍","📝"];
+let memory = [];
+
+// 🔊 Ses Efektleri
+const sendSound = new Audio("https://cdn.pixabay.com/audio/2022/03/15/audio_ba5b8f7a3e.mp3");
+const replySound = new Audio("https://cdn.pixabay.com/audio/2022/03/09/audio_7b4f0b5e4d.mp3");
+
+function playSound(type){
+  if(!soundToggle.checked) return;
+  (type === "send" ? sendSound : replySound).play().catch(()=>{});
+}
+
+function sendMessage(){
+  const text = input.value.trim();
+  if(!text) return;
+  addMessage(text, "user");
+  playSound("send");
+  input.value = "";
+
+  setTimeout(()=>{
+    const response = getResponse(text);
+    addMessage(response, "bot");
+    playSound("reply");
+  }, 1000 + Math.random()*1500);
+}
+
+function addMessage(text, type){
+  const msg = document.createElement("div");
+  msg.className = `message ${type}`;
+  msg.textContent = text;
+  chatBox.appendChild(msg);
+  chatBox.scrollTo({top:chatBox.scrollHeight, behavior:'smooth'});
+}
+
+function getResponse(text){
+  text = text.toLowerCase();
+  memory.push(text);
+  if(text.includes("energy")) return "😿 Ah... Energy aklıma geldi... Çok özledik onu 💔";
+  if(text.includes("merhaba")) return "Selam! Nasılsın? "+emojis[Math.floor(Math.random()*emojis.length)];
+  if(text.includes("hava")) return "Bugün havalar tam Leopar havası 🌤️";
+  if(text.includes("oyun")) return "Oyunlar? Hadi biraz eğlenelim 🎮";
+  return ["Hadi biraz daha konuşalım 😄","İlginç dedin, anlat biraz daha!","Hmm... bunu sevdim 🤔"][Math.floor(Math.random()*3)];
+}
+
+function changeTheme(theme){
+  if(theme==="dark"){ document.body.style.background="#000"; document.body.style.color="#eee";}
+  else if(theme==="light"){ document.body.style.background="#f5f5f5"; document.body.style.color="#111";}
+  else { document.body.style.background="#0b132b"; document.body.style.color="#e0e0e0";}
+}
+</script>
+
 </body>
 </html>
