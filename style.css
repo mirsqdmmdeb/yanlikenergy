@@ -1,0 +1,179 @@
+/* Yanlik 2.1 (Leopar) — Stil Dosyası */
+/* Tema: Lacivert Minimal, Modern, Glow efektli */
+
+:root {
+  --bg-color: #0b132b;
+  --chat-bg: #1c2541;
+  --accent: #00b4d8;
+  --accent-light: #48cae4;
+  --text: #e0e0e0;
+  --bot-bubble: #1c77c3;
+  --user-bubble: #274690;
+  --error-color: #ff5e5b;
+  --energy-color: #8a2be2;
+  --transition: all 0.3s ease;
+}
+
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+header {
+  text-align: center;
+  padding: 25px 10px;
+  border-bottom: 2px solid var(--accent);
+}
+
+header h1 {
+  margin: 0;
+  font-size: 2.2em;
+  color: var(--accent-light);
+  letter-spacing: 2px;
+  animation: fadeIn 1s ease forwards;
+}
+
+/* Chat Kutusu */
+.chat-box {
+  flex: 1;
+  background-color: var(--chat-bg);
+  margin: 30px auto;
+  padding: 20px;
+  border-radius: 15px;
+  border: 1px solid var(--accent);
+  max-width: 650px;
+  width: 90%;
+  overflow-y: auto;
+  box-shadow: 0 0 15px rgba(0, 180, 216, 0.2);
+}
+
+.chat-box p {
+  opacity: 0;
+  transform: translateY(10px);
+  animation: fadeIn 0.5s forwards;
+  margin: 8px 0;
+  padding: 10px 14px;
+  border-radius: 12px;
+  word-wrap: break-word;
+  max-width: 80%;
+}
+
+.user-msg {
+  background: linear-gradient(90deg, var(--user-bubble), #1b3b73);
+  color: #fff;
+  text-align: right;
+  margin-left: auto;
+}
+
+.bot-msg {
+  background: linear-gradient(90deg, var(--bot-bubble), var(--accent-light));
+  color: #fff;
+  text-align: left;
+  margin-right: auto;
+}
+
+/* Giriş Alanı */
+input[type="text"] {
+  width: 70%;
+  padding: 12px;
+  border-radius: 8px;
+  border: none;
+  background-color: #112240;
+  color: var(--text);
+  outline: none;
+  transition: var(--transition);
+}
+
+input[type="text"]:focus {
+  border: 1px solid var(--accent);
+  box-shadow: 0 0 8px var(--accent);
+}
+
+button {
+  padding: 12px 18px;
+  border-radius: 8px;
+  border: none;
+  background-color: var(--accent);
+  color: #fff;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+button:hover {
+  background-color: var(--accent-light);
+  transform: scale(1.05);
+}
+
+/* Instagram Link */
+.instagram-link {
+  display: inline-block;
+  margin-top: 15px;
+  padding: 10px 20px;
+  background-color: #14213d;
+  color: var(--text);
+  text-decoration: none;
+  border-radius: 8px;
+  transition: var(--transition);
+}
+
+.instagram-link:hover {
+  background-color: var(--accent);
+  color: #000;
+}
+
+/* 404 Stili */
+.oops {
+  display: none;
+  text-align: center;
+  font-size: 1.8em;
+  color: var(--error-color);
+  margin-top: 50px;
+}
+
+.oops.active {
+  display: block;
+  animation: fadeIn 0.8s ease forwards;
+}
+
+/* Footer */
+footer {
+  text-align: center;
+  padding: 20px;
+  border-top: 2px solid var(--accent);
+  color: #aaa;
+  font-size: 0.9em;
+}
+
+/* Efektler */
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Energy modu */
+body.energy {
+  background: radial-gradient(circle, #190033 0%, #0b001a 100%);
+  animation: pulse 3s infinite alternate;
+}
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 15px #8a2be2; }
+  100% { box-shadow: 0 0 30px #5e17eb; }
+}
+
+/* Scrollbar */
+.chat-box::-webkit-scrollbar {
+  width: 8px;
+}
+.chat-box::-webkit-scrollbar-thumb {
+  background: var(--accent);
+  border-radius: 10px;
+}
