@@ -2,6 +2,7 @@ export class YanlikState {
   constructor() {
     this.memory = JSON.parse(localStorage.getItem('yanlik_memory') || '[]');
     this.energy = JSON.parse(localStorage.getItem('yanlik_energy') || 'false');
+    this.delay = localStorage.getItem('yanlik_delay') || 5;
   }
   remember(line) {
     this.memory.push(line);
@@ -10,4 +11,5 @@ export class YanlikState {
   }
   isEnergy() { return !!this.energy; }
   setEnergy(v) { this.energy = !!v; localStorage.setItem('yanlik_energy', JSON.stringify(v)); }
+  getDelay() { return Number(this.delay) * 200; }
 }
