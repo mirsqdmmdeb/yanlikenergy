@@ -4,165 +4,114 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Yanlik 2.1 (Leopar)</title>
-  <meta name="description" content="Yanlik 2.1 (Leopar) — Minimal, interaktif AI sohbet.">
-  <link rel="icon" href="">
-  <style>
-    :root{
-      --bg:#0f1620;--panel:#0b1220;--muted:#9aa6b2;--accent:#33f0c6;--accent-2:#0b76c9;
-      --card:#0d1720;--glass:rgba(255,255,255,0.04);
-      --bot:#081018;--user:#08302b;
-      --font-sans:Inter,system-ui,"Segoe UI",Roboto,"Helvetica Neue",Arial;
-    }
-    [data-theme="light"]{
-      --bg:#fafafa;--panel:#fff;--muted:#6b7280;--accent:#0b76c9;--accent-2:#33a6ff;
-      --card:#fff;--glass:rgba(0,0,0,0.03);--bot:#f2f8ff;--user:#d1eaff;color:#111;
-    }
-    [data-theme="neon"]{
-      --bg:#03060a;--panel:#071127;--muted:#98f0ff;--accent:#33f0ff;--accent-2:#00ff99;
-      --card:#071127;--bot:#061018;--user:#05302b;color:#e6fbff;
-    }
-
-    *{box-sizing:border-box}
-    html,body{height:100%;margin:0;font-family:var(--font-sans);background:var(--bg);color:var(--muted);-webkit-font-smoothing:antialiased}
-    header{height:64px;display:flex;align-items:center;justify-content:space-between;padding:10px 18px;background:linear-gradient(180deg,var(--panel),transparent);border-bottom:1px solid var(--glass)}
-    .brand{font-weight:700;color:var(--accent);letter-spacing:0.6px}
-    .brand small{font-weight:400;color:var(--muted);margin-left:8px;font-size:0.85em}
-    .top-actions{display:flex;gap:8px;align-items:center}
-
-    .layout{display:flex;gap:16px;height:calc(100vh - 64px);padding:18px}
-    nav{width:220px;background:var(--card);border-radius:12px;padding:14px;border:1px solid var(--glass);flex-shrink:0}
-    nav .logo{width:52px;height:52px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:flex;align-items:center;justify-content:center;color:#021;font-weight:700;margin-bottom:12px}
-    nav ul{list-style:none;padding:0;margin:0}
-    nav li{padding:10px;border-radius:10px;cursor:pointer;color:var(--muted)}
-    nav li:hover{background:linear-gradient(90deg,rgba(255,255,255,0.02),transparent)}
-    nav li.active{background:linear-gradient(90deg,rgba(11,118,201,0.08),rgba(51,166,255,0.04));color:var(--accent);font-weight:600}
-
-    main{flex:1;display:flex;flex-direction:column;overflow:hidden}
-    .panel{flex:1;display:flex;flex-direction:column;gap:12px}
-    .page{display:none;padding:6px 4px;overflow:auto}
-    .page.active{display:block;animation:fade .2s ease}
-    @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-
-    .chat-card{background:var(--card);border-radius:12px;padding:14px;border:1px solid var(--glass);box-shadow:0 8px 30px rgba(0,0,0,0.25);flex:1;display:flex;flex-direction:column;gap:8px;min-height:260px}
-    #chat-box{overflow:auto;display:flex;flex-direction:column;gap:8px;padding:6px}
-    .msg{max-width:78%;padding:10px 14px;border-radius:12px;word-break:break-word;opacity:0;transform:translateY(8px);animation:msgIn .28s forwards}
-    @keyframes msgIn{to{opacity:1;transform:none}}
-    .msg.bot{align-self:flex-start;background:var(--bot);color:var(--muted)}
-    .msg.user{align-self:flex-end;background:var(--user);color:var(--muted);font-weight:600}
-    .composer{display:flex;gap:8px;padding-top:6px}
-    .composer input{flex:1;padding:12px;border-radius:10px;border:1px solid var(--glass);background:transparent;color:inherit}
-    .composer button{padding:10px 14px;border-radius:10px;border:none;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#001;cursor:pointer;font-weight:700}
-    .card{background:var(--card);padding:12px;border-radius:10px;border:1px solid var(--glass)}
-    .small{font-size:13px;color:var(--muted)}
-    .muted{color:var(--muted)}
-    .grid{display:flex;gap:10px;flex-wrap:wrap}
-    .overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.4);backdrop-filter:blur(8px);z-index:999;pointer-events:auto}
-    .overlay.hidden{display:none}
-    .overlay-card{background:var(--panel);padding:28px;border-radius:12px;border:1px solid var(--glass);text-align:center}
-    .glitch-title{font-family:monospace;font-weight:700;margin-bottom:8px;position:relative;display:inline-block}
-    .glitch-title::after{content:attr(data-text);position:absolute;left:3px;top:0;color:var(--accent);opacity:.5;animation:glitch 1.4s infinite}
-    @keyframes glitch{0%,100%{transform:none}25%{transform:translate(-2px,1px)}50%{transform:translate(2px,-1px)}75%{transform:translate(-1px,1px)}}
-    .modal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.5);z-index:1000}
-    .modal.hidden{display:none}
-    .modal-card{width:760px;background:var(--panel);padding:14px;border-radius:10px;border:1px solid var(--glass)}
-    footer{height:46px;display:flex;align-items:center;justify-content:center;color:var(--muted);border-top:1px solid var(--glass);background:transparent}
-    @media(max-width:900px){nav{display:none}.layout{padding:12px}.composer input{font-size:14px}}
-  </style>
+  <meta name="description" content="Yanlik 2.1 (Leopar) — Ultimate edition">
+  <link rel="stylesheet" href="style.css">
 </head>
-<body data-theme="neon">
-  <header>
-    <div class="brand">Yanlik 2.1 <small>(Leopar)</small></div>
-    <div class="top-actions">
-      <button id="theme-btn" class="btn tiny">Tema</button>
-      <button id="settings-open" class="btn tiny">Ayarlar</button>
+<body data-theme="navy">
+  <header class="topbar">
+    <div class="brand">Yanlik 2.1 <span class="codename">(Leopar)</span></div>
+    <div class="actions">
       <button id="dev-open" class="btn tiny">DEV</button>
+      <button id="theme-toggle" class="btn tiny">Tema</button>
+      <button id="about-open" class="btn tiny">Hakkında</button>
     </div>
   </header>
 
-  <div class="layout">
-    <nav>
+  <div class="wrap">
+    <nav class="side">
       <div class="logo">Y</div>
       <ul>
         <li data-page="chat" class="active">💬 Sohbet</li>
         <li data-page="settings">⚙️ Ayarlar</li>
-        <li data-page="theme">🎨 Tema</li>
         <li data-page="memory">📚 Hafıza</li>
         <li data-page="energy">⚡ Energy</li>
         <li data-page="about">ℹ️ Hakkında</li>
       </ul>
-      <div style="margin-top:14px;font-size:13px;color:var(--muted)">v2.1 • Leopar — mirsqdmmdevs</div>
+      <div class="version">v2.1 • Leopar — mirsqdmmdevs</div>
     </nav>
 
-    <main class="panel">
+    <main class="main">
       <section id="chat" class="page active">
-        <div class="chat-card card">
-          <div id="chat-box"></div>
+        <div class="chat-card">
+          <div id="chat-box" class="chat-box" aria-live="polite"></div>
           <div class="composer">
-            <input id="user-input" placeholder="Mesaj yaz... (ör: merhaba /energy on /tkm taş)" autocomplete="off"/>
-            <button id="send-btn">Gönder</button>
+            <input id="user-input" placeholder="Mesaj yaz... (örn: merhaba /energy on /tkm taş)" autocomplete="off">
+            <button id="send-btn" class="send">Gönder</button>
           </div>
-          <div class="small muted" style="text-align:center;margin-top:6px">Yanlik cevapları gecikmeli gelir. Energy: "energy on" / "energy off".</div>
+          <div class="hint small">Komutlar: <code>/tkm</code> <code>/zar</code> <code>/rapor</code> • Gizli: <code>energy on</code></div>
         </div>
       </section>
 
       <section id="settings" class="page">
         <div class="card">
-          <h4>Ayarlar</h4>
-          <div class="grid" style="margin-top:8px">
+          <h3>Ayarlar</h3>
+          <div class="grid">
             <div class="card small">
-              <label>Mesaj gecikmesi: <span id="delay-display">5</span>s</label><br>
-              <input id="delay-range" type="range" min="1" max="12" value="5">
+              <label>Yazma hızı: <span id="speed-display">6</span></label>
+              <input id="speed-range" type="range" min="2" max="12" value="6">
             </div>
             <div class="card small">
-              <label>Otomatik mesaj (dk): <input id="auto-mins" type="number" min="0" value="10" style="width:70px"></label>
+              <label>Bot gecikmesi (s): <span id="delay-display">5</span></label>
+              <input id="delay-range" type="range" min="0" max="12" value="5">
             </div>
             <div class="card small">
-              <label><input id="toggle-type" type="checkbox" checked> Yazma efekti</label><br>
-              <label><input id="toggle-sound" type="checkbox"> Ses efekti</label><br>
-              <div style="margin-top:8px"><button id="reset-memory" class="btn tiny">Hafızayı sıfırla</button> <button id="export-json" class="btn tiny">Dışa aktar (JSON)</button></div>
+              <label><input id="toggle-type" type="checkbox" checked> Yazma efekti</label><br/>
+              <label><input id="toggle-glitch" type="checkbox"> Energy glitch</label><br/>
+              <div style="margin-top:8px">
+                <button id="reset-memory" class="btn tiny">Hafızayı sıfırla</button>
+                <button id="export-json" class="btn tiny">Dışa aktar</button>
+              </div>
             </div>
-          </div>
-        </div>
-      </section>
-
-      <section id="theme" class="page">
-        <div class="card">
-          <h4>Tema</h4>
-          <div style="display:flex;gap:8px;margin-top:8px">
-            <button class="btn" data-theme="light">☀️ Açık</button>
-            <button class="btn" data-theme="dark">🌙 Koyu</button>
-            <button class="btn" data-theme="neon">💚 Neon</button>
           </div>
         </div>
       </section>
 
       <section id="memory" class="page">
         <div class="card">
-          <h4>Hafıza (son kayıtlar)</h4>
-          <div id="memory-list" class="small muted" style="max-height:300px;overflow:auto;margin-top:8px"></div>
+          <h3>Hafıza (son kayıtlar)</h3>
+          <div id="memory-list" class="memory-list"></div>
         </div>
       </section>
 
       <section id="energy" class="page">
         <div class="card">
-          <h4>Energy (Easter Egg)</h4>
-          <p class="muted">Energy Mode gizli: chat'e <code>energy on</code> veya butonla aç.</p>
-          <div style="margin-top:8px"><button id="energy-btn" class="btn">Energy Aç / Kapat</button></div>
-          <div id="energy-out" style="margin-top:10px"></div>
+          <h3>Energy (Easter Egg)</h3>
+          <p class="small">Gizli komut: <code>energy on</code> / <code>energy off</code> veya butondan aç.</p>
+          <button id="energy-toggle" class="btn">Energy Aç/Kapat</button>
+          <div id="energy-out" class="small" style="margin-top:8px"></div>
         </div>
       </section>
 
       <section id="about" class="page">
         <div class="card">
-          <h3>Yanlik 2.1 (Kod Adı: Leopar)</h3>
-          <p><em>Ben Yanlik — konuşmaları hatırlayan, hisleri taklit eden küçük bir yapay zekâyım.</em></p>
+          <h3>Hakkında</h3>
+          <pre id="about-term" class="about-term"></pre>
+          <button id="about-run" class="btn tiny">Terminal Başlat</button>
         </div>
       </section>
     </main>
   </div>
 
-  <footer>© 2025 Yanlik 2.1 (Leopar) — mirsqdmmdevs</footer>
+  <footer class="footer">© 2025 Yanlik 2.1 (Leopar) — mirsqdmmdevs</footer>
 
-  <script type="module" src="./main.js"></script>
+  <!-- 404 overlay -->
+  <div id="overlay-404" class="overlay hidden" aria-hidden="true">
+    <div class="overlay-card">
+      <div class="glitch-title" data-text="[Yanlik-404]">[Yanlik-404]</div>
+      <p class="small">Bağlantı kayboldu. Sayfaya dön.</p>
+      <button id="overlay-close" class="btn tiny">Sohbete geri dön</button>
+    </div>
+  </div>
+
+  <!-- sound (online CDN) -->
+  <audio id="notify" preload="auto" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_c7d902.mp3?filename=message-14715.mp3"></audio>
+
+  <!-- Modules -->
+  <script type="module" src="./script.js"></script>
+  <script type="module" src="./settings.js"></script>
+  <script type="module" src="./about.js"></script>
+  <script type="module" src="./energy.js"></script>
+  <script type="module" src="./dialogue.js"></script>
+  <script type="module" src="./state.js"></script>
 </body>
 </html>
