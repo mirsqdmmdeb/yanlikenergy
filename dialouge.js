@@ -1,31 +1,25 @@
 export function getYanlikReply(text, state) {
-  const t = text.toLowerCase();
+  const t = text.toLowerCase().trim();
+  if (t === 'energy on') { state.setEnergy(true); return '⚡ Energy Mode aktif.'; }
+  if (t === 'energy off') { state.setEnergy(false); return '💤 Energy kapalı.'; }
 
-  if (t.includes('merhaba')) return 'Merhaba! Seni görmek güzel 😄';
-  if (t.includes('nasılsın')) return 'Gayet iyiyim, sen nasılsın?';
-  if (t.includes('üzgün')) return 'Üzülme, bazen duygular da geçici olur 💙';
-  if (t.includes('mutlu')) return 'Harika! Mutluluğun bulaşıcı 😄';
-  if (t.startsWith('/zar')) return `🎲 Zar: ${Math.floor(Math.random()*6)+1}`;
   if (t.startsWith('/tkm')) {
-    const ops = ['taş', 'kağıt', 'makas'];
-    const bot = ops[Math.floor(Math.random()*3)];
-    return `Ben ${bot} seçtim!`;
+    const o = ['taş','kağıt','makas']; const cpu = o[Math.floor(Math.random()*3)];
+    const user = t.split(' ')[1];
+    if (!user) return 'Kullanım: /tkm taş|kağıt|makas';
+    if (user === cpu) return `Berabere — ${cpu}`;
+    if ((user==='taş'&&cpu==='makas')||(user==='kağıt'&&cpu==='taş')||(user==='makas'&&cpu==='kağıt'))
+      return `Kazandın 🎉 Bot: ${cpu}`;
+    return `Kaybettin 😅 Bot: ${cpu}`;
   }
 
-  // Hafızadan bazen geri dön
-  if (state.memory.length > 5 && Math.random() < 0.3) {
-    const old = state.memory.filter(m => m.startsWith('user:')).map(m => m.slice(5));
-    if (old.length) {
-      const recall = old[Math.floor(Math.random() * old.length)];
-      return `Bunu hatırlıyorum: "${recall}" 🧠`;
-    }
+  if (state.isEnergy()) {
+    const list = ['⚡ Dalga yayıldı.','Enerji tınısı hissediliyor.','Matrix akışı seninle.'];
+    return list[Math.floor(Math.random()*list.length)];
   }
 
-  const responses = [
-    'İlginç, devam et biraz daha anlat.',
-    'Hımm... anladım.',
-    'Gerçekten mi?',
-    'Bunu düşünmemiştim!',
-  ];
-  return responses[Math.floor(Math.random() * responses.length)];
+  if (/merhaba|selam/.test(t)) return 'Selam! Nasılsın bugün?';
+  if (/nasılsın/.test(t)) return 'Ben iyiyim, sen nasılsın?';
+  if (/görüşürüz|bay/.test(t)) return 'Görüşürüz! ⚡';
+  return ['Hmm... ilginç.','Devam et, dinliyorum.','Bunu biraz açar mısın?'][Math.floor(Math.random()*3)];
 }
