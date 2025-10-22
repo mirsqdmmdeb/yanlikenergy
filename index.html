@@ -1,47 +1,28 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Yanlik 2.1 (Leopar) </title>
-  <meta name="description" content="Yanlik 2.1 — Lacivert neon temalı sohbet arayüzü.">
-  <link rel="stylesheet" href="./style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yanlik 2.5 - Sohbet</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header class="topbar">
-    <h1>Yanlik <span class="badge">2.2</span></h1>
-    <div class="controls">
-      <label class="switch"><input id="energy-toggle" type="checkbox"><span>Energy</span></label>
-      <select id="theme-select">
-        <option value="lacivert">Lacivert Neon</option>
-        <option value="mavi">Mavi Neon</option>
-        <option value="mor">Mor Neon</option>
-        <option value="yesil">Yeşil Neon</option>
-        <option value="kirmizi">Kırmızı Neon</option>
-      </select>
-      <label class="speed-label">Hız <input id="speed-range" type="range" min="1" max="20" step="1"></label>
-      <button id="save-chat">💾 Sohbeti Kaydet</button>
-      <button id="clear-memory">🧹 Hafızayı Temizle</button>
-    </div>
-  </header>
+<nav>
+    <a href="index.html" class="active" data-i18n="nav_chat">Sohbet</a>
+    <a href="settings.html" data-i18n="nav_settings">Ayarlar</a>
+    <a href="about.html" data-i18n="nav_about">Hakkında</a>
+    <a href="updates.html" data-i18n="nav_updates">Güncellemeler</a>
+    <a href="language.html" data-i18n="nav_language">Dil</a>
+</nav>
 
-  <main class="container">
-    <section class="chat-panel">
-      <div id="chat-box" class="chat-box"></div>
-      <div id="typing-indicator" class="typing" style="display:none"></div>
-      <div class="composer">
-        <input id="user-input" placeholder="Mesajını yaz..." aria-label="Mesaj">
-        <button id="send-btn">Gönder</button>
-      </div>
-    </section>
-    <aside class="about-panel">
-      <h2>Hakkında</h2>
-      <p>Yanlik 2.1 — lacivert neon ana tema, hız ayarı ve sohbet kaydetme özelliğiyle.</p>
-    </aside>
-  </main>
+<div id="chat-box" class="card" style="height:400px; overflow-y:auto;"></div>
 
-  <footer class="site-footer">© 2025 mirsqdmmdevs</footer>
+<div class="card">
+    <input type="text" id="user-input" placeholder="Mesaj yaz...">
+    <button onclick="sendMessage()">Gönder</button>
+    <button onclick="clearHistory()">Temizle</button>
+</div>
 
-  <script type="module" src="./main.js" defer></script>
+<script src="main.js"></script>
 </body>
 </html>
