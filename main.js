@@ -25,6 +25,7 @@ function loadLang(lang) {
     localStorage.setItem('yanlik-lang', lang);
 }
 
+// Sayfa yüklendiğinde dil uygula
 document.addEventListener('DOMContentLoaded', () => {
     const savedLang = localStorage.getItem('yanlik-lang') || 'tr';
     loadLang(savedLang);
@@ -41,4 +42,25 @@ function addMessage(sender, text) {
     chatBox.appendChild(msg);
     chatBox.scrollTop = chatBox.scrollHeight;
     chatHistory.push({sender, text});
+}
+
+// ===== Gönder Fonksiyonu =====
+function sendMessage() {
+    const input = document.getElementById('user-input');
+    const text = input.value.trim();
+    if(!text) return;
+    addMessage('Sen', text);
+    input.value = '';
+
+    addMessage('Yanlik', 'Düşünüyor...');
+    setTimeout(() => {
+        addMessage('Yanlik', 'Selam! Ben Yanlik 2.5, Quantum Update öncesi sürüm 😎');
+    }, 1000);
+}
+
+// ===== Geçmiş Temizleme =====
+function clearHistory() {
+    chatHistory = [];
+    const chatBox = document.getElementById('chat-box');
+    chatBox.innerHTML = '';
 }
