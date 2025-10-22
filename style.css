@@ -2,21 +2,22 @@
 body {
     margin: 0;
     font-family: 'Segoe UI', sans-serif;
-    background: #f0f0f0;
-    color: #111;
+    background: #111;
+    color: #f0f0f0;
+    transition: background 0.3s, color 0.3s;
 }
 
-/* ===== Cam / Glassmorphism Kart ===== */
+/* ===== Cam Kart ===== */
 .card {
     backdrop-filter: blur(10px);
-    background: rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.05);
     border-radius: 20px;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
     padding: 20px;
-    margin: 20px;
+    margin: 20px 0;
 }
 
-/* ===== Menü Sekmeleri ===== */
+/* ===== Menü ===== */
 nav {
     display: flex;
     justify-content: center;
@@ -27,12 +28,13 @@ nav {
 
 nav a {
     text-decoration: none;
-    color: #111;
+    color: #0ff;
     font-weight: bold;
+    transition: color 0.3s;
 }
 
 nav a.active {
-    color: #0ff;
+    text-shadow: 0 0 8px #0ff;
 }
 
 /* ===== Buton ===== */
@@ -44,13 +46,22 @@ button {
     background: #0ff;
     color: #111;
     font-weight: bold;
+    transition: 0.3s;
 }
 
 button:hover {
     background: #0cc;
 }
 
-/* ===== Tema Renkleri ===== */
+/* ===== Giriş Kutusu ===== */
+input[type="text"] {
+    padding: 10px;
+    border-radius: 10px;
+    border: none;
+    width: 70%;
+}
+
+/* ===== Temalar ===== */
 body.theme-blue { --main-color: #0ff; }
 body.theme-purple { --main-color: #a0f; }
 body.theme-green { --main-color: #0f0; }
@@ -58,3 +69,4 @@ body.theme-red { --main-color: #f00; }
 body.theme-gold { --main-color: #fc0; }
 
 .card { border: 2px solid var(--main-color); }
+nav a { color: var(--main-color); }
