@@ -1,248 +1,47 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="tr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Yanlik 2.1 (Leopar)</title>
-<style>
-:root {
-  --bg: #0b132b;
-  --text: #e0e0e0;
-  --accent: #00b4d8;
-  --bot: #1b263b;
-  --user: #2a3a5e;
-}
-body {
-  margin: 0;
-  font-family: 'Poppins', sans-serif;
-  background-color: var(--bg);
-  color: var(--text);
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-}
-header {
-  background-color: #000;
-  color: var(--accent);
-  text-align: center;
-  padding: 20px;
-  font-size: 1.8em;
-  letter-spacing: 1px;
-  border-bottom: 2px solid var(--accent);
-}
-nav {
-  display: flex;
-  justify-content: center;
-  background-color: #111;
-  border-bottom: 1px solid var(--accent);
-}
-nav button {
-  flex: 1;
-  padding: 15px;
-  background: none;
-  border: none;
-  color: var(--text);
-  font-size: 1em;
-  cursor: pointer;
-  transition: 0.3s;
-}
-nav button:hover, nav button.active {
-  background-color: var(--accent);
-  color: #000;
-}
-section {
-  flex: 1;
-  display: none;
-  padding: 20px;
-  overflow-y: auto;
-}
-section.active {
-  display: block;
-  animation: fadeIn 0.5s ease;
-}
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-/* Chat Bölümü */
-.chat-box {
-  background-color: var(--bot);
-  border: 1px solid var(--accent);
-  border-radius: 10px;
-  padding: 15px;
-  height: 400px;
-  overflow-y: auto;
-}
-.message {
-  margin: 10px 0;
-  padding: 10px 15px;
-  border-radius: 12px;
-  max-width: 75%;
-  animation: fadeIn 0.4s ease;
-}
-.user { background: var(--user); margin-left: auto; text-align: right; }
-.bot { background: var(--accent); color: #000; margin-right: auto; }
-.input-area {
-  margin-top: 10px;
-  display: flex;
-  gap: 10px;
-}
-input[type="text"] {
-  flex: 1;
-  padding: 10px;
-  border-radius: 8px;
-  border: none;
-  outline: none;
-}
-button.send-btn {
-  background-color: var(--accent);
-  color: #000;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: bold;
-}
-/* Ayarlar */
-.settings label {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin: 15px 0;
-  font-size: 1.1em;
-}
-.settings input, select {
-  transform: scale(1.2);
-}
-/* Hakkında */
-.about {
-  text-align: center;
-  margin-top: 50px;
-}
-.about h2 {
-  color: var(--accent);
-}
-.about p {
-  opacity: 0.8;
-}
-footer {
-  background: #000;
-  text-align: center;
-  padding: 10px;
-  border-top: 2px solid var(--accent);
-  font-size: 0.85em;
-  color: #aaa;
-}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Yanlik 2.1 (Leopar) </title>
+  <meta name="description" content="Yanlik 2.1 — Lacivert neon temalı sohbet arayüzü.">
+  <link rel="stylesheet" href="./style.css">
 </head>
 <body>
+  <header class="topbar">
+    <h1>Yanlik <span class="badge">2.2</span></h1>
+    <div class="controls">
+      <label class="switch"><input id="energy-toggle" type="checkbox"><span>Energy</span></label>
+      <select id="theme-select">
+        <option value="lacivert">Lacivert Neon</option>
+        <option value="mavi">Mavi Neon</option>
+        <option value="mor">Mor Neon</option>
+        <option value="yesil">Yeşil Neon</option>
+        <option value="kirmizi">Kırmızı Neon</option>
+      </select>
+      <label class="speed-label">Hız <input id="speed-range" type="range" min="1" max="20" step="1"></label>
+      <button id="save-chat">💾 Sohbeti Kaydet</button>
+      <button id="clear-memory">🧹 Hafızayı Temizle</button>
+    </div>
+  </header>
 
-<header>🦁 Yanlik 2.1 <span style="color:#888;">(Leopar)</span></header>
+  <main class="container">
+    <section class="chat-panel">
+      <div id="chat-box" class="chat-box"></div>
+      <div id="typing-indicator" class="typing" style="display:none"></div>
+      <div class="composer">
+        <input id="user-input" placeholder="Mesajını yaz..." aria-label="Mesaj">
+        <button id="send-btn">Gönder</button>
+      </div>
+    </section>
+    <aside class="about-panel">
+      <h2>Hakkında</h2>
+      <p>Yanlik 2.1 — lacivert neon ana tema, hız ayarı ve sohbet kaydetme özelliğiyle.</p>
+    </aside>
+  </main>
 
-<nav>
-  <button class="active" onclick="showTab('chat')">💬 Sohbet</button>
-  <button onclick="showTab('settings')">⚙️ Ayarlar</button>
-  <button onclick="showTab('about')">📘 Hakkında</button>
-</nav>
+  <footer class="site-footer">© 2025 mirsqdmmdevs</footer>
 
-<!-- Chat -->
-<section id="chat" class="active">
-  <div class="chat-box" id="chatBox">
-    <div class="message bot">Merhaba! Ben Yanlik 2.1 (Leopar). Sana nasıl yardımcı olabilirim?</div>
-  </div>
-  <div class="input-area">
-    <input type="text" id="userInput" placeholder="Mesajını yaz...">
-    <button class="send-btn" onclick="sendMessage()">Gönder</button>
-  </div>
-</section>
-
-<!-- Ayarlar -->
-<section id="settings" class="settings">
-  <label>
-    Tema:
-    <select id="themeSelect" onchange="changeTheme(this.value)">
-      <option value="default">Varsayılan (Lacivert)</option>
-      <option value="dark">Koyu</option>
-      <option value="light">Açık</option>
-    </select>
-  </label>
-  <label>
-    Ses Efektleri:
-    <input type="checkbox" id="soundToggle" checked>
-  </label>
-</section>
-
-<!-- Hakkında -->
-<section id="about" class="about">
-  <h2>Yanlik 2.1 (Leopar)</h2>
-  <p>Bu sürüm, sade nostaljiyi modern animasyonlarla birleştirir.<br>
-  Geliştirici: <strong>mirsqdmmdevs</strong></p>
-  <p>✨ Özellikler: Gecikmeli cevap, otomatik yanıtlar, tema, ses efektleri.</p>
-</section>
-
-<footer>&copy; 2025 Yanlik. Tüm hakları saklıdır.</footer>
-
-<script>
-function showTab(id){
-  document.querySelectorAll("section").forEach(s => s.classList.remove("active"));
-  document.querySelectorAll("nav button").forEach(b => b.classList.remove("active"));
-  document.getElementById(id).classList.add("active");
-  event.target.classList.add("active");
-}
-
-const chatBox = document.getElementById('chatBox');
-const input = document.getElementById('userInput');
-const soundToggle = document.getElementById('soundToggle');
-const emojis = ["😎","🤔","😏","🌞","🧐","🎉","😄","👍","📝"];
-let memory = [];
-
-// 🔊 Ses Efektleri
-const sendSound = new Audio("https://cdn.pixabay.com/audio/2022/03/15/audio_ba5b8f7a3e.mp3");
-const replySound = new Audio("https://cdn.pixabay.com/audio/2022/03/09/audio_7b4f0b5e4d.mp3");
-
-function playSound(type){
-  if(!soundToggle.checked) return;
-  (type === "send" ? sendSound : replySound).play().catch(()=>{});
-}
-
-function sendMessage(){
-  const text = input.value.trim();
-  if(!text) return;
-  addMessage(text, "user");
-  playSound("send");
-  input.value = "";
-
-  setTimeout(()=>{
-    const response = getResponse(text);
-    addMessage(response, "bot");
-    playSound("reply");
-  }, 1000 + Math.random()*1500);
-}
-
-function addMessage(text, type){
-  const msg = document.createElement("div");
-  msg.className = `message ${type}`;
-  msg.textContent = text;
-  chatBox.appendChild(msg);
-  chatBox.scrollTo({top:chatBox.scrollHeight, behavior:'smooth'});
-}
-
-function getResponse(text){
-  text = text.toLowerCase();
-  memory.push(text);
-  if(text.includes("energy")) return "😿 Ah... Energy aklıma geldi... Çok özledik onu 💔";
-  if(text.includes("merhaba")) return "Selam! Nasılsın? "+emojis[Math.floor(Math.random()*emojis.length)];
-  if(text.includes("hava")) return "Bugün havalar tam Leopar havası 🌤️";
-  if(text.includes("oyun")) return "Oyunlar? Hadi biraz eğlenelim 🎮";
-  return ["Hadi biraz daha konuşalım 😄","İlginç dedin, anlat biraz daha!","Hmm... bunu sevdim 🤔"][Math.floor(Math.random()*3)];
-}
-
-function changeTheme(theme){
-  if(theme==="dark"){ document.body.style.background="#000"; document.body.style.color="#eee";}
-  else if(theme==="light"){ document.body.style.background="#f5f5f5"; document.body.style.color="#111";}
-  else { document.body.style.background="#0b132b"; document.body.style.color="#e0e0e0";}
-}
-</script>
-
+  <script type="module" src="./main.js" defer></script>
 </body>
 </html>
