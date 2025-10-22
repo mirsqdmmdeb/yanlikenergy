@@ -1,65 +1,44 @@
-import { bindUI, renderMessage, botReplySimulate, yanlikState } from "./chat.js";
+// ===== Tema Sistemi =====
+function setTheme(theme) {
+    document.body.className = `theme-${theme}`;
+    localStorage.setItem('yanlik-theme', theme);
+}
 
-document.addEventListener("DOMContentLoaded",()=>{
-  const chatBox=document.getElementById("chat-box");
-  const input=document.getElementById("user-input");
-  const sendBtn=document.getElementById("send-btn");
-  const typingEl=document.getElementById("typing-indicator");
-  const themeSelect=document.getElementById("theme-select");
-  const clearBtn=document.getElementById("clear-memory");
-  const energyToggle=document.getElementById("energy-toggle");
-  const speedRange=document.getElementById("speed-range");
-  const saveBtn=document.getElementById("save-chat");
-
-  bindUI({chatBoxEl:chatBox,inputEl:input,sendBtnEl:sendBtn,typingEl});
-
-  // Load theme & energy & delay
-  const savedTheme=localStorage.getItem("yanlik_theme")||"lacivert";
-  document.documentElement.setAttribute("data-theme",savedTheme);
-  themeSelect.value=savedTheme;
-  energyToggle.checked=yanlikState.isEnergy();
-  speedRange.value=yanlikState.delay;
-
-  function sendText(){
-    const text=input.value.trim();
-    if(!text) return;
-    renderMessage("user",text);
-    input.value="";
-    botReplySimulate(text);
-  }
-
-  sendBtn.addEventListener("click",sendText);
-  input.addEventListener("keydown",e=>{if(e.key==="Enter")sendText();});
-
-  themeSelect.addEventListener("change",e=>{
-    const t=e.target.value;
-    document.documentElement.setAttribute("data-theme",t);
-    localStorage.setItem("yanlik_theme",t);
-  });
-
-  clearBtn.addEventListener("click",()=>{
-    if(confirm("Hafızayı sıfırlamak istiyor musun?")){
-      yanlikState.clearMemory(); location.reload();
-    }
-  });
-
-  energyToggle.addEventListener("change",e=>{
-    yanlikState.setEnergy(e.target.checked);
-  });
-
-  speedRange.addEventListener("input",e=>{
-    const val=e.target.value;
-    yanlikState.setDelay(val);
-  });
-
-  saveBtn.addEventListener("click",()=>{
-    const mem=yanlikState.getMemory().join("\\n");
-    const blob=new Blob([mem],{type:"text/plain"});
-    const a=document.createElement("a");
-    a.href=URL.createObjectURL(blob);
-    a.download="yanlik_chat.txt";
-    a.click();
-  });
-
-  renderMessage("bot","Merhaba! Yanlik 2.1 (Leopar) başlatıldı ⚡");
+// Yüklendiğinde kayıtlı temayı uygula
+document.addEventListener('DOMContentLoaded', () => {
+    const savedTheme = localStorage.getItem('yanlik-theme') || 'blue';
+    setTheme(savedTheme);
 });
+
+// ===== Dil Sistemi =====
+let currentLang = 'tr';
+function loadLang(lang) {
+    fetch(`lang_${lang}.json`)
+        .then(res => res.json())
+        .then(data => {
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if(data[key]) el.innerText = data[key];
+            });
+        });
+    currentLang = lang;
+    localStorage.setItem('yanlik-lang', lang);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const savedLang = localStorage.getItem('yanlik-lang') || 'tr';
+    loadLang(savedLang);
+});
+
+// ===== Mesaj Sistemi =====
+let chatHistory = [];
+
+function addMessage(sender, text) {
+    const chatBox = document.getElementById('chat-box');
+    const msg = document.createElement('div');
+    msg.className = 'card';
+    msg.innerHTML = `<strong>${sender}:</strong> ${text}`;
+    chatBox.appendChild(msg);
+    chatBox.scrollTop = chatBox.scrollHeight;
+    chatHistory.push({sender, text});
+}
