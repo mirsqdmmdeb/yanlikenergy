@@ -1,0 +1,15 @@
+{
+    "nav_chat": "Chat",
+    "nav_settings": "Einstellungen",
+    "nav_about": "Über",
+    "nav_updates": "Updates",
+    "nav_language": "Sprache",
+    "theme_blue": "Blau Neon",
+    "theme_purple": "Lila Rauch",
+    "theme_green": "Grün Cyber",
+    "theme_red": "Rot Spannung",
+    "theme_gold": "Goldenes Licht",
+    "send_button": "Senden",
+    "clear_button": "Löschen",
+    "chat_placeholder": "Nachricht eingeben..."
+}
