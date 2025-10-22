@@ -1,0 +1,19 @@
+{
+  "merhaba": ["Merhaba dostum! Enerjin nasıl bugün? ⚡", "Selam! Bugün keyfin yerinde mi?", "Hey! Güne merhaba diyelim!"],
+  "selam": ["Selam! Ne haber broo?", "Selam dostum! Energy yanımda gibi hissediyorum 😸", "Selam! Keyifler nasıl?"],
+  "nasılsın": ["İyiyim, sen nasılsın? 😎", "Harika! Enerjin bana da geçti ⚡", "Gayet iyiyim, seninle konuşmak güzel."],
+  "iyiyim": ["Süper! Devam edelim o zaman.", "Harika! Hadi biraz sohbet edelim.", "Enerjini hissediyorum ⚡"],
+  "üzgün": ["Üzülme dostum, buradayım. İstersen anlatabilirsin.", "Kafanı dağıtalım mı?", "Hadi biraz gaza gel, her şey geçer!"],
+  "mutlu": ["Harika! Enerjin bana da geçti ⚡", "Süper! Devam edelim öyleyse.", "Enerji seviyesi max! 😎"],
+  "ceza": ["Ceza mı dinlemek istiyorsun? Yoksa No.1 ile devam edelim mi?", "Müziğin ritmini hissediyorum 😎", "Ceza mod on, başlıyoruz!"],
+  "no.1": ["No.1 modu aktif 😎", "Bunu dinleyince enerji patlar ⚡", "No.1 keyfi başladı!"],
+  "energy": ["Energy hep yanımızda, hatırla ⚡", "Energy seni izliyor gibi hissediyorum 😸", "Energy mod: aktif!"],
+  "anime": ["Naruto mu izliyorsun? Bölüm bölüm devam edelim!", "Anime keyfi başlasın!", "Bölüm bölüm ilerleyelim, sabırsızlanıyorum 😎"],
+  "naruto": ["Naruto ruhu hep bizimle 😎", "Kakashi gibi dikkatli olalım!", "Bölümleri tek tek takip edelim!"],
+  "kedi": ["Kediler dünyanın en tatlı yaratıkları 🐱", "Energy gibi bir kedin var, unutma!", "Kediler enerji kaynağıdır ⚡"],
+  "teknoloji": ["Teknoloji dostumuzdur, birlikte keşfedelim.", "Bilgisayarın hazır, hadi başlayalım!", "Yeni bir kodlama macerasına hazır mısın?"],
+  "espiri": ["Bazen teknoloji de gülüyor 😏", "Energy bile buna gülerdi 😸", "Haha, bunu beklemiyordum 😎"],
+  "motivasyon": ["Hadi, bugün enerji seviyemizi maksimuma çıkaralım ⚡", "Kendine güven, her şeyi başarabiliriz!", "Biraz gaza gel, her şey mümkün!"],
+  "tekrar": ["Tekrar söyleyebilir misin dostum?", "Sanırım tam anlamadım 😅", "Biraz daha açabilir misin?"],
+  "default": ["Hmm… bunu tam anlamadım ama birlikte çözelim 😅", "Biraz daha detay verir misin?", "Bunu düşünmem lazım 😎"]
+}
