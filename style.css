@@ -1,23 +1,29 @@
-/* ===== Genel Stil ===== */
+/* ===== Yanlik 2.5 Full Cam & Neon ===== */
 body {
     margin: 0;
     font-family: 'Segoe UI', sans-serif;
     background: #111;
     color: #f0f0f0;
-    transition: background 0.3s, color 0.3s;
+    transition: background 0.5s, color 0.5s;
 }
 
-/* ===== Cam Kart ===== */
+/* Cam Kart */
 .card {
-    backdrop-filter: blur(10px);
-    background: rgba(255,255,255,0.05);
-    border-radius: 20px;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    backdrop-filter: blur(15px);
+    background: rgba(255,255,255,0.07);
+    border-radius: 25px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
     padding: 20px;
     margin: 20px 0;
+    border: 2px solid var(--main-color);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.5);
 }
 
-/* ===== Menü ===== */
+/* Menü */
 nav {
     display: flex;
     justify-content: center;
@@ -25,48 +31,62 @@ nav {
     padding: 10px;
     background: rgba(255,255,255,0.05);
 }
-
 nav a {
     text-decoration: none;
-    color: #0ff;
+    color: var(--main-color);
     font-weight: bold;
-    transition: color 0.3s;
+    transition: text-shadow 0.3s;
 }
-
 nav a.active {
-    text-shadow: 0 0 8px #0ff;
+    text-shadow: 0 0 15px var(--main-color), 0 0 30px var(--main-color);
 }
 
-/* ===== Buton ===== */
+/* Butonlar & Input */
 button {
     padding: 10px 20px;
     border: none;
     border-radius: 10px;
     cursor: pointer;
-    background: #0ff;
+    background: var(--main-color);
     color: #111;
     font-weight: bold;
     transition: 0.3s;
 }
-
 button:hover {
-    background: #0cc;
+    transform: scale(1.05);
+    box-shadow: 0 0 20px var(--main-color);
 }
-
-/* ===== Giriş Kutusu ===== */
 input[type="text"] {
     padding: 10px;
     border-radius: 10px;
     border: none;
     width: 70%;
 }
+input:focus {
+    outline: none;
+    border: 2px solid var(--main-color);
+    box-shadow: 0 0 10px var(--main-color);
+}
 
-/* ===== Temalar ===== */
+/* Temalar */
 body.theme-blue { --main-color: #0ff; }
 body.theme-purple { --main-color: #a0f; }
 body.theme-green { --main-color: #0f0; }
 body.theme-red { --main-color: #f00; }
 body.theme-gold { --main-color: #fc0; }
 
-.card { border: 2px solid var(--main-color); }
-nav a { color: var(--main-color); }
+/* Mesaj Balonları */
+.msg-user { background: rgba(0,255,255,0.2); border-left: 3px solid #0ff; }
+.msg-yanlik { background: rgba(255,255,255,0.1); border-left: 3px solid #fc0; }
+
+/* Başlık Neon Flicker */
+h1 {
+    color: var(--main-color);
+    text-shadow: 0 0 5px var(--main-color), 0 0 10px var(--main-color);
+    animation: neon-flicker 1.5s infinite alternate;
+}
+@keyframes neon-flicker {
+    0% { text-shadow: 0 0 5px var(--main-color);}
+    50% { text-shadow: 0 0 20px var(--main-color);}
+    100% { text-shadow: 0 0 10px var(--main-color);}
+}
