@@ -3,88 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>404 | Yanlik 2.1 (Leopar)</title>
-<style>
-:root {
-  --bg: #0b132b;
-  --text: #f1f1f1;
-  --accent: #00b4d8;
-}
-body {
-  margin: 0;
-  font-family: 'Poppins', sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-  overflow: hidden;
-}
-.glow {
-  font-size: 4em;
-  color: var(--accent);
-  text-shadow: 0 0 10px var(--accent), 0 0 20px var(--accent);
-  animation: pulse 2s infinite;
-}
-@keyframes pulse {
-  0% { text-shadow: 0 0 5px var(--accent); }
-  50% { text-shadow: 0 0 25px var(--accent), 0 0 50px var(--accent); }
-  100% { text-shadow: 0 0 5px var(--accent); }
-}
-.message {
-  margin-top: 20px;
-  font-size: 1.3em;
-  opacity: 0.85;
-}
-.hint {
-  margin-top: 40px;
-  font-size: 0.9em;
-  color: #aaa;
-}
-.overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(11, 19, 43, 0.9);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  z-index: 10;
-  backdrop-filter: blur(8px);
-  transition: opacity 0.8s ease;
-}
-.fade-out {
-  opacity: 0;
-  pointer-events: none;
-}
-</style>
+<title>Yanlik 2.5 - 404</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-<div class="overlay" id="oops-overlay">
-  <h1 class="glow">404</h1>
-  <div class="message">Oops! Sayfa bulunamadı 😅</div>
-  <div class="hint">Sayfanın herhangi bir yerine tıkla, sohbet devam etsin 💬</div>
+<div class="card" style="text-align:center; margin-top:100px;">
+    <h1>404</h1>
+    <p>Sayfa bulunamadı 😿</p>
+    <button onclick="window.location.href='index.html'">Ana Sayfa</button>
 </div>
-
-<script>
-// 🦁 Yanlik 2.1 - Leopar 404 sistemi
-document.addEventListener("click", () => {
-  const overlay = document.getElementById("oops-overlay");
-  if (!overlay.classList.contains("fade-out")) {
-    overlay.classList.add("fade-out");
-    setTimeout(() => {
-      overlay.style.display = "none";
-      console.log("✅ 404 ekranı kapatıldı, sohbet aktif.");
-    }, 800);
-  }
-});
-</script>
-
 </body>
 </html>
