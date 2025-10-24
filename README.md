@@ -1,5 +1,4 @@
 # yanlikenergy
-Yanlik
 Yanlik, mirsqdmmdevs’in kişisel yapay zekasıdır. Sana sohbet ederken yardımcı olur, fikirlerini paylaşır, merakını tetikler ve bazen de esprili yanıtlar verir.
 
 Özellikler
