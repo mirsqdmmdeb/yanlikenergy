@@ -1,30 +1,23 @@
 <!DOCTYPE html>
-<html lang="tr" data-theme="dark">
+<html lang="tr" data-theme="neon-blue">
 <head>
   <meta charset="utf-8" />
-  <title>Yanlik v2 • Hızlı Yapay Zeka Sohbet</title>
+  <title>Yanlik v2 •  </title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="Yanlik v2: hızlı, sade ve offline çalışan yapay zeka sohbet arayüzü (API gerektirmez)." />
-  <link rel="manifest" href="./manifest.json">
+  <meta name="description" content="Neon mavi/altın temalı, sekmeli, gelişmiş konuşma arayüzü. API gerektirmez." />
+  <link rel="manifest" href="./manifest.json" />
   <meta name="theme-color" content="#0f172a" />
   <meta http-equiv="Content-Security-Policy"
-        content="default-src 'self';
-                 script-src 'self' 'unsafe-inline';
-                 style-src 'self' 'unsafe-inline';
-                 img-src 'self' data:;
-                 connect-src 'self';
-                 font-src 'self'">
-
+        content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; font-src 'self'">
   <link rel="stylesheet" href="./style.css" />
 </head>
 <body>
   <div class="app">
-    <!-- Sol: Konuşmalar -->
+
+    <!-- Sol panel (isteğe bağlı konuşma listesi kalsın) -->
     <aside class="sidebar">
       <div class="brand">
-        <div class="dot"></div>
-        <strong>Yanlik</strong>
-        <span class="badge">v2</span>
+        <div class="dot"></div><strong>Yanlik</strong><span class="badge">neon</span>
       </div>
       <button id="newChatBtn" class="btn block">+ Yeni konuşma</button>
       <div id="threadList" class="threads" aria-label="Konuşmalar"></div>
@@ -35,25 +28,43 @@
       </div>
     </aside>
 
-    <!-- Sağ: İçerik -->
     <section class="main">
+      <!-- SEKME ŞERİDİ -->
+      <div class="tabs" id="tabBar" role="tablist" aria-label="Sekmeler">
+        <button id="addTabBtn" class="tab add" title="Yeni sekme">＋</button>
+      </div>
+
+      <!-- ÜST BAR -->
       <header class="topbar">
         <div class="title">
           <h1 id="threadTitle">Yeni Konuşma</h1>
           <small id="statusPill" class="pill">● Hazır</small>
         </div>
         <div class="actions">
-          <button id="settingsOpen" class="btn ghost">Ayarlar</button>
-          <a href="./settings.html" class="btn ghost">Sayfaya Git</a>
+          <div class="search">
+            <input id="searchInput" type="search" placeholder="Mesajlarda ara…" />
+          </div>
+          <button id="settingsOpen" class="btn ghost" onclick="location.href='./settings.html'">Ayarlar</button>
         </div>
       </header>
 
+      <!-- ÖNERİ ÇİPLERİ -->
+      <div class="suggest">
+        <button class="chip" data-suggest="/help">/help</button>
+        <button class="chip" data-suggest="özetle">Özetle</button>
+        <button class="chip" data-suggest="/calc 12*(3+4)/5">Hesap</button>
+        <button class="chip" data-suggest="tema neon-altın yap">Tema: Neon Altın</button>
+      </div>
+
+      <!-- Sohbet -->
       <div id="chatList" class="chat" aria-live="polite"></div>
       <div id="typing" class="typing" style="display:none;">Yazıyor…</div>
 
+      <!-- Composer -->
       <footer class="composer">
         <textarea id="messageInput" placeholder="Mesaj yazın…"></textarea>
         <div class="composer-actions">
+          <button id="multiSelBtn" class="btn ghost" title="Çoklu seçim">Seç</button>
           <button id="clearBtn" class="btn ghost" title="Konuşmayı temizle">Temizle</button>
           <button id="sendBtn" class="btn primary">Gönder</button>
         </div>
@@ -62,67 +73,7 @@
     </section>
   </div>
 
-  <!-- Ayarlar Modal (hızlı erişim) -->
-  <dialog id="settingsModal" class="modal">
-    <form method="dialog" class="card">
-      <header class="modal-head">
-        <strong>Ayarlar</strong>
-        <button class="btn icon" id="settingsClose" aria-label="Kapat">✕</button>
-      </header>
-      <div class="grid">
-        <label class="field">
-          <span>Tema</span>
-          <select id="m_theme">
-            <option value="system">Sistem</option>
-            <option value="light">Açık</option>
-            <option value="dark">Koyu</option>
-          </select>
-        </label>
-        <label class="field">
-          <span>Dil</span>
-          <select id="m_language">
-            <option value="tr">Türkçe</option>
-            <option value="en">English</option>
-            <option value="de">Deutsch</option>
-          </select>
-        </label>
-        <label class="field switch">
-          <input id="m_memory" type="checkbox" />
-          <span>Konuşmaları hatırla</span>
-        </label>
-        <label class="field switch">
-          <input id="m_typingIndicator" type="checkbox" />
-          <span>Yazma göstergesi</span>
-        </label>
-        <label class="field switch">
-          <input id="m_sendSound" type="checkbox" />
-          <span>Gönderme sesi</span>
-        </label>
-        <label class="field">
-          <span>Gönderme</span>
-          <select id="m_sendBehavior">
-            <option value="enter">Enter → Gönder</option>
-            <option value="ctrlenter">Ctrl+Enter → Gönder</option>
-          </select>
-        </label>
-        <label class="field">
-          <span>Yaratıcılık (0–1)</span>
-          <input id="m_temperature" type="range" min="0" max="1" step="0.05" />
-        </label>
-        <label class="field">
-          <span>Sistem mesajı</span>
-          <textarea id="m_systemPrompt" rows="3" placeholder="Opsiyonel"></textarea>
-        </label>
-      </div>
-      <footer class="modal-foot">
-        <button id="m_reset" class="btn ghost" value="cancel">Varsayılan</button>
-        <button id="m_save" class="btn primary" value="default">Kaydet</button>
-      </footer>
-    </form>
-  </dialog>
-
   <script src="./state.js"></script>
-  <script src="./i18n.js"></script>
   <script src="./chat.js"></script>
   <script>
     if ('serviceWorker' in navigator) {
