@@ -1,18 +1,45 @@
-export class YanlikState {
-  constructor(){
-    this.memory = JSON.parse(localStorage.getItem('yanlik_memory') || '[]');
-    this.energy = JSON.parse(localStorage.getItem('yanlik_energy') || 'false');
-    this.delay = Number(localStorage.getItem('yanlik_delay') || 5);
+(function () {
+  const SETTINGS_KEY = "yanlik.settings";
+  const DEFAULTS = {
+    theme: "system",
+    language: "tr",
+    memory: true,
+    typingIndicator: true,
+    sendSound: false,
+    sendBehavior: "enter",
+    temperature: 0.7,
+    systemPrompt: ""
+  };
+
+  function safeRead() {
+    try {
+      const raw = localStorage.getItem(SETTINGS_KEY);
+      return raw ? { ...DEFAULTS, ...JSON.parse(raw) } : { ...DEFAULTS };
+    } catch {
+      return { ...DEFAULTS };
+    }
   }
-  remember(role,line){
-    this.memory.push(`${role}:${line}`);
-    if(this.memory.length>1000) this.memory.shift();
-    localStorage.setItem('yanlik_memory', JSON.stringify(this.memory));
+
+  let settings = safeRead();
+  const listeners = new Set();
+
+  function setSettings(next) {
+    settings = { ...settings, ...next };
+    try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)); } catch {}
+    listeners.forEach(fn => { try { fn(settings); } catch {} });
   }
-  clearMemory(){ this.memory=[]; localStorage.removeItem('yanlik_memory'); }
-  getMemory(){ return this.memory; }
-  setEnergy(v){ this.energy=v; localStorage.setItem('yanlik_energy', JSON.stringify(v)); }
-  isEnergy(){ return !!this.energy; }
-  setDelay(v){ this.delay=v; localStorage.setItem('yanlik_delay', String(v)); }
-  getDelayMs(){ return Math.max(1,this.delay)*100; }
-}
+  function onSettingsChange(fn) {
+    listeners.add(fn);
+    return () => listeners.delete(fn);
+  }
+
+  window.__yanlik = window.__yanlik || {};
+  window.__yanlik.getSettings = () => settings;
+  window.__yanlik.setSettings = setSettings;
+  window.__yanlik.onSettingsChange = onSettingsChange;
+
+  // ilk açılışta temayı uygula
+  const sysDark = window.matchMedia?.("(prefers-color-scheme: dark)").matches;
+  const isDark = settings.theme === "dark" || (settings.theme === "system" && sysDark);
+  document.documentElement.setAttribute("data-theme", isDark ? "dark" : "light");
+})();
