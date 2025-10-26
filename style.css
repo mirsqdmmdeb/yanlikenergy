@@ -1,35 +1,325 @@
-/* === Sekme şeridi === */
-.tabs{display:flex; gap:6px; padding:8px 10px; border-bottom:1px solid var(--border); overflow:auto; background:transparent; position:sticky; top:0; z-index:15}
+/* =========================================================
+   Yanlik • Modern Neon UI v3
+   - Neon Blue / Neon Gold temaları korunur
+   - Akışkan tipografi, cam efekt, modern boşluklar
+   - Sekmeler, arama, mesaj kartları, modallar güncellendi
+   - Erişilebilir focus visible + reduce-motion desteği
+   ========================================================= */
+
+/* 1) Temel tasarım değişkenleri */
+:root{
+  /* Tipografi */
+  --font-sans: system-ui, Segoe UI, Roboto, Ubuntu, "Helvetica Neue", Arial;
+  --text-base: clamp(14px, 0.9vw + 10px, 16px);
+  --text-sm: 0.92rem;
+  --text-xs: 0.84rem;
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 18px;
+
+  /* Işık/Gölge */
+  --shadow-soft: 0 1px 0 rgba(255,255,255,.06), 0 6px 20px rgba(0,0,0,.35);
+  --shadow-lift: 0 10px 30px rgba(0,0,0,.45);
+  --shadow-inset: inset 0 0 0 1px rgba(255,255,255,.06);
+
+  /* Renkler (varsayılan koyu) */
+  --bg: #0a0f17;
+  --fg: #e7ecff;
+  --muted: #9fb0ffcc;
+  --panel: #0e1420cc;
+  --border: #1a2540;
+  --primary: #5aa8ff;
+  --primary-ink: #051327;
+  --accent: #0ef;
+  --glow: 0 0 8px #3aa0ff, 0 0 24px #3aa0ff88, 0 0 48px #3aa0ff55;
+
+  /* Spacing scale */
+  --sp-1: 6px;  --sp-2: 10px; --sp-3: 14px; --sp-4: 18px;
+  --sp-5: 24px; --sp-6: 32px; --sp-7: 44px;
+
+  /* Komponent yükseklikleri */
+  --h-input: 42px;
+  --h-button: 40px;
+
+  /* Geçişler */
+  --ease: cubic-bezier(.22,.9,.24,1);
+  --t-fast: .16s; --t-norm: .22s; --t-slow: .35s;
+
+  /* Scrollbar */
+  --scroll-track: rgba(255,255,255,.06);
+  --scroll-thumb: rgba(255,255,255,.18);
+}
+
+/* Açık tema (isteğe bağlı) */
+[data-theme="light"]{
+  --bg:#f6f8ff;
+  --fg:#0a0f17;
+  --muted:#42507a;
+  --panel:#ffffffcc;
+  --border:#dfe6ff;
+  --primary:#2b6cff;
+  --primary-ink:#ffffff;
+  --accent:#3a7bff;
+  --glow: 0 0 0 transparent;
+}
+
+/* NEON MAVİ */
+[data-theme="neon-blue"]{
+  --bg: radial-gradient(1200px 800px at 15% 10%, #05142a, #070b12 60%, #05060a 100%);
+  --fg: #e9f2ff;
+  --muted: #9bbcff;
+  --panel: rgba(6,14,26,.72);
+  --border: #163059;
+  --primary: #22b4ff;
+  --primary-ink: #02111f;
+  --accent: #05edff;
+  --glow: 0 0 10px #22b4ff, 0 0 28px #22b4ff88, 0 0 72px #22b4ff55;
+}
+
+/* NEON ALTIN */
+[data-theme="neon-gold"]{
+  --bg: radial-gradient(1200px 800px at 85% 10%, #1b0f02, #0b0803 60%, #060403 100%);
+  --fg: #ffeec9;
+  --muted: #ffd99a;
+  --panel: rgba(23,12,2,.78);
+  --border: #4a2d06;
+  --primary: #ffbf3b;
+  --primary-ink: #1d1202;
+  --accent: #ff9f1a;
+  --glow: 0 0 10px #ffbf3b, 0 0 30px #ffbf3b88, 0 0 80px #ffbf3b55;
+}
+
+/* 2) Global reset & temel stiller */
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0; color:var(--fg); background:var(--bg); background-attachment:fixed;
+  font: var(--text-base)/1.6 var(--font-sans);
+  -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+}
+a{color:var(--primary); text-decoration:none}
+a:hover{ text-decoration: underline; text-underline-offset: 3px; }
+
+::selection{ background: rgba(90,168,255,.28); }
+
+@media (prefers-reduced-motion: reduce){
+  *{ animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
+}
+
+/* Scrollbar */
+*::-webkit-scrollbar{ width:10px; height:10px }
+*::-webkit-scrollbar-track{ background: transparent }
+*::-webkit-scrollbar-thumb{ background: var(--scroll-thumb); border-radius:999px; border:2px solid transparent; background-clip: padding-box }
+*::-webkit-scrollbar-thumb:hover{ background: rgba(255,255,255,.28) }
+
+/* 3) Uygulama iskeleti */
+.app{
+  display:grid; grid-template-columns: 280px 1fr; min-height:100vh;
+}
+
+/* 4) Sidebar (glass + derinlik) */
+.sidebar{
+  backdrop-filter: blur(16px) saturate(1.12);
+  background: var(--panel);
+  border-right: 1px solid var(--border);
+  display:flex; flex-direction:column; padding: var(--sp-3);
+  box-shadow: var(--shadow-inset);
+}
+.brand{
+  display:flex; align-items:center; gap:10px; margin-bottom: var(--sp-2);
+}
+.brand .dot{
+  width:10px; height:10px; border-radius:50%; background:var(--primary); box-shadow: var(--glow);
+}
+.badge{
+  padding:2px 8px; border:1px solid var(--border); border-radius:999px; color:var(--muted); font-size: var(--text-xs);
+}
+
+/* 5) Butonlar */
+.btn{
+  border:0; border-radius: var(--radius-md); padding: 10px 12px; cursor:pointer;
+  transition: transform var(--t-fast) var(--ease), box-shadow var(--t-norm) var(--ease), background var(--t-fast);
+}
+.btn.block{ width:100% }
+.btn.primary{
+  background: var(--primary); color: var(--primary-ink); font-weight:700; box-shadow: var(--glow), var(--shadow-soft);
+}
+.btn.primary:hover{ transform: translateY(-1px) }
+.btn.ghost{
+  background: transparent; border:1px solid var(--border); color: var(--fg);
+}
+.btn.ghost:hover{ box-shadow: 0 0 0 2px rgba(255,255,255,.06) inset }
+.btn.subtle{ background: transparent; border:1px dashed var(--border); color: var(--muted) }
+.btn.icon{ background: transparent; color: var(--fg); padding: 6px 8px }
+.btn:disabled{ opacity:.5; cursor:not-allowed }
+
+/* 6) Konuşma listesi (sol) */
+.threads{ flex:1; overflow:auto; margin-top: var(--sp-2); display:flex; flex-direction:column; gap:6px }
+.thread{
+  display:flex; justify-content:space-between; align-items:center; gap:8px;
+  border:1px solid var(--border); border-radius: var(--radius-md); padding: 8px 10px;
+  background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,0));
+  transition: transform var(--t-fast), box-shadow var(--t-fast);
+}
+.thread:hover{ transform: translateY(-1px); box-shadow: var(--shadow-soft) }
+.thread .name{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width: 62%; }
+.thread .mini{ color:var(--muted); font-size: var(--text-xs) }
+.thread .ops{ display:flex; gap:6px }
+.sidebar-footer{ margin-top: var(--sp-2); display:flex; gap:8px }
+
+/* 7) Üst bar */
+.main{ display:flex; flex-direction:column }
+.topbar{
+  position: sticky; top: 0;
+  background: linear-gradient( to bottom, rgba(0,0,0,.22), rgba(0,0,0,0) );
+  border-bottom: 1px solid var(--border);
+  display:flex; align-items:center; justify-content:space-between; gap: var(--sp-3);
+  padding: 12px 16px; z-index: 12;
+  backdrop-filter: blur(6px);
+}
+.topbar .title{ display:flex; align-items:center; gap:10px }
+.pill{ border:1px solid var(--border); border-radius:999px; padding:2px 8px; color:var(--muted); font-size: var(--text-xs) }
+
+/* 8) Sekme şeridi (tabs) */
+.tabs{
+  display:flex; gap:6px; padding:8px 10px; border-bottom:1px solid var(--border);
+  overflow:auto; background: transparent; position: sticky; top: 0; z-index: 15;
+  backdrop-filter: blur(6px);
+}
 .tab{
-  display:flex; align-items:center; gap:8px; padding:6px 10px; border:1px solid var(--border); border-radius:10px;
-  background: rgba(255,255,255,.04); color:var(--fg); cursor:pointer; user-select:none;
+  display:flex; align-items:center; gap:8px;
+  padding: 8px 12px; border:1px solid var(--border); border-radius: var(--radius-md);
+  background: rgba(255,255,255,.04); color: var(--fg); cursor:pointer; user-select:none;
+  transition: box-shadow var(--t-norm), transform var(--t-fast);
 }
-.tab.active{ box-shadow: var(--glow); background: rgba(255,255,255,.07); }
-.tab .name{max-width:180px; white-space:nowrap; text-overflow:ellipsis; overflow:hidden}
-.tab .ops{display:flex; gap:6px}
-.tab .pin{opacity:.8}
-.tab .close{opacity:.8}
-.tab.add{border-style:dashed; background:transparent; }
-.tab.dragging{opacity:.4}
+.tab:hover{ transform: translateY(-1px) }
+.tab.active{ box-shadow: var(--glow), var(--shadow-soft); background: rgba(255,255,255,.07) }
+.tab .name{ max-width: 180px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
+.tab .ops{ display:flex; gap:6px }
+.tab .close{ opacity:.8 }
+.tab .pin{ opacity:.9 }
+.tab.add{ border-style: dashed; background: transparent }
+.tab.dragging{ opacity:.4 }
 
-/* Arama kutusu */
+/* 9) Arama & öneri çipleri */
 .search input{
-  width:220px; padding:7px 10px; border:1px solid var(--border); border-radius:10px; background:rgba(0,0,0,.35); color:var(--fg);
+  width: clamp(180px, 24vw, 280px);
+  height: var(--h-input);
+  padding: 0 12px;
+  border:1px solid var(--border); border-radius: var(--radius-md);
+  background: rgba(0,0,0,.35); color: var(--fg);
+  outline: none; transition: box-shadow var(--t-fast);
 }
+.search input:focus{ box-shadow: 0 0 0 2px rgba(255,255,255,.06) inset }
 
-/* Öneri çipleri */
-.suggest{display:flex; gap:8px; padding:8px 16px; border-bottom:1px solid var(--border)}
+.suggest{
+  display:flex; gap:8px; padding: 8px 16px; border-bottom:1px solid var(--border);
+}
 .chip{
-  border:1px solid var(--border); background:transparent; color:var(--fg); border-radius:999px; padding:6px 10px; cursor:pointer;
+  border:1px solid var(--border); background: transparent; color: var(--fg);
+  border-radius: 999px; padding: 6px 10px; cursor:pointer;
+  transition: transform var(--t-fast), box-shadow var(--t-fast);
 }
-.chip:hover{box-shadow:0 0 0 2px rgba(255,255,255,0.06) inset}
+.chip:hover{ transform: translateY(-1px); box-shadow: 0 0 0 2px rgba(255,255,255,.06) inset }
 
-/* Mesaj seçim & düzenleme */
-.msg.selectable{cursor:pointer; position:relative}
-.msg.selectable.selected{outline:2px solid var(--primary)}
-.msg .ops .btn-mini{padding:2px 6px; font-size:12px}
-.msg .editbar{display:flex; gap:6px; margin-top:6px}
-.msg-edit{
-  width:100%; min-height:70px; resize:vertical; border:1px solid var(--border); border-radius:10px; padding:8px;
-  background: rgba(0,0,0,.3); color:var(--fg);
+/* 10) Sohbet alanı & mesaj kartları */
+.chat{
+  flex:1; overflow:auto; padding: var(--sp-4);
+  display:flex; flex-direction:column; gap: var(--sp-3);
 }
+.msg{
+  max-width: 78%;
+  padding: 12px 14px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  position: relative;
+  background: rgba(255,255,255,.03);
+  box-shadow: var(--shadow-inset), var(--glow);
+  transition: transform var(--t-fast);
+}
+.msg:hover{ transform: translateY(-1px) }
+.msg-user{ align-self: flex-end; background: rgba(255,255,255,.06) }
+.msg-assistant{ align-self: flex-start }
+.msg .meta{ color: var(--muted); font-size: var(--text-xs); margin-top: 6px }
+.msg .ops{ position:absolute; top:6px; right:8px; display:flex; gap:6px; opacity:0; transition: opacity var(--t-fast) }
+.msg:hover .ops{ opacity:.95 }
+
+/* seçilebilir & düzenleme */
+.msg.selectable{ cursor: pointer }
+.msg.selectable.selected{ outline: 2px solid var(--primary) }
+.msg .editbar{ display:flex; gap:6px; margin-top:6px }
+.msg-edit{
+  width:100%; min-height:70px; resize:vertical;
+  border:1px solid var(--border); border-radius: var(--radius-md);
+  padding:8px; background: rgba(0,0,0,.3); color: var(--fg);
+}
+
+/* Yazıyor… */
+.typing{ opacity:.9; font-style: italic; margin: 0 var(--sp-4) var(--sp-2); color: var(--muted); text-shadow: var(--glow) }
+
+/* 11) Composer */
+.composer{
+  border-top: 1px solid var(--border);
+  padding: var(--sp-3) var(--sp-4);
+  display: grid; gap: var(--sp-2);
+}
+.composer textarea{
+  width:100%; min-height: 104px; resize: vertical;
+  background: rgba(0,0,0,.35); color: var(--fg);
+  border: 1px solid var(--border); border-radius: var(--radius-lg);
+  padding: 12px; outline: none;
+  box-shadow: var(--shadow-inset);
+}
+.composer-actions{ display:flex; gap:8px; align-items:center; justify-content:flex-end }
+.hint{ opacity:.75; font-size: var(--text-sm) }
+
+/* 12) Modal / Kart */
+.modal{ border:0; padding:0; background: transparent }
+.modal::backdrop{ background: rgba(0,0,0,.45) }
+.card{
+  width: min(760px, 92vw);
+  backdrop-filter: blur(16px) saturate(1.2);
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--sp-3);
+  box-shadow: var(--glow), var(--shadow-lift);
+}
+.modal-head{
+  display:flex; align-items:center; justify-content:space-between;
+  border-bottom:1px solid var(--border); padding: 6px 4px 10px; margin-bottom: 8px;
+}
+.grid{ display:grid; grid-template-columns: 1fr 1fr; gap: 10px }
+.field{ display:flex; flex-direction:column; gap:6px }
+.field.switch{ flex-direction: row; align-items:center }
+.modal-foot{ display:flex; align-items:center; justify-content:flex-end; gap:8px; margin-top:10px }
+
+/* 13) Focus görünürlüğü (erişilebilirlik) */
+:focus-visible{
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 10px;
+}
+
+/* 14) Mobil / Tablet uyumu */
+@media (max-width: 1024px){
+  .app{ grid-template-columns: 1fr }
+  .sidebar{ display:none }
+  .tabs{ position: sticky; top: 0 }
+  .chat{ padding: var(--sp-3) }
+  .msg{ max-width: 92% }
+}
+@media (max-width: 640px){
+  .search input{ width: 100%; }
+  .composer textarea{ min-height: 92px }
+}
+
+/* 15) Kod blokları ve inline code */
+code,pre{
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  background: #0b1220;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 2px 6px;
+}
+pre{ padding: 10px 12px; overflow: auto }
