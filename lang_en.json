@@ -1,15 +1,3 @@
 {
-    "nav_chat": "Chat",
-    "nav_settings": "Settings",
-    "nav_about": "About",
-    "nav_updates": "Updates",
-    "nav_language": "Language",
-    "theme_blue": "Blue Neon",
-    "theme_purple": "Purple Smoke",
-    "theme_green": "Green Cyber",
-    "theme_red": "Red Voltage",
-    "theme_gold": "Golden Light",
-    "send_button": "Send",
-    "clear_button": "Clear",
-    "chat_placeholder": "Type a message..."
+  "ui": { "send": "Send", "new": "New chat", "ready": "Ready" }
 }
