@@ -1,32 +1,50 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="tr" data-theme="dark">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Yanlik 2.5 - Sohbet</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="utf-8" />
+  <title>Yanlik • Hızlı Yapay Zeka Sohbet</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Yanlik: hızlı ve sade yapay zeka sohbet uygulaması." />
+  <link rel="manifest" href="./manifest.json">
+  <meta name="theme-color" content="#0f172a" />
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self';
+                 script-src 'self' 'unsafe-inline';
+                 style-src 'self' 'unsafe-inline';
+                 img-src 'self' data:;
+                 connect-src 'self';
+                 font-src 'self'">
+  <link rel="stylesheet" href="./style.css" />
 </head>
 <body>
-<header>
-  <img src="logo.png" alt="Yanlik Logo" class="logo">
-  <h1>Yanlik 2.5 </h1>
-</header>
-<nav>
-    <a href="index.html" class="active" data-i18n="nav_chat">Sohbet</a>
-    <a href="settings.html" data-i18n="nav_settings">Ayarlar</a>
-    <a href="about.html" data-i18n="nav_about">Hakkında</a>
-    <a href="updates.html" data-i18n="nav_updates">Güncellemeler</a>
-    <a href="language.html" data-i18n="nav_language">Dil</a>
-</nav>
+  <div class="container">
+    <header>
+      <h2>Yanlik</h2>
+      <nav>
+        <a href="./settings.html">Ayarlar</a>
+      </nav>
+    </header>
 
-<div id="chat-box" class="card" style="height:400px; overflow-y:auto;"></div>
+    <main>
+      <div id="chatList" aria-live="polite" aria-label="Sohbet mesajları"></div>
+      <div id="typing" class="muted" style="display:none;">Yazıyor…</div>
 
-<div class="card">
-    <input type="text" id="user-input" placeholder="Mesaj yaz...">
-    <button onclick="sendMessage()">Gönder</button>
-    <button onclick="clearHistory()">Temizle</button>
-</div>
+      <div class="composer" role="form" aria-label="Sohbet göndericisi">
+        <label for="messageInput" class="sr-only">Mesajınız</label>
+        <textarea id="messageInput" placeholder="Mesaj yaz..."></textarea>
+        <button id="sendBtn" type="button">Gönder</button>
+      </div>
+      <p class="muted">Enter → Gönder, Shift+Enter → Satır (Ayarlar’dan değiştir)</p>
+    </main>
+  </div>
 
-<script src="main.js"></script>
+  <script src="./state.js"></script>
+  <script src="./i18n.js"></script>
+  <script src="./chat.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js').catch(()=>{});
+    }
+  </script>
 </body>
 </html>
