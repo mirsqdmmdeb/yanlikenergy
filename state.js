@@ -14,7 +14,8 @@
   function safeRead() {
     try {
       const raw = localStorage.getItem(SETTINGS_KEY);
-      return raw ? { ...DEFAULTS, ...JSON.parse(raw) } : { ...DEFAULTS };
+      if (!raw) return { ...DEFAULTS };
+      return { ...DEFAULTS, ...JSON.parse(raw) };
     } catch {
       return { ...DEFAULTS };
     }
@@ -26,20 +27,14 @@
   function setSettings(next) {
     settings = { ...settings, ...next };
     try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)); } catch {}
-    listeners.forEach(fn => { try { fn(settings); } catch {} });
-  }
-  function onSettingsChange(fn) {
-    listeners.add(fn);
-    return () => listeners.delete(fn);
+    listeners.forEach((fn) => { try { fn(settings); } catch {} });
   }
 
+  function onSettingsChange(fn) { listeners.add(fn); return () => listeners.delete(fn); }
+
   window.__yanlik = window.__yanlik || {};
+  window.__yanlik.DEFAULTS = DEFAULTS;
   window.__yanlik.getSettings = () => settings;
   window.__yanlik.setSettings = setSettings;
   window.__yanlik.onSettingsChange = onSettingsChange;
-
-  // ilk açılışta temayı uygula
-  const sysDark = window.matchMedia?.("(prefers-color-scheme: dark)").matches;
-  const isDark = settings.theme === "dark" || (settings.theme === "system" && sysDark);
-  document.documentElement.setAttribute("data-theme", isDark ? "dark" : "light");
 })();
