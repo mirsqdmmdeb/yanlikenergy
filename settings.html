@@ -3,94 +3,60 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Ayarlar • Yanlik</title>
+  <title>Ayarlar • Yanlik v2</title>
   <link rel="stylesheet" href="./style.css" />
 </head>
 <body>
-  <main class="container">
-    <header>
-      <h2>Ayarlar</h2>
-      <nav><a href="./index.html">Geri</a></nav>
-    </header>
-
-    <section class="card" aria-labelledby="appearance">
-      <h3 id="appearance">Görünüm & Dil</h3>
-      <div class="row">
-        <div class="field">
-          <label for="theme">Tema</label>
-          <select id="theme">
-            <option value="system">Sistem</option>
-            <option value="light">Açık</option>
-            <option value="dark">Koyu</option>
-          </select>
-          <div class="muted">Seçim anında uygulanır ve hatırlanır.</div>
+  <div class="app" style="grid-template-columns:1fr;">
+    <section class="main">
+      <header class="topbar">
+        <div class="title"><h1>Ayarlar</h1></div>
+        <div class="actions"><a class="btn ghost" href="./index.html">Sohbete dön</a></div>
+      </header>
+      <div class="card" style="margin:16px; padding:16px;">
+        <div class="grid">
+          <label class="field"><span>Tema</span>
+            <select id="theme"><option value="system">Sistem</option><option value="light">Açık</option><option value="dark">Koyu</option></select>
+          </label>
+          <label class="field"><span>Dil</span>
+            <select id="language"><option value="tr">Türkçe</option><option value="en">English</option><option value="de">Deutsch</option></select>
+          </label>
+          <label class="field switch"><input id="memory" type="checkbox"/><span>Konuşmaları hatırla</span></label>
+          <label class="field switch"><input id="typingIndicator" type="checkbox"/><span>Yazma göstergesi</span></label>
+          <label class="field switch"><input id="sendSound" type="checkbox"/><span>Gönderme sesi</span></label>
+          <label class="field"><span>Gönderme</span>
+            <select id="sendBehavior"><option value="enter">Enter → Gönder</option><option value="ctrlenter">Ctrl+Enter → Gönder</option></select>
+          </label>
+          <label class="field"><span>Yaratıcılık (0–1)</span><input id="temperature" type="range" min="0" max="1" step="0.05"/></label>
+          <label class="field"><span>Sistem mesajı</span><textarea id="systemPrompt" rows="3"></textarea></label>
         </div>
-        <div class="field">
-          <label for="language">Dil</label>
-          <select id="language">
-            <option value="tr">Türkçe</option>
-            <option value="en">English</option>
-            <option value="de">Deutsch</option>
-          </select>
+        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px;">
+          <button id="resetBtn" class="btn ghost">Varsayılan</button>
+          <button id="saveBtn" class="btn primary">Kaydet</button>
         </div>
       </div>
     </section>
-
-    <section class="card" aria-labelledby="chatprefs">
-      <h3 id="chatprefs">Sohbet Tercihleri</h3>
-      <div class="row">
-        <div class="field">
-          <label class="switch">
-            <input id="memory" type="checkbox" />
-            <span>Konuşmaları hatırla</span>
-          </label>
-        </div>
-        <div class="field">
-          <label class="switch">
-            <input id="typingIndicator" type="checkbox" />
-            <span>Yazma göstergesi</span>
-          </label>
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="field">
-          <label class="switch">
-            <input id="sendSound" type="checkbox" />
-            <span>Gönderme sesi</span>
-          </label>
-        </div>
-        <div class="field">
-          <label for="sendBehavior">Gönderme davranışı</label>
-          <select id="sendBehavior">
-            <option value="enter">Enter → Gönder, Shift+Enter → Satır</option>
-            <option value="ctrlenter">Ctrl+Enter → Gönder, Enter → Satır</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="field">
-          <label for="temperature">Yaratıcılık (temperature)</label>
-          <div class="range-row">
-            <input id="temperature" type="range" min="0" max="1" step="0.05" />
-            <output id="temperatureValue">0.70</output>
-          </div>
-        </div>
-        <div class="field">
-          <label for="systemPrompt">Sistem mesajı (opsiyonel)</label>
-          <textarea id="systemPrompt" rows="3" placeholder="Örn: Kısa ve esprili yanıt ver."></textarea>
-        </div>
-      </div>
-
-      <div class="actions">
-        <button id="saveBtn" class="primary" type="button">Kaydet</button>
-        <button id="resetBtn" class="secondary" type="button">Varsayılanlara dön</button>
-      </div>
-    </section>
-  </main>
+  </div>
 
   <script src="./state.js"></script>
-  <script src="./settings.js"></script>
+  <script>
+    const $=s=>document.querySelector(s);
+    const el={theme:$("#theme"),language:$("#language"),memory:$("#memory"),typingIndicator:$("#typingIndicator"),sendSound:$("#sendSound"),sendBehavior:$("#sendBehavior"),temperature:$("#temperature"),systemPrompt:$("#systemPrompt"),saveBtn:$("#saveBtn"),resetBtn:$("#resetBtn")};
+    const DEF=window.__yanlik.DEFAULTS;
+    function fill(){
+      const s=window.__yanlik.getSettings();
+      el.theme.value=s.theme; el.language.value=s.language; el.memory.checked=s.memory;
+      el.typingIndicator.checked=s.typingIndicator; el.sendSound.checked=s.sendSound;
+      el.sendBehavior.value=s.sendBehavior; el.temperature.value=String(s.temperature);
+      el.systemPrompt.value=s.systemPrompt||"";
+    }
+    function save(){
+      const next={ theme:el.theme.value, language:el.language.value, memory:el.memory.checked, typingIndicator:el.typingIndicator.checked, sendSound:el.sendSound.checked, sendBehavior:el.sendBehavior.value, temperature:Number(el.temperature.value), systemPrompt:el.systemPrompt.value.trim() };
+      window.__yanlik.setSettings(next);
+      alert("Kaydedildi.");
+    }
+    function reset(){ window.__yanlik.setSettings(DEF); fill(); alert("Varsayılanlara dönüldü."); }
+    fill(); el.saveBtn.addEventListener("click",save); el.resetBtn.addEventListener("click",reset);
+  </script>
 </body>
 </html>
