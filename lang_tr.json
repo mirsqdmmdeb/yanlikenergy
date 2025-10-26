@@ -1,15 +1,3 @@
 {
-    "nav_chat": "Sohbet",
-    "nav_settings": "Ayarlar",
-    "nav_about": "Hakkında",
-    "nav_updates": "Güncellemeler",
-    "nav_language": "Dil",
-    "theme_blue": "Mavi Neon",
-    "theme_purple": "Mor Duman",
-    "theme_green": "Yeşil Siber",
-    "theme_red": "Kırmızı Voltaj",
-    "theme_gold": "Altın Işık",
-    "send_button": "Gönder",
-    "clear_button": "Temizle",
-    "chat_placeholder": "Mesaj yaz..."
+  "ui": { "send": "Gönder", "new": "Yeni konuşma", "ready": "Hazır" }
 }
