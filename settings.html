@@ -1,29 +1,96 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Yanlik 2.5 - Ayarlar</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ayarlar • Yanlik</title>
+  <link rel="stylesheet" href="./style.css" />
 </head>
 <body>
-<nav>
-    <a href="index.html" data-i18n="nav_chat">Sohbet</a>
-    <a href="settings.html" class="active" data-i18n="nav_settings">Ayarlar</a>
-    <a href="about.html" data-i18n="nav_about">Hakkında</a>
-    <a href="updates.html" data-i18n="nav_updates">Güncellemeler</a>
-    <a href="language.html" data-i18n="nav_language">Dil</a>
-</nav>
+  <main class="container">
+    <header>
+      <h2>Ayarlar</h2>
+      <nav><a href="./index.html">Geri</a></nav>
+    </header>
 
-<div class="card">
-    <h2>Tema Seçimi</h2>
-    <button onclick="setTheme('blue')">Mavi Neon</button>
-    <button onclick="setTheme('purple')">Mor Duman</button>
-    <button onclick="setTheme('green')">Yeşil Siber</button>
-    <button onclick="setTheme('red')">Kırmızı Voltaj</button>
-    <button onclick="setTheme('gold')">Altın Işık</button>
-</div>
+    <section class="card" aria-labelledby="appearance">
+      <h3 id="appearance">Görünüm & Dil</h3>
+      <div class="row">
+        <div class="field">
+          <label for="theme">Tema</label>
+          <select id="theme">
+            <option value="system">Sistem</option>
+            <option value="light">Açık</option>
+            <option value="dark">Koyu</option>
+          </select>
+          <div class="muted">Seçim anında uygulanır ve hatırlanır.</div>
+        </div>
+        <div class="field">
+          <label for="language">Dil</label>
+          <select id="language">
+            <option value="tr">Türkçe</option>
+            <option value="en">English</option>
+            <option value="de">Deutsch</option>
+          </select>
+        </div>
+      </div>
+    </section>
 
-<script src="main.js"></script>
+    <section class="card" aria-labelledby="chatprefs">
+      <h3 id="chatprefs">Sohbet Tercihleri</h3>
+      <div class="row">
+        <div class="field">
+          <label class="switch">
+            <input id="memory" type="checkbox" />
+            <span>Konuşmaları hatırla</span>
+          </label>
+        </div>
+        <div class="field">
+          <label class="switch">
+            <input id="typingIndicator" type="checkbox" />
+            <span>Yazma göstergesi</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label class="switch">
+            <input id="sendSound" type="checkbox" />
+            <span>Gönderme sesi</span>
+          </label>
+        </div>
+        <div class="field">
+          <label for="sendBehavior">Gönderme davranışı</label>
+          <select id="sendBehavior">
+            <option value="enter">Enter → Gönder, Shift+Enter → Satır</option>
+            <option value="ctrlenter">Ctrl+Enter → Gönder, Enter → Satır</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label for="temperature">Yaratıcılık (temperature)</label>
+          <div class="range-row">
+            <input id="temperature" type="range" min="0" max="1" step="0.05" />
+            <output id="temperatureValue">0.70</output>
+          </div>
+        </div>
+        <div class="field">
+          <label for="systemPrompt">Sistem mesajı (opsiyonel)</label>
+          <textarea id="systemPrompt" rows="3" placeholder="Örn: Kısa ve esprili yanıt ver."></textarea>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button id="saveBtn" class="primary" type="button">Kaydet</button>
+        <button id="resetBtn" class="secondary" type="button">Varsayılanlara dön</button>
+      </div>
+    </section>
+  </main>
+
+  <script src="./state.js"></script>
+  <script src="./settings.js"></script>
 </body>
 </html>
