@@ -1,102 +1,36 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Yanlik • Giriş</title>
-  <link rel="stylesheet" href="./style.css" />
-
+  <link rel="stylesheet" href="style.css">
   <style>
-    body {
-      background: #0d0f1a;
-      color: #eee;
-      font-family: "Poppins", sans-serif;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      margin: 0;
-    }
-    .login-box {
-      background: rgba(30, 35, 58, 0.85);
-      padding: 2.5rem 3rem;
-      border-radius: 18px;
-      box-shadow: 0 0 20px rgba(0,255,255,0.2);
-      width: 320px;
-    }
-    h2 {
-      text-align: center;
-      margin-bottom: 1.5rem;
-      color: #00c9ff;
-    }
-    label {
-      font-size: 0.9rem;
-      display: block;
-      margin-top: 1rem;
-      margin-bottom: 0.3rem;
-      color: #ccc;
-    }
-    input {
-      width: 100%;
-      padding: 0.7rem;
-      border: none;
-      border-radius: 8px;
-      background: #1b1f32;
-      color: #fff;
-      font-size: 0.9rem;
-      outline: none;
-    }
-    input:focus {
-      box-shadow: 0 0 0 2px #00c9ff;
-    }
-    button {
-      margin-top: 1.5rem;
-      width: 100%;
-      padding: 0.8rem;
-      background: linear-gradient(90deg, #00c9ff, #92fe9d);
-      border: none;
-      border-radius: 10px;
-      color: #000;
-      font-weight: bold;
-      cursor: pointer;
-      transition: 0.3s;
-      font-size: 1rem;
-    }
-    button:hover {
-      filter: brightness(1.1);
-      transform: scale(1.02);
-    }
-    .hint {
-      margin-top: 1rem;
-      text-align: center;
-      font-size: 0.8rem;
-      color: #aaa;
-    }
+    body{display:grid;place-items:center;min-height:100vh;background:#0b1222;color:#e8f0ff}
+    .card{width:340px;background:#121a2b;border-radius:16px;padding:20px;box-shadow:0 12px 40px rgba(0,0,0,.35)}
+    h2{margin:0 0 10px;color:#79d0ff}
+    input,button{width:100%;padding:10px;border:0;border-radius:10px}
+    input{background:#0e1423;color:#fff;margin:6px 0}
+    button{background:#00c9ff;color:#02131a;font-weight:700;margin-top:8px;cursor:pointer}
   </style>
 </head>
 <body>
-
-  <div class="login-box">
-    <h2>Admin Girişi</h2>
-    <form id="loginForm">
-      <label for="u">Kullanıcı Adı</label>
-      <input id="u" name="username" type="text" placeholder="Kullanıcı adı" required />
-
-      <label for="p">Şifre</label>
-      <input id="p" name="password" type="password" placeholder="Şifre" required />
-
-      <!-- 👇 İşte bu giriş butonu -->
-      <button type="submit">Giriş Yap</button>
-    </form>
-
-    <div class="hint">
-      <p><b> </b></p>
-      <div class="muted"><a href="register.html">Kayıt ol</a> • <a href="#" onclick="YANLIK_AUTH.loginGuest('Misafir'); location.href='index.html'">Misafir</a></div>
-    </div>
+  <div class="card">
+    <h2>Giriş</h2>
+    <input id="u" placeholder="Kullanıcı adı">
+    <input id="p" type="password" placeholder="Şifre">
+    <button id="go">Giriş</button>
   </div>
-
-  <!-- Sistem dosyaları -->
   <script src="./auth.js"></script>
-  <script src="./login.js"></script>
+  <script>
+    document.getElementById("go").onclick = ()=>{
+      const u = document.getElementById("u").value.trim();
+      const p = document.getElementById("p").value.trim();
+      try{
+        const user = YANLIK_AUTH.login({ username:u, password:p });
+        if(["owner","admin"].includes(user.role)) location.href="admin.html";
+        else location.href="index.html";
+      }catch(e){ alert(e.message); }
+    };
+  </script>
 </body>
 </html>
