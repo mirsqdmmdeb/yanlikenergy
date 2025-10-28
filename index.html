@@ -16,6 +16,22 @@
   </script>
 </head>
 <body>
+<script src="./auth.js"></script>
+<script>
+  const wait = setInterval(()=>{
+    if(window.YANLIK_AUTH){
+      clearInterval(wait);
+      // index: misafir serbestse allowGuest:true
+      const s = YANLIK_AUTH.requireAuth('./login.html', { allowGuest:true });
+      if(!s) document.write("Yönlendiriliyorsunuz...");
+      // idle auto-logout (öneri)
+      let last = Date.now();
+      ['click','keydown','mousemove','touchstart'].forEach(ev=>document.addEventListener(ev,()=>last=Date.now()));
+      setInterval(()=>{ if(Date.now()-last>30*60*1000){ YANLIK_AUTH.logout('login.html'); } }, 15000); // 30 dk idle
+      setInterval(()=>{ try{ YANLIK_AUTH.pingSession(); }catch{} }, 10000);
+    }
+  },50);
+</script>
 <!-- 💡 Login kontrolü (sohbetten önce çalışmalı) -->
 <script src="./auth.js"></script>
 <script>
