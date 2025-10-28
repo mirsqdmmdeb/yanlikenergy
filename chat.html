@@ -4,85 +4,68 @@
 <meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Yanlik • Sohbet</title>
 <style>
-:root{--c1:#00c9ff;--c2:#0077ff;--bg:#050b18;--fg:#e8f0ff;--mut:#9bb3cc}
-*{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--fg);font-family:system-ui,Segoe UI,Roboto;min-height:100vh;display:grid;grid-template-rows:60px 1fr 120px;overflow:hidden}
-nav{grid-row:1/2;display:flex;gap:18px;justify-content:center;align-items:center;padding:12px;background:rgba(0,0,0,.35);backdrop-filter:blur(10px);z-index:5}
-nav a{color:var(--c1);text-decoration:none;font-weight:700} nav a:hover{color:var(--c2)}
-main{grid-row:2/3;overflow:auto;padding:16px}
-.msg{max-width:min(880px,92%);margin:10px auto;padding:12px 14px;border-radius:12px;border:1px solid #ffffff18;background:rgba(255,255,255,.06);box-shadow:0 8px 24px rgba(0,0,0,.35);animation:pop .25s ease}
-.msg.me{background:linear-gradient(135deg,var(--c2),var(--c1));color:#06141c;border-color:transparent}
+:root{--c1:#00c9ff;--c2:#0077ff;--fg:#e8f0ff;--mut:#9bb3cc}
+*{box-sizing:border-box} body{margin:0;height:100svh;display:grid;grid-template-rows:1fr auto;overflow:hidden;
+font-family:system-ui,Segoe UI,Roboto;color:var(--fg)}
+#bg{position:fixed;inset:0;z-index:-1;background:radial-gradient(1000px 600px at 0 0,#031630 0%,#000 70%)}
+main{overflow:auto;padding:14px 10px}
+.wrap{max-width:980px;margin:0 auto}
+.msg{max-width:780px;margin:10px 0;padding:12px 14px;border-radius:12px;border:1px solid #ffffff18;background:rgba(255,255,255,.06);
+box-shadow:0 8px 24px rgba(0,0,0,.35);animation:pop .2s ease}
+.msg.me{margin-left:auto;background:linear-gradient(135deg,var(--c2),var(--c1));color:#06141c;border:0}
 .meta{font-size:12px;color:var(--mut);margin-bottom:6px}
-#typing{display:none;text-align:center;color:#9bb3cc}
-@keyframes pop{from{opacity:0;transform:translateY(6px) scale(.98)}to{opacity:1;transform:none}}
-footer{grid-row:3/4;background:rgba(0,0,0,.35);backdrop-filter:blur(10px);border-top:1px solid #ffffff18;padding:10px 12px}
-.bar{display:flex;gap:8px;max-width:1000px;margin:0 auto}
-input#msg{flex:1;background:#0f1b2e;color:var(--fg);border:1px solid #ffffff1a;border-radius:12px;padding:12px}
+#typing{display:none;color:#9bb3cc;margin:6px 2px}
+@keyframes pop{from{opacity:0;transform:translateY(6px) scale(.985)}to{opacity:1;transform:none}}
+footer{position:sticky;bottom:0;background:rgba(0,0,0,.38);backdrop-filter:blur(10px);border-top:1px solid #ffffff18;padding:10px}
+.bar{max-width:980px;margin:0 auto;display:flex;gap:8px}
+#msg{flex:1;background:#0f1b2e;color:var(--fg);border:1px solid #ffffff1a;border-radius:12px;padding:12px}
 .btn{background:linear-gradient(135deg,var(--c2),var(--c1));border:none;border-radius:12px;padding:12px 16px;color:#06141c;font-weight:800}
-.btn:hover{box-shadow:0 0 20px #00c9ffaa}
-.hint{font-size:.9rem;color:#9bb3cc;text-align:center;margin-top:6px}
+.links{position:fixed;left:10px;bottom:12px;display:flex;gap:10px;font-size:.95rem}
+.links a{color:#9fd3ff;text-decoration:none;background:#0f1b2eaa;border:1px solid #ffffff22;padding:6px 10px;border-radius:10px}
+@media (max-width:640px){ .msg{max-width:92vw} }
 </style>
 </head>
 <body>
-<nav>
-  <a href="index.html">Ana Sayfa</a>
-  <a href="chat.html">Sohbet</a>
-  <a href="ayarlar.html">Ayarlar</a>
-  <a href="hakkinda.html">Hakkında</a>
-</nav>
+<canvas id="bg"></canvas>
 
-<main id="area"></main>
-<div id="typing">Yanlik yazıyor… • • •</div>
+<main><div id="area" class="wrap"></div><div id="typing" class="wrap">Yanlik yazıyor… • • •</div></main>
 
 <footer>
   <div class="bar">
     <input id="msg" placeholder="Mesaj yaz… (ör: '= 2+3*5', 'plan fizik', '5 dk sonra hatırlat', 'mod koç')">
     <button id="send" class="btn">Gönder</button>
   </div>
-  <div class="hint">İpucu: <b>=</b> ile hesap, “<b>madde madde</b>” ile liste, “<b>kısalt</b>” ile TL;DR.</div>
+  <div class="links">
+    <a href="index.html">Ana sayfa</a>
+    <a href="ayarlar.html">Ayarlar</a>
+    <a href="hakkinda.html">Hakkında</a>
+  </div>
 </footer>
 
 <script src="bg.js"></script>
 <script src="memory.js"></script>
 <script src="ai.js"></script>
 <script>
-const area=document.getElementById('area');
-const typing=document.getElementById('typing');
-const input=document.getElementById('msg');
-const send=document.getElementById('send');
+const area=document.getElementById('area'), typing=document.getElementById('typing');
+const input=document.getElementById('msg'), send=document.getElementById('send');
+const profile=YANLIK_MEM.loadProfile(), memory=YANLIK_MEM.loadMemory();
 
-const profile = YANLIK_MEM.loadProfile();
-const memory  = YANLIK_MEM.loadMemory();
-
+function esc(s){return (s||"").replace(/[<>&]/g,m=>({ '<':'&lt;','>':'&gt;','&':'&amp;'}[m]))}
+function time(){return new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})}
 function push(role,text){
-  const div=document.createElement('div'); div.className='msg '+(role==='me'?'me':'bot');
-  div.innerHTML=`<div class="meta">${new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})} • ${role==='me'?'Ben':'Yanlik'}</div>${text}`;
-  area.appendChild(div); area.scrollTop=area.scrollHeight;
+  const d=document.createElement('div'); d.className='msg '+(role==='me'?'me':'bot');
+  d.innerHTML=`<div class="meta">${time()} • ${role==='me'?'Ben':'Yanlik'}</div>${text}`;
+  area.appendChild(d); area.parentElement.scrollTop=area.parentElement.scrollHeight;
 }
-function esc(s){return (s||"").replace(/[<>&]/g,m=>({ '<':'&lt;','>':'&gt;','&':'&amp;'}[m]));}
-
 async function handleSend(){
-  const t=input.value.trim(); if(!t) return;
-  push('me', esc(t)); input.value='';
-  typing.style.display='block';
-  await new Promise(r=>setTimeout(r, Math.min(900, 300 + t.length*8)));
-
-  const replies = YANLIK.respond(t, {
-    profile,
-    memory,
-    saveProfile: p=> YANLIK_MEM.saveProfile(p),
-    saveMemory:  m=> YANLIK_MEM.saveMemory(m),
-    onNotify:    p=> push('bot', esc(p.text)),
-    history:     Array.from(area.querySelectorAll('.msg')).slice(-20).map(n=>({text:n.textContent||''}))
-  });
-
-  typing.style.display='none';
-  for(const m of replies){ push('bot', esc(m.text)); }
+  const t=input.value.trim(); if(!t) return; push('me',esc(t)); input.value='';
+  typing.style.display='block'; await new Promise(r=>setTimeout(r,Math.min(900,300+t.length*8)));
+  const replies = YANLIK.respond(t,{profile,memory,saveProfile:p=>YANLIK_MEM.saveProfile(p),saveMemory:m=>YANLIK_MEM.saveMemory(m),
+    onNotify:p=>push('bot',esc(p.text)), history:Array.from(area.querySelectorAll('.msg')).slice(-20).map(n=>({text:n.textContent||''}))});
+  typing.style.display='none'; for(const m of replies) push('bot',esc(m.text));
 }
-send.onclick=handleSend;
-input.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();handleSend();}});
-
-// hoş geldin
-push('bot', 'Selam! Ben <b>Yanlik</b>. “plan”, “madde madde”, “kısalt”, “= 2+2” gibi komutları deneyebilirsin.');
+send.onclick=handleSend; input.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();handleSend();}});
+push('bot','Selam! Ben <b>Yanlik</b>. “plan”, “madde madde”, “kısalt”, “= 2+2” gibi komutları deneyebilirsin.');
 </script>
 </body>
 </html>
