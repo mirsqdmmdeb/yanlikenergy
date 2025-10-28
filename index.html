@@ -1,71 +1,37 @@
 <!doctype html>
 <html lang="tr">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Yanlik Energy • Ana Sayfa</title>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Yanlik Energy v2</title>
 <style>
-:root{--c1:#00c9ff;--c2:#0077ff;--fg:#e8f0ff}
-*{box-sizing:border-box;margin:0;padding:0}
-body{
-  min-height:100vh;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  font-family:system-ui,Segoe UI,Roboto,Arial;
-  color:var(--fg);
-  background:radial-gradient(1000px 600px at 0 0,#031630 0%,#000 70%);
-  overflow:hidden;
-}
-h1{font-size:3rem;color:var(--c1);text-shadow:0 0 20px #00c9ff88;margin-bottom:10px;animation:fadein 1s ease both}
-p{color:#9bb3cc;margin-bottom:22px}
-.row{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-bottom:12px}
-a{
-  background:linear-gradient(135deg,var(--c2),var(--c1));
-  color:#031018;text-decoration:none;font-weight:700;
-  padding:12px 22px;border-radius:14px;
-  box-shadow:0 0 25px #00c9ff44;
-  transition:transform .15s ease,box-shadow .25s ease;
-}
-a:hover{transform:translateY(-3px);box-shadow:0 0 35px #00c9ffaa}
-footer{margin-top:40px;font-size:.9rem;color:#7ca0c9;text-align:center}
-footer kbd{background:#0f1b2e;border:1px solid #ffffff25;border-radius:6px;padding:2px 6px}
-canvas{position:fixed;inset:0;z-index:-1}
-@keyframes fadein{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:none}}
+:root{--c1:#00c9ff;--c2:#0077ff;--bg:#050b18;--fg:#e8f0ff}
+*{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--fg);
+font-family:system-ui,Segoe UI,Roboto;min-height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden}
+nav{position:fixed;top:0;left:0;right:0;display:flex;gap:18px;justify-content:center;padding:12px;background:rgba(0,0,0,.35);backdrop-filter:blur(10px);z-index:5}
+nav a{color:var(--c1);text-decoration:none;font-weight:700} nav a:hover{color:var(--c2)}
+.wrap{text-align:center;padding:24px;background:rgba(255,255,255,.05);border:1px solid #ffffff18;border-radius:18px;backdrop-filter:blur(10px);box-shadow:0 0 30px #00c9ff22}
+h1{margin:0 0 8px;color:var(--c1);text-shadow:0 0 20px #00c9ffaa;font-size:2.6rem}
+p{margin:6px 0 20px;color:#9bb3cc}
+.btns a{display:inline-block;margin:6px;padding:12px 18px;border-radius:14px;background:linear-gradient(135deg,var(--c2),var(--c1));color:#06141c;font-weight:800;text-decoration:none;box-shadow:0 0 25px #00c9ff44}
+.btns a:hover{transform:translateY(-2px);box-shadow:0 0 35px #00c9ffaa}
 </style>
 </head>
 <body>
-<canvas id="bg"></canvas>
-<h1>Yanlik Energy</h1>
-<p>Hızlı • Güvenli • Akıcı Sohbet Deneyimi</p>
-
-<div class="row">
-  <a href="chat.html">💬 Sohbet</a>
-  <a href="login.html">🔑 Giriş Yap</a>
-  <a href="signup.html">🆕 Üye Ol</a>
+<nav>
+  <a href="index.html">Ana Sayfa</a>
+  <a href="chat.html">Sohbet</a>
+  <a href="ayarlar.html">Ayarlar</a>
+  <a href="hakkinda.html">Hakkında</a>
+</nav>
+<div class="wrap">
+  <h1>Yanlik 🤖</h1>
+  <p>Neon gücüyle akıllı, empatik ve çok dilli sohbet.</p>
+  <div class="btns">
+    <a href="login.html">Giriş Yap</a>
+    <a href="signup.html">Üye Ol</a>
+    <a href="chat.html">Sohbete Başla</a>
+  </div>
 </div>
-
-<footer>
-  Kısayollar: <kbd>/</kbd> Arama · <kbd>Ctrl</kbd>+<kbd>K</kbd> Komut Paleti · <kbd>Ctrl</kbd>+<kbd>Enter</kbd> Gönder
-</footer>
-
-<script>
-const c=document.getElementById("bg"),x=c.getContext("2d");
-function fit(){c.width=innerWidth;c.height=innerHeight}
-addEventListener("resize",fit);fit();
-const p=Array.from({length:50},()=>({x:Math.random()*c.width,y:Math.random()*c.height,vx:(Math.random()-.5)*.6,vy:(Math.random()-.5)*.6,r:1+Math.random()*2}));
-(function draw(){
-  x.clearRect(0,0,c.width,c.height);
-  for(const a of p){
-    a.x+=a.vx;a.y+=a.vy;
-    if(a.x<0||a.x>c.width)a.vx*=-1;if(a.y<0||a.y>c.height)a.vy*=-1;
-    x.beginPath();x.arc(a.x,a.y,a.r,0,6.28);x.fillStyle="#00c9ff55";x.fill();
-  }
-  for(let i=0;i<p.length;i++)for(let j=i+1;j<p.length;j++){
-    const dx=p[i].x-p[j].x,dy=p[i].y-p[j].y,d=Math.hypot(dx,dy);
-    if(d<120){x.globalAlpha=1-d/120;x.strokeStyle="#00c9ff22";
-      x.beginPath();x.moveTo(p[i].x,p[i].y);x.lineTo(p[j].x,p[j].y);x.stroke();x.globalAlpha=1;}
-  }
-  requestAnimationFrame(draw);
-})();
-</script>
+<script src="bg.js"></script>
 </body>
 </html>
