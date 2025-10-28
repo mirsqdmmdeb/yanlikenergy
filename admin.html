@@ -7,6 +7,11 @@
   <link rel="stylesheet" href="./style.css?v=ui4" />
 </head>
 <body>
+<script src="./auth.js"></script>
+<script>
+  const s = YANLIK_AUTH.requireAuth('./login.html');
+  if(!s) document.write("Yönlendiriliyorsunuz...");
+</script>
   <script src="./auth.js"></script>
   <script>
 // === Sohbet Görüntüleme ===
