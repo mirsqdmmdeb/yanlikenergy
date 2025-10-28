@@ -1,100 +1,69 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Yanlik • Sohbet</title>
-  <link rel="stylesheet" href="./style.css?v=ui4" />
-  <script>
-    // Tema yükle
-    try {
-      const s = JSON.parse(localStorage.getItem("yanlik.settings")) || {};
-      document.documentElement.setAttribute("data-theme", s.theme || "neon-blue");
-    } catch {
-      document.documentElement.setAttribute("data-theme", "neon-blue");
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Yanlik • Ana Sayfa</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      background: radial-gradient(circle at top left, #02182a, #000);
+      color: #e8f0ff;
+      font-family: system-ui;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
     }
-  </script>
+    h1 {
+      font-size: 2.4em;
+      color: #00c9ff;
+      text-shadow: 0 0 15px #00c9ff88;
+      margin-bottom: 10px;
+    }
+    p {
+      color: #9bb3cc;
+      font-size: 1.1em;
+    }
+    .btns {
+      margin-top: 30px;
+      display: flex;
+      gap: 20px;
+    }
+    a.button {
+      padding: 10px 18px;
+      border-radius: 10px;
+      text-decoration: none;
+      background: linear-gradient(135deg,#0077ff,#00c9ff);
+      color: #02131a;
+      font-weight: 600;
+      box-shadow: 0 0 15px rgba(0,201,255,.3);
+      transition: transform .15s ease, box-shadow .15s ease;
+    }
+    a.button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 25px rgba(0,201,255,.6);
+    }
+  </style>
 </head>
 <body>
-<script src="./auth.js"></script>
-<script>
-  const wait = setInterval(()=>{
-    if(window.YANLIK_AUTH){
-      clearInterval(wait);
-      // index: misafir serbestse allowGuest:true
-      const s = YANLIK_AUTH.requireAuth('./login.html', { allowGuest:true });
-      if(!s) document.write("Yönlendiriliyorsunuz...");
-      // idle auto-logout (öneri)
-      let last = Date.now();
-      ['click','keydown','mousemove','touchstart'].forEach(ev=>document.addEventListener(ev,()=>last=Date.now()));
-      setInterval(()=>{ if(Date.now()-last>30*60*1000){ YANLIK_AUTH.logout('login.html'); } }, 15000); // 30 dk idle
-      setInterval(()=>{ try{ YANLIK_AUTH.pingSession(); }catch{} }, 10000);
-    }
-  },50);
-</script>
-<!-- 💡 Login kontrolü (sohbetten önce çalışmalı) -->
-<script src="./auth.js"></script>
-<script>
-  const sess = YANLIK_AUTH.requireAuth('./login.html');
-  if(!sess) document.write("Yönlendiriliyorsunuz...");
-</script>
-  <div class="app">
-    <!-- Kenar -->
-    <aside class="sidebar">
-      <div class="brand">
-        <div class="dot"></div>
-        <strong>YANLIK</strong>
-        <span class="badge">v5.0</span>
-      </div>
-      <div class="search">
-        <input type="search" placeholder="Ara..." />
-      </div>
-      <div class="threads">
-        <div class="thread">
-          <span class="name">Genel Chat</span>
-          <span class="mini">Aktif</span>
-        </div>
-      </div>
-    </aside>
+  <script src="./auth.js"></script>
+  <script>
+    // Giriş kontrolü
+    const s = YANLIK_AUTH.getSession();
+    </script>
 
-    <!-- Ana -->
-    <section class="main">
-      <div class="topbar">
-        <div class="title">
-          <h2 id="threadTitle">Sohbet</h2>
-          <span class="pill" id="statusPill">Hazır</span>
-        </div>
-        <div class="btn-group">
-          <button class="btn ghost tooltip" data-tip="Ayarlar" onclick="location.href='settings.html'">⚙️</button>
-        </div>
-      </div>
+  <h1>Yanlik Energy</h1>
+  <p>Akıllı konuşma ve yönetim platformuna hoş geldin ⚡</p>
 
-      <div class="tabs">
-        <div class="tab active"><span class="name">Chat</span></div>
-        <div class="tab add" onclick="UI.toast('Yeni sekme yakında…','success')">＋</div>
-      </div>
-
-      <div class="chat" id="chatList" style="aspect-ratio:12/8;max-height:80vh;margin:auto;"></div>
-      <div class="typing" id="typing" style="display:none;">Yanıt hazırlanıyor...</div>
-
-      <div class="composer">
-        <textarea id="messageInput" placeholder="Mesaj yaz..."></textarea>
-        <div class="composer-actions">
-          <span class="hint">Enter → Gönder</span>
-          <button id="sendBtn" class="btn primary">Gönder</button>
-        </div>
-      </div>
-    </section>
+  <div class="btns">
+    <a class="button" href="chat.html">Sohbet</a>
+    <a class="button" href="admin.html">Admin Paneli</a>
+    <a class="button" href="login.html">Giriş</a>
   </div>
 
-  <!-- Script sırası -->
-  <script src="./ui.js?v=ui4"></script>
-  <script src="./chat_core.js"></script>
-  <script src="./chat_lang.js"></script>
-  <script src="./chat_smalltalk.js"></script>       <!-- normal sohbet (yeni) -->
-  <script src="./chat_empathetic.js"></script>      <!-- empati (gelişmiş yeni) -->
-  <script src="./chat_crisis.js"></script>
-  <script src="./chat_ui.js"></script>
-  <script src="./chat_boot.js"></script>
+  <p style="margin-top:40px;font-size:0.9em;color:#555">© 2025 Yanlik</p>
 </body>
 </html>
