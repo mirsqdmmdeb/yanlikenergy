@@ -4,94 +4,139 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Yanlik • Admin - Kullanıcılar</title>
-  <link rel="stylesheet" href="./style.css"/>
   <style>
     body{background:#071226;color:#eee;font-family:Inter,system-ui,Arial;margin:0;padding:20px}
     header{display:flex;justify-content:space-between;align-items:center}
     table{width:100%;border-collapse:collapse;margin-top:12px}
-    th,td{padding:8px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.04)}
+    th,td{padding:8px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.06)}
     button{padding:6px 8px;border-radius:8px;border:0;background:#00c9ff;color:#000;cursor:pointer}
     .danger{background:#ff6b6b;color:#fff}
     .muted{color:#9fb3c8;font-size:.9rem}
+    .switch{display:inline-flex;align-items:center;gap:8px}
+    .switch input{transform:scale(1.2)}
   </style>
 </head>
 <body>
   <script src="./auth.js"></script>
   <script>
-    const s = YANLIK_AUTH.requireAuth('login.html', { requireRole: 'admin' });
-    if(!s) document.write("Yönlendiriliyorsunuz...");
+    // owner/admin sayfası; sadece girişli admin/owner görür
+    const check = setInterval(()=>{
+      if(window.YANLIK_AUTH){
+        clearInterval(check);
+        const s = YANLIK_AUTH.requireAuth('login.html', { requireRole: 'admin' }); // owner da "admin" check'ini geçer
+        if(!s) document.write("Yönlendiriliyorsunuz...");
+        window.__viewer = s;
+        renderAll();
+      }
+    },50);
+
+    function isOwner(){ return window.__viewer?.role === "owner"; }
   </script>
 
   <header>
     <h1>Kullanıcı Yönetimi</h1>
     <div>
-      <span>Hoş geldin, <strong id="adminName"></strong></span>
+      <span>Hoş geldin, <strong id="adminName">...</strong></span>
       <button onclick="YANLIK_AUTH.logout('login.html')">Çıkış</button>
     </div>
   </header>
 
-  <section>
-    <p class="muted">Parolalar gösterilmez. Buradan roller atayabilir, kullanıcı silebilir veya parolalarını sıfırlayabilirsiniz.</p>
-
-    <table id="usersTable">
-      <thead>
-        <tr><th>Kullanıcı</th><th>Görünen İsim</th><th>Rol</th><th>Oluşturma</th><th>Son Giriş</th><th>IP</th><th>İşlem</th></tr>
-      </thead>
-      <tbody></tbody>
-    </table>
+  <section id="ownerPanel" style="display:none;margin-top:8px">
+    <div class="switch">
+      <label>Yardımcı adminler IP görebilsin (maskeli):</label>
+      <input type="checkbox" id="ipShareToggle"/>
+    </div>
+    <span class="muted">⚠️ Owner açıksa adminler IP’yi <b>maskeli</b> görür (ör. 1.2.3.x). Owner daima tam görür.</span>
   </section>
 
-  <script>
-    (function render(){
-      try{
-        const sess = YANLIK_AUTH.getSession();
-        document.getElementById('adminName').textContent = sess?.display ? (sess.display[0]+"***"+sess.display.slice(-1)) : sess.username;
+  <table id="usersTable">
+    <thead>
+      <tr>
+        <th>Kullanıcı</th><th>Görünen İsim</th><th>Rol</th><th>Oluşturma</th><th>Son Giriş</th><th>IP</th><th>İşlem</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
 
-        const rows = YANLIK_AUTH.listUsersForAdmin();
-        const tbody = document.querySelector('#usersTable tbody');
-        tbody.innerHTML = rows.map(r=>{
-          return `<tr id="r-${r.id}">
-            <td>${r.username}</td>
-            <td>${r.display}</td>
-            <td>
-              <select onchange="changeRole('${r.id}', this.value)">
-                <option value="admin" ${r.role==='admin'?'selected':''}>admin</option>
-                <option value="standard" ${r.role==='standard'?'selected':''}>standard</option>
-                <option value="guest" ${r.role==='guest'?'selected':''}>guest</option>
-              </select>
-            </td>
-            <td>${r.createdAt?new Date(r.createdAt).toLocaleString():'-'}</td>
-            <td>${r.lastLoginAt?new Date(r.lastLoginAt).toLocaleString():'-'}</td>
-            <td>${r.lastLoginIp || '-'}</td>
-            <td>
-              <button onclick="promptPwd('${r.username}')">Şifre Değiştir</button>
-              <button class="danger" onclick="delUser('${r.id}')">Sil</button>
-            </td>
-          </tr>`;
-        }).join('');
-      }catch(e){ console.error(e); }
-    })();
+  <script>
+    function renderAll(){
+      const sess = YANLIK_AUTH.getSession();
+      document.getElementById('adminName').textContent = (sess?.display||sess?.username||"-");
+
+      // owner switch
+      const ownerPanel = document.getElementById('ownerPanel');
+      if(isOwner()){ ownerPanel.style.display = 'block';
+        const set = YANLIK_AUTH.getSettings();
+        const tgl = document.getElementById('ipShareToggle');
+        tgl.checked = !!set.ipShareAllowed;
+        tgl.onchange = ()=>{
+          try{ YANLIK_AUTH.setSettings({ ipShareAllowed: tgl.checked }, sess); alert("Ayar güncellendi"); renderTable(); }
+          catch(e){ alert(e.message); tgl.checked = !tgl.checked; }
+        };
+      } else { ownerPanel.style.display = 'none'; }
+
+      renderTable();
+    }
+
+    function renderTable(){
+      const s = YANLIK_AUTH.getSession();
+      const rows = YANLIK_AUTH.listUsersForAdmin(s);
+      const tbody = document.querySelector('#usersTable tbody');
+      tbody.innerHTML = rows.map(r=>{
+        const isTargetOwner = r.role === "owner";
+        const roleSelect = isOwner() && !isTargetOwner
+          ? `<select onchange="changeRole('${r.id}', this.value)">
+               <option value="admin" ${r.role==='admin'?'selected':''}>admin</option>
+               <option value="standard" ${r.role==='standard'?'selected':''}>standard</option>
+               <option value="guest" ${r.role==='guest'?'selected':''}>guest</option>
+             </select>`
+          : r.role;
+
+        const ipCell = r.lastLoginIp ? r.lastLoginIp : "-";
+
+        const actions = [];
+        // Şifre değiştir: owner kendisi + herkes için; kullanıcı kendi sayfasında da yapabilir
+        actions.push(`<button onclick="promptPwd('${r.username}')">Şifre</button>`);
+        // Sil & Rol: sadece owner ve hedef owner değilse
+        if(isOwner() && !isTargetOwner){
+          actions.push(`<button class="danger" onclick="delUser('${r.id}')">Sil</button>`);
+        }
+
+        return `<tr id="r-${r.id}">
+          <td>${r.username}</td>
+          <td>${r.display}</td>
+          <td>${roleSelect}</td>
+          <td>${r.createdAt?new Date(r.createdAt).toLocaleString():'-'}</td>
+          <td>${r.lastLoginAt?new Date(r.lastLoginAt).toLocaleString():'-'}</td>
+          <td>${ipCell}</td>
+          <td>${actions.join(" ")}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    async function promptPwd(username){
+      const np = prompt("Yeni parola ("+username+")");
+      if(!np) return;
+      try{
+        await YANLIK_AUTH.changePasswordAsync(YANLIK_AUTH.getSession(), username, np);
+        alert("Parola değiştirildi.");
+      }catch(e){ alert(e.message); }
+    }
 
     function changeRole(id, role){
       try{
-        YANLIK_AUTH.updateUser(id, { role });
+        YANLIK_AUTH.changeRole(YANLIK_AUTH.getSession(), id, role);
         alert("Rol değiştirildi: "+role);
-      }catch(e){ alert("Hata: "+e.message); }
+        renderTable();
+      }catch(e){ alert(e.message); }
     }
-    function promptPwd(username){
-      const np = prompt("Yeni parola: ("+username+")");
-      if(!np) return;
-      try{
-        YANLIK_AUTH.changePassword(username, np);
-        alert("Parola güncellendi.");
-      }catch(e){ alert("Hata: "+e.message); }
-    }
+
     function delUser(id){
       if(!confirm("Silinsin mi?")) return;
       try{
-        YANLIK_AUTH.deleteUser(id);
-        document.getElementById('r-'+id).remove();
-      }catch(e){ alert("Hata: "+e.message); }
+        YANLIK_AUTH.deleteUser(YANLIK_AUTH.getSession(), id);
+        document.getElementById('r-'+id)?.remove();
+      }catch(e){ alert(e.message); }
     }
   </script>
 </body>
