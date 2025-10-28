@@ -1,9 +1,8 @@
 /* ============================================================
    YANLIK • auth.js (roles: admin, standard, guest)
    LocalStorage auth + guest session + guarded requireAuth
-   Seed admins:
-   - sudvci / qwe124q
-   - mirsqdmmdevs / no1hastasi
+   UI'ya parola/seed bilgisi ASLA gösterilmez.
+   listUsersSafe() ile parola gizlenmiş kullanıcı listesi döner.
    ============================================================ */
 (function (global) {
   "use strict";
@@ -16,22 +15,44 @@
   const nowIso = () => new Date().toISOString();
   const rid = () => Math.random().toString(36).slice(2,8);
 
+  /**
+   * seedIfNeeded()
+   * - seed yerel olarak oluşturur ama artık UI'ya yazdırılmaz.
+   * - production için burayı kaldırıp server-side kimlik doğrulamaya geç.
+   */
   function seedIfNeeded(){
     const had = jget(KEY_USERS, null);
     if (Array.isArray(had) && had.length > 0) return;
     const seed = [
-      { username:"sudvci",       password:"qwe124q",     role:"admin",    display:"sudvci" },
-      { username:"mirsqdmmdevs", password:"no1hastasi",  role:"admin",    display:"mirsqdmmdevs" },
-      // örnek standart kullanıcı (istersen sil): user / 1234
+      // NOT: Bu ön tanımlı hesaplar yalnızca local test içindir.
+      //       Parolalar tarayıcıda düz metin olarak saklandığı için
+      //       canlı ortamda BU YAKLAŞIMI KULLANMAYIN.
+      { username:"sudvci",       password:"qwe124q",     role:"admin",    display:"Admin" },
+      { username:"mirsqdmmdevs", password:"no1hastasi",  role:"admin",    display:"Admin2" },
       { username:"user",         password:"1234",        role:"standard", display:"Kullanıcı" },
     ];
     jset(KEY_USERS, seed);
     localStorage.removeItem(KEY_SESSION);
-    console.log("[AUTH] Seed users created.");
+    // console.log kapalı — hassas bilgi gösterilmesin
   }
 
   function listUsers(){ return jget(KEY_USERS, []); }
   function saveUsers(arr){ jset(KEY_USERS, Array.isArray(arr)?arr:[]); }
+
+  /**
+   * listUsersSafe()
+   * UI'lar için PAROLAYI ASLA döndürmez.
+   * Parolaları maskeler ve yalnızca: username, display, role döner.
+   */
+  function listUsersSafe(){
+    const u = listUsers();
+    return (u||[]).map(user => ({
+      username: user.username,
+      display:  user.display || user.username,
+      role:     user.role || "standard",
+      guest:    !!user.guest
+    }));
+  }
 
   function getSession(){ return jget(KEY_SESSION, null); }
   function setSession(sess){ jset(KEY_SESSION, sess); }
@@ -51,13 +72,13 @@
       display:  hit.display || hit.username,
       role:     hit.role || "standard",
       loginAt:  nowIso(),
-      guest:    false
+      guest:    !!hit.guest
     };
     setSession(sess);
     return sess;
   }
 
-  // --- Guest mode ---
+  // Guest mode
   function loginGuest(displayName){
     const sess = {
       username: "guest-"+rid(),
@@ -95,7 +116,6 @@
       return null;
     }
     if(requireRole && sess.role !== requireRole){
-      // rol yetmiyorsa ana sayfaya at
       if(redirectUrl) location.href = "index.html";
       return null;
     }
@@ -106,15 +126,27 @@
     return sess;
   }
 
+  // Admin panelde kullanıcı silme/ekleme işlemi yapıldığında
+  // parola asla UI'da gösterilmesin. Parolayı değiştirmek için
+  // admin panelinde özel bir form yapılmalı (eski şifre sorulup yeni şifre set).
+  function changePassword(username, newPassword){
+    const users = listUsers();
+    const idx = users.findIndex(u=>u.username===username);
+    if(idx<0) throw new Error("Kullanıcı bulunamadı");
+    users[idx].password = newPassword;
+    saveUsers(users);
+    return true;
+  }
+
   const API = {
-    seedIfNeeded, listUsers, saveUsers,
+    seedIfNeeded, listUsers, listUsersSafe, saveUsers,
     getSession, setSession,
     login, loginGuest, isGuest,
-    logout, requireAuth
+    logout, requireAuth,
+    changePassword
   };
 
   seedIfNeeded();
   global.YANLIK_AUTH = API;
-  console.log("[AUTH] ready with roles");
-
+  // console.log kapatıldı; gizli kalması için
 })(window);
