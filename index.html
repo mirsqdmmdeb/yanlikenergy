@@ -3,45 +3,38 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Yanlik • Ana Sayfa</title>
+<title>Yanlik Energy • Ana Sayfa</title>
 <style>
-:root{
-  --c1:#00c9ff; --c2:#0077ff; --bg:#010914; --fg:#e8f0ff;
-}
+:root{--c1:#00c9ff;--c2:#0077ff;--fg:#e8f0ff}
 *{box-sizing:border-box;margin:0;padding:0}
 body{
-  min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  min-height:100vh;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  font-family:system-ui,Segoe UI,Roboto,Arial;
+  color:var(--fg);
   background:radial-gradient(1000px 600px at 0 0,#031630 0%,#000 70%);
-  color:var(--fg);font-family:system-ui,Segoe UI,Roboto,Arial;
   overflow:hidden;
 }
-h1{
-  font-size:3rem;color:var(--c1);
-  text-shadow:0 0 20px var(--c1),0 0 60px var(--c2);
-  animation:fadein 1.2s ease both;
-}
-p{margin:12px 0 24px;font-size:1.1rem;color:#9bb3cc}
+h1{font-size:3rem;color:var(--c1);text-shadow:0 0 20px #00c9ff88;margin-bottom:10px;animation:fadein 1s ease both}
+p{color:#9bb3cc;margin-bottom:22px}
 .row{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-bottom:12px}
 a{
   background:linear-gradient(135deg,var(--c2),var(--c1));
   color:#031018;text-decoration:none;font-weight:700;
-  padding:12px 22px;border-radius:14px;box-shadow:0 0 25px #00c9ff44;
+  padding:12px 22px;border-radius:14px;
+  box-shadow:0 0 25px #00c9ff44;
   transition:transform .15s ease,box-shadow .25s ease;
 }
 a:hover{transform:translateY(-3px);box-shadow:0 0 35px #00c9ffaa}
-footer{margin-top:40px;font-size:.9rem;color:#7ca0c9}
-footer kbd{
-  background:#0f1b2e;border:1px solid #ffffff25;border-radius:6px;padding:2px 6px;
-}
-@keyframes fadein{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:none}}
-/* glow particles */
+footer{margin-top:40px;font-size:.9rem;color:#7ca0c9;text-align:center}
+footer kbd{background:#0f1b2e;border:1px solid #ffffff25;border-radius:6px;padding:2px 6px}
 canvas{position:fixed;inset:0;z-index:-1}
+@keyframes fadein{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:none}}
 </style>
 </head>
 <body>
 <canvas id="bg"></canvas>
-
-<h1>Yanlik</h1>
+<h1>Yanlik Energy</h1>
 <p>Hızlı • Güvenli • Akıcı Sohbet Deneyimi</p>
 
 <div class="row">
@@ -55,7 +48,6 @@ canvas{position:fixed;inset:0;z-index:-1}
 </footer>
 
 <script>
-/* basit mavi partikül efekti */
 const c=document.getElementById("bg"),x=c.getContext("2d");
 function fit(){c.width=innerWidth;c.height=innerHeight}
 addEventListener("resize",fit);fit();
@@ -65,12 +57,12 @@ const p=Array.from({length:50},()=>({x:Math.random()*c.width,y:Math.random()*c.h
   for(const a of p){
     a.x+=a.vx;a.y+=a.vy;
     if(a.x<0||a.x>c.width)a.vx*=-1;if(a.y<0||a.y>c.height)a.vy*=-1;
-    x.beginPath();x.arc(a.x,a.y,a.r,0,6.28);
-    x.fillStyle="#00c9ff55";x.fill();
+    x.beginPath();x.arc(a.x,a.y,a.r,0,6.28);x.fillStyle="#00c9ff55";x.fill();
   }
   for(let i=0;i<p.length;i++)for(let j=i+1;j<p.length;j++){
     const dx=p[i].x-p[j].x,dy=p[i].y-p[j].y,d=Math.hypot(dx,dy);
-    if(d<120){x.globalAlpha=1-d/120;x.strokeStyle="#00c9ff22";x.beginPath();x.moveTo(p[i].x,p[i].y);x.lineTo(p[j].x,p[j].y);x.stroke();x.globalAlpha=1;}
+    if(d<120){x.globalAlpha=1-d/120;x.strokeStyle="#00c9ff22";
+      x.beginPath();x.moveTo(p[i].x,p[i].y);x.lineTo(p[j].x,p[j].y);x.stroke();x.globalAlpha=1;}
   }
   requestAnimationFrame(draw);
 })();
