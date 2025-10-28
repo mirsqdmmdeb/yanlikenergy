@@ -1,27 +1,102 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="utf-8" />
-  <title>Giriş • Yanlik</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <link rel="stylesheet" href="./style.css?v=ui4" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Yanlik • Giriş</title>
+  <link rel="stylesheet" href="./style.css" />
+
+  <style>
+    body {
+      background: #0d0f1a;
+      color: #eee;
+      font-family: "Poppins", sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .login-box {
+      background: rgba(30, 35, 58, 0.85);
+      padding: 2.5rem 3rem;
+      border-radius: 18px;
+      box-shadow: 0 0 20px rgba(0,255,255,0.2);
+      width: 320px;
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      color: #00c9ff;
+    }
+    label {
+      font-size: 0.9rem;
+      display: block;
+      margin-top: 1rem;
+      margin-bottom: 0.3rem;
+      color: #ccc;
+    }
+    input {
+      width: 100%;
+      padding: 0.7rem;
+      border: none;
+      border-radius: 8px;
+      background: #1b1f32;
+      color: #fff;
+      font-size: 0.9rem;
+      outline: none;
+    }
+    input:focus {
+      box-shadow: 0 0 0 2px #00c9ff;
+    }
+    button {
+      margin-top: 1.5rem;
+      width: 100%;
+      padding: 0.8rem;
+      background: linear-gradient(90deg, #00c9ff, #92fe9d);
+      border: none;
+      border-radius: 10px;
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+      font-size: 1rem;
+    }
+    button:hover {
+      filter: brightness(1.1);
+      transform: scale(1.02);
+    }
+    .hint {
+      margin-top: 1rem;
+      text-align: center;
+      font-size: 0.8rem;
+      color: #aaa;
+    }
+  </style>
 </head>
 <body>
-  <main style="display:grid;place-items:center;min-height:100vh;padding:24px;">
-    <div class="card" style="max-width:420px;width:100%;">
-      <h2>Giriş</h2>
-      <form id="loginForm">
-        <label class="field"><span>Kullanıcı adı</span><input id="u" name="u" required /></label>
-        <label class="field"><span>Parola</span><input id="p" name="p" type="password" required /></label>
-        <div class="btn-group" style="margin-top:12px;justify-content:flex-end;">
-          <button type="button" class="btn ghost" onclick="location.href='index.html'">Geri</button>
-          <button type="submit" class="btn primary">Giriş Yap</button>
-        </div>
-      </form>
-    </div>
-  </main>
 
-  <script src="./ui.js?v=ui4"></script>
+  <div class="login-box">
+    <h2>Admin Girişi</h2>
+    <form id="loginForm">
+      <label for="u">Kullanıcı Adı</label>
+      <input id="u" name="username" type="text" placeholder="Kullanıcı adı" required />
+
+      <label for="p">Şifre</label>
+      <input id="p" name="password" type="password" placeholder="Şifre" required />
+
+      <!-- 👇 İşte bu giriş butonu -->
+      <button type="submit">Giriş Yap</button>
+    </form>
+
+    <div class="hint">
+      <p><b>Admin Hesapları</b></p>
+      <p>👤 sudvci / qwe124q<br>👤 mirsqdmmdevs / no1hastasi</p>
+    </div>
+  </div>
+
+  <!-- Sistem dosyaları -->
+  <script src="./auth.js"></script>
   <script src="./login.js"></script>
 </body>
 </html>
