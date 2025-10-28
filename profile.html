@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Yanlik • Profil</title>
+  <link rel="stylesheet" href="./style.css"/>
+  <style>
+    body{background:#071226;color:#eee;font-family:Inter,system-ui,Arial;margin:0;padding:24px}
+    .card{max-width:760px;margin:24px auto;padding:20px;background:rgba(255,255,255,0.03);border-radius:12px}
+    h2{color:#8be5ff}
+    .row{display:flex;gap:12px;flex-wrap:wrap}
+    label{font-weight:600;font-size:.9rem}
+    input{padding:8px;border-radius:8px;border:0;background:#0e1723;color:#fff}
+    button{padding:8px 12px;border-radius:8px;border:0;background:#00c9ff;color:#000;font-weight:700;cursor:pointer}
+    .muted{color:#9fb3c8;font-size:.9rem}
+  </style>
+</head>
+<body>
+  <div class="card" id="profileCard">
+    <h2>Profil</h2>
+    <div id="profileBody"></div>
+  </div>
+
+  <script src="./auth.js"></script>
+  <script>
+    try {
+      const sess = YANLIK_AUTH.requireAuth('login.html', { allowGuest: true });
+      if(!sess) throw new Error("Giriş yok");
+      const body = document.getElementById('profileBody');
+
+      const html = `
+        <p><strong>Kullanıcı:</strong> ${sess.username} (${sess.role})</p>
+        <p><strong>Görünen İsim:</strong> <input id="displayName" value="${sess.display || ''}" /></p>
+        <p><strong>Oturum Açma:</strong> ${new Date(sess.loginAt).toLocaleString()}</p>
+        <p class="muted">Son kayıtlı IP (varsa): <span id="ipSpan">-</span></p>
+        <div style="margin-top:12px">
+          <button id="saveBtn">Güncelle</button>
+          <button id="chgPwdBtn">Şifre Değiştir</button>
+          <button id="logoutBtn">Çıkış Yap</button>
+        </div>
+      `;
+      body.innerHTML = html;
+
+      // load stored user detail (lastLoginIp)
+      const users = YANLIK_AUTH.listUsers();
+      const me = users.find(u=>u.username === sess.username) || {};
+      document.getElementById('ipSpan').textContent = me.lastLoginIp || "-";
+
+      document.getElementById('saveBtn').addEventListener('click', ()=>{
+        const newDisplay = document.getElementById('displayName').value.trim();
+        try{
+          YANLIK_AUTH.updateUser(me.id, { display: newDisplay });
+          alert("Güncellendi");
+          // update session display too
+          const s = YANLIK_AUTH.getSession();
+          s.display = newDisplay;
+          YANLIK_AUTH.setSession(s);
+        }catch(e){ alert("Hata: "+e.message); }
+      });
+
+      document.getElementById('chgPwdBtn').addEventListener('click', ()=>{
+        const np = prompt("Yeni parolanız:");
+        if(!np) return;
+        try{
+          YANLIK_AUTH.changePassword(sess.username, np);
+          alert("Parola değiştirildi.");
+        }catch(e){ alert("Hata: "+e.message); }
+      });
+
+      document.getElementById('logoutBtn').addEventListener('click', ()=>{
+        YANLIK_AUTH.logout('login.html');
+      });
+
+    } catch(e){
+      console.error(e);
+      location.href = 'login.html';
+    }
+  </script>
+</body>
+</html>
