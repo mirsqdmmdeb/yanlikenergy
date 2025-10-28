@@ -1,149 +1,48 @@
 <!doctype html>
 <html lang="tr">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Yanlik • Giriş</title>
 <style>
-:root{--c1:#00c9ff;--c2:#0077ff;--fg:#e8f0ff}
-*{box-sizing:border-box;margin:0;padding:0}
-body{
-  min-height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;
-  font-family:system-ui,Segoe UI,Roboto,Arial;color:var(--fg);
-  background:radial-gradient(1000px 600px at 0 0,#031630 0%,#000 70%);
-  overflow:hidden;text-align:center;
-}
-h1{color:var(--c1);text-shadow:0 0 18px #00c9ff66;margin-bottom:6px;animation:fadein .8s ease both}
-p{color:#9bb3cc;margin-bottom:20px}
-form{
-  width:min(95vw,420px);display:flex;flex-direction:column;gap:10px;margin-top:6px;
-  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);
-  padding:22px;border-radius:18px;backdrop-filter:blur(10px);
-  box-shadow:0 0 40px #00c9ff22;animation:pop .5s ease both;
-}
-label{font-size:.9rem;color:#b8cbe2;text-align:left}
-input{
-  width:100%;padding:11px 12px;border-radius:12px;border:none;background:#0f1b2e;color:var(--fg)
-}
-.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:space-between}
-.btn{
-  background:linear-gradient(135deg,var(--c2),var(--c1));color:#02131a;font-weight:800;border:none;
-  border-radius:12px;padding:11px 14px;cursor:pointer;transition:transform .15s ease,box-shadow .25s ease
-}
-.btn:hover{transform:translateY(-2px);box-shadow:0 0 22px #00c9ffaa}
-.link{color:var(--c1);text-decoration:none;font-size:.9rem}
-.link:hover{text-decoration:underline}
-.msg{display:none;margin-top:6px;border-radius:10px;padding:10px 12px;font-size:.95rem;text-align:left}
-.msg.err{display:none;background:#1e0b0b;border:1px solid #ff6b6b;color:#ffdada}
-.msg.ok{display:none;background:#0b1e13;border:1px solid #26d07c;color:#d8ffea}
-small{color:#7ea6c9}
-canvas{position:fixed;inset:0;z-index:-1}
-@keyframes fadein{from{opacity:0;transform:translateY(-14px)}to{opacity:1;transform:none}}
-@keyframes pop{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:none}}
+:root{--c1:#00c9ff;--c2:#0077ff;--bg:#050b18;--fg:#e8f0ff}
+*{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--fg);font-family:system-ui,Segoe UI,Roboto;min-height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden}
+nav{position:fixed;top:0;left:0;right:0;display:flex;gap:18px;justify-content:center;padding:12px;background:rgba(0,0,0,.35);backdrop-filter:blur(10px);z-index:5}
+nav a{color:var(--c1);text-decoration:none;font-weight:700} nav a:hover{color:var(--c2)}
+.card{width:min(420px,92%);background:rgba(255,255,255,.06);border:1px solid #ffffff18;border-radius:16px;padding:20px;backdrop-filter:blur(10px);box-shadow:0 0 24px #00c9ff22;text-align:center}
+h1{margin:0 0 8px;color:var(--c1);text-shadow:0 0 18px #00c9ffaa}
+input{width:100%;background:#0f1b2e;color:var(--fg);border:1px solid #ffffff1a;border-radius:12px;padding:12px;margin:6px 0}
+.btn{width:100%;background:linear-gradient(135deg,var(--c2),var(--c1));border:none;border-radius:12px;padding:12px 16px;color:#06141c;font-weight:800}
+a.link{color:var(--c1);text-decoration:none} a.link:hover{text-decoration:underline}
+.msg{display:none;margin-top:8px;border-radius:10px;padding:10px 12px} .err{background:#1e0b0b;border:1px solid #ff6b6b;color:#ffdada}
 </style>
 </head>
 <body>
-<canvas id="bg"></canvas>
+<nav>
+  <a href="index.html">Ana Sayfa</a>
+  <a href="chat.html">Sohbet</a>
+  <a href="ayarlar.html">Ayarlar</a>
+  <a href="hakkinda.html">Hakkında</a>
+</nav>
 
-<h1>Yanlik Energy</h1>
-<p>Hesabına giriş yap</p>
+<div class="card">
+  <h1>Giriş Yap</h1>
+  <input id="user" placeholder="Kullanıcı adı">
+  <input id="pass" type="password" placeholder="Şifre">
+  <button class="btn" id="go">Giriş</button>
+  <div id="m" class="msg err"></div>
+  <p style="margin-top:10px"><a class="link" href="signup.html">Hesabın yok mu? Üye Ol</a></p>
+</div>
 
-<form id="f" onsubmit="return false">
-  <label for="user">Kullanıcı adı</label>
-  <input id="user" placeholder="örn. mirsqdmmdevs" autocomplete="username" required>
-
-  <label for="pass">Şifre</label>
-  <input id="pass" type="password" placeholder="••••••••" autocomplete="current-password" required>
-
-  <div class="row">
-    <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="remember"> <small>Beni hatırla</small></label>
-    <a class="link" href="signup.html">Hesabın yok mu? Üye Ol</a>
-  </div>
-
-  <div class="row">
-    <button id="loginBtn" class="btn" style="flex:1">Giriş Yap</button>
-    <button id="guestBtn" type="button" class="btn" style="flex:1; background:linear-gradient(135deg,#3f68ff,#7acbff)">Misafir Girişi</button>
-  </div>
-
-  <div id="mErr" class="msg err"></div>
-  <div id="mOk" class="msg ok"></div>
-</form>
-
-<script src="./auth.js"></script>
+<script src="bg.js"></script>
+<script src="memory.js"></script>
 <script>
-/* === Neon parçacık arkaplan === */
-const c=document.getElementById("bg"),x=c.getContext("2d");
-function fit(){c.width=innerWidth;c.height=innerHeight} addEventListener("resize",fit); fit();
-const P=Array.from({length:60},()=>({x:Math.random()*c.width,y:Math.random()*c.height,vx:(Math.random()-.5)*.6,vy:(Math.random()-.5)*.6,r:1+Math.random()*2}));
-(function draw(){
-  x.clearRect(0,0,c.width,c.height);
-  for(const a of P){
-    a.x+=a.vx;a.y+=a.vy;
-    if(a.x<0||a.x>c.width)a.vx*=-1; if(a.y<0||a.y>c.height)a.vy*=-1;
-    x.beginPath(); x.arc(a.x,a.y,a.r,0,6.283); x.fillStyle="#00c9ff55"; x.fill();
-  }
-  for(let i=0;i<P.length;i++)for(let j=i+1;j<P.length;j++){
-    const dx=P[i].x-P[j].x, dy=P[i].y-P[j].y, d=Math.hypot(dx,dy);
-    if(d<120){ x.globalAlpha=1-d/120; x.strokeStyle="#00c9ff22"; x.beginPath(); x.moveTo(P[i].x,P[i].y); x.lineTo(P[j].x,P[j].y); x.stroke(); x.globalAlpha=1; }
-  }
-  requestAnimationFrame(draw);
-})();
-
-/* === Helperlar === */
-const $=s=>document.querySelector(s);
-const show=(el,txt)=>{ el.textContent=txt; el.style.display='block'; };
-const hide=el=>{ el.style.display='none'; };
-
-/* === Query paramdan kullanıcı adı doldur === */
-const params=new URLSearchParams(location.search);
-const qpUser=params.get("u"); if(qpUser) $("#user").value=qpUser;
-
-/* === Remember me === */
-const RKEY="yanlik:lastUser";
-const last=localStorage.getItem(RKEY); if(last && !qpUser) $("#user").value=last;
-
-/* === Enter ile giriş === */
-$("#f").addEventListener("keydown", e=>{ if(e.key==="Enter"){ e.preventDefault(); doLogin(); }});
-$("#loginBtn").onclick = doLogin;
-$("#guestBtn").onclick = guestLogin;
-
-function doLogin(){
-  hide($("#mErr")); hide($("#mOk"));
-  const u=$("#user").value.trim(), p=$("#pass").value;
-  if(!u || !p) return show($("#mErr"), "Kullanıcı adı ve şifre zorunlu.");
-
-  try{
-    const ok = YANLIK_AUTH.login(u,p);
-    if(ok){
-      if($("#remember").checked) localStorage.setItem(RKEY,u); else localStorage.removeItem(RKEY);
-      show($("#mOk"), "Giriş başarılı! Yönlendiriliyorsun…");
-      setTimeout(()=> location.href="chat.html", 400);
-    }else{
-      show($("#mErr"), "Hatalı kullanıcı adı veya şifre.");
-    }
-  }catch(e){
-    console.error(e);
-    show($("#mErr"), "Giriş modülü (auth.js) erişilemiyor.");
-  }
-}
-
-function guestLogin(){
-  // Misafir kullanıcı: local-only oturum (auth.js içinde destek varsa onu kullanır)
-  try{
-    if(YANLIK_AUTH && typeof YANLIK_AUTH.guest==='function'){
-      YANLIK_AUTH.guest();
-    }else{
-      // basit fallback: fake session
-      const sess={username:"guest_"+Math.random().toString(36).slice(2,7), display:"Misafir", role:"guest", at:new Date().toISOString()};
-      localStorage.setItem("yanlik:session", JSON.stringify(sess));
-    }
-    show($("#mOk"), "Misafir olarak giriş yapıldı, yönlendiriliyor…");
-    setTimeout(()=> location.href="chat.html", 300);
-  }catch(e){
-    console.error(e);
-    show($("#mErr"), "Misafir girişi başarısız.");
-  }
-}
+document.getElementById('go').onclick=()=>{
+  const u=document.getElementById('user').value.trim();
+  const p=document.getElementById('pass').value.trim();
+  const ok = YANLIK_MEM.login(u,p);
+  const m=document.getElementById('m');
+  if(ok){ location.href='chat.html'; } else { m.style.display='block'; m.textContent='Hatalı kullanıcı adı veya şifre'; }
+};
 </script>
 </body>
 </html>
