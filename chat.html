@@ -6,121 +6,291 @@
   <title>Yanlik • Sohbet</title>
   <link rel="stylesheet" href="style.css">
   <style>
-    body {
-      font-family: system-ui;
-      margin: 0;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      background: radial-gradient(circle at top left, #02182a, #000);
-      color: #e8f0ff;
+    :root{
+      --bg:#000814;--bg2:#001d3d;--fg:#e8f0ff;--muted:#9bb3cc;--acc:#00c9ff;--acc2:#0077ff;
     }
-    header, footer {
-      background: rgba(0,0,0,0.3);
-      backdrop-filter: blur(8px);
-      padding: 12px 16px;
+    *{box-sizing:border-box}
+    body{
+      font-family:system-ui,Segoe UI,Roboto,Arial;
+      margin:0; height:100vh; display:flex; flex-direction:column;
+      background: radial-gradient(1000px 600px at 10% 0%, #02182a 0%, #000 60%);
+      color:var(--fg);
     }
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-weight: 600;
-      color: #00c9ff;
-      text-shadow: 0 0 10px #00c9ff88;
+    header, footer{
+      background:rgba(0,0,0,.35); backdrop-filter:blur(8px);
+      padding:12px 16px;
     }
-    main {
-      flex: 1;
-      overflow-y: auto;
-      padding: 12px 16px;
+    header{ display:flex; gap:12px; align-items:center; justify-content:space-between; }
+    .brand{ display:flex; gap:10px; align-items:center; font-weight:700; color:var(--acc); text-shadow:0 0 10px #00c9ff77;}
+    .pill{ background:#0f1b2e; border:1px solid rgba(255,255,255,.06); padding:6px 8px; border-radius:999px; color:var(--muted); }
+    .controls{ display:flex; gap:8px; flex-wrap:wrap; }
+    select, .seg{
+      background:#0f1b2e; color:#fff; border:1px solid rgba(255,255,255,.06);
+      border-radius:10px; padding:8px 10px;
     }
-    .msg {
-      margin-bottom: 10px;
-      background: rgba(255,255,255,0.05);
-      border-radius: 10px;
-      padding: 8px 12px;
+    .seg{ display:flex; gap:4px; }
+    .seg button{
+      border:0; background:transparent; color:#9fd3ff; padding:6px 10px; border-radius:8px; cursor:pointer;
     }
-    .meta {
-      font-size: 12px;
-      color: #9bb3cc;
+    .seg button.active{ background:linear-gradient(135deg,var(--acc2),var(--acc)); color:#02131a; font-weight:700; }
+    main{ flex:1; overflow-y:auto; padding:12px 16px; }
+    .row{ display:flex; gap:8px; }
+    .msg{
+      margin:10px 0; padding:10px 12px; border-radius:12px;
+      border:1px solid rgba(255,255,255,.06); background:rgba(255,255,255,.04);
+      max-width:880px;
     }
-    footer {
-      display: flex;
-      gap: 8px;
+    .me{ background:linear-gradient(180deg, rgba(0,201,255,.12), rgba(255,255,255,.03)); border-color:#00c9ff33;}
+    .meta{ font-size:12px; color:var(--muted); margin-bottom:4px; }
+    .typing{ font-size:12px; color:var(--muted); display:none; gap:6px; align-items:center; }
+    .dot{ width:6px; height:6px; border-radius:50%; background:var(--muted); animation:b 1s infinite alternate; }
+    .dot:nth-child(2){ animation-delay:.2s } .dot:nth-child(3){ animation-delay:.4s }
+    @keyframes b { to{ transform:translateY(-2px); opacity:.6; } }
+    footer{ display:flex; flex-direction:column; gap:8px; }
+    input{
+      flex:1; background:#0e1423; color:#fff; border:0; border-radius:10px; padding:12px;
     }
-    input {
-      flex: 1;
-      background: #0e1423;
-      color: #fff;
-      border: 0;
-      border-radius: 8px;
-      padding: 10px;
+    button.send{
+      background:linear-gradient(135deg,var(--acc2),var(--acc));
+      border:0; color:#02131a; font-weight:800; padding:12px 16px; border-radius:10px; cursor:pointer;
     }
-    button {
-      background: linear-gradient(135deg,#0077ff,#00c9ff);
-      border: 0;
-      color: #02131a;
-      font-weight: 700;
-      padding: 10px 16px;
-      border-radius: 8px;
-      cursor: pointer;
+    .quick{ display:flex; gap:8px; flex-wrap:wrap; }
+    .quick button{
+      background:#0f1b2e; border:1px solid rgba(255,255,255,.06); color:#9fd3ff;
+      padding:6px 10px; border-radius:999px; cursor:pointer;
     }
-    button:hover { filter: brightness(1.2); }
   </style>
 </head>
 <body>
   <script src="./auth.js"></script>
   <script>
-    const sess = YANLIK_AUTH.requireAuth('login.html');
+    const sess = YANLIK_AUTH.requireAuth('login.html'); // giriş zorunlu
     if(!sess) document.write("Yönlendiriliyorsunuz...");
   </script>
 
   <header>
-    <span>💬 Sohbet Odası</span>
-    <span id="userInfo">Yükleniyor...</span>
+    <div class="brand">💬 YanlikAI <span class="pill" id="userBadge">yükleniyor…</span></div>
+    <div class="controls">
+      <!-- Mod -->
+      <div class="seg" id="modeSeg" role="tablist" aria-label="Mod">
+        <button data-mode="empathy" class="active">Empati</button>
+        <button data-mode="assistant">Asistan</button>
+      </div>
+      <!-- Ton -->
+      <div class="seg" id="toneSeg" role="tablist" aria-label="Ton">
+        <button data-tone="soft" class="active">Yumuşak</button>
+        <button data-tone="neutral">Nötr</button>
+      </div>
+      <!-- Dil -->
+      <select id="langSel" title="Dil">
+        <option value="auto" selected>Dil: Otomatik</option>
+        <option value="tr">Türkçe</option>
+        <option value="en">English</option>
+      </select>
+      <button class="seg" id="logoutBtn" title="Çıkış">Çıkış</button>
+    </div>
   </header>
 
   <main id="chatList"></main>
 
+  <div class="typing" id="typing"><span>YanlikAI yazıyor</span><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+
   <footer>
-    <input id="msgInput" placeholder="Mesaj yaz..." autocomplete="off"/>
-    <button id="sendBtn">Gönder</button>
+    <div class="quick" id="quick">
+      <button data-t="Selam!">Selam!</button>
+      <button data-t="Biraz moralim bozuk.">Biraz moralim bozuk.</button>
+      <button data-t="Bana hızlı bir çalışma planı verir misin?">Çalışma planı</button>
+      <button data-t="Bugün verimli olmak için 3 küçük adım?">3 küçük adım</button>
+    </div>
+    <div class="row">
+      <input id="msgInput" placeholder="Mesaj yaz ve Enter’a bas..." autocomplete="off"/>
+      <button class="send" id="sendBtn">Gönder</button>
+    </div>
   </footer>
 
   <script>
+    // ===== UI refs
     const list = document.getElementById("chatList");
     const input = document.getElementById("msgInput");
-    const btn = document.getElementById("sendBtn");
+    const btn   = document.getElementById("sendBtn");
+    const badge = document.getElementById("userBadge");
+    const typing= document.getElementById("typing");
+    const langSel = document.getElementById("langSel");
+
+    // ===== Session info
     const me = YANLIK_AUTH.getSession();
+    badge.textContent = `${me.display} (${me.role})`;
 
-    document.getElementById("userInfo").textContent =
-      `${me.display} (${me.role})`;
+    // ===== Mode / Tone
+    let MODE = "empathy"; // empathy | assistant
+    let TONE = "soft";    // soft | neutral
 
+    document.getElementById("modeSeg").onclick = (e)=>{
+      if(e.target.tagName!=="BUTTON") return;
+      MODE = e.target.dataset.mode;
+      [...e.currentTarget.children].forEach(b=>b.classList.toggle("active", b.dataset.mode===MODE));
+    };
+    document.getElementById("toneSeg").onclick = (e)=>{
+      if(e.target.tagName!=="BUTTON") return;
+      TONE = e.target.dataset.tone;
+      [...e.currentTarget.children].forEach(b=>b.classList.toggle("active", b.dataset.tone===TONE));
+    };
+
+    // ===== Logout
+    document.getElementById("logoutBtn").onclick = ()=>{
+      YANLIK_AUTH.logout(); location.href="login.html";
+    };
+
+    // ===== Helpers
     function fmt(t){ return new Date(t).toLocaleTimeString("tr-TR",{hour:'2-digit',minute:'2-digit'}); }
-
+    function esc(x){ return (x||"").replace(/</g,"&lt;"); }
     function render(){
       const chats = YANLIK_AUTH.listChats();
-      list.innerHTML = chats.slice(-100).map(c=>`
-        <div class="msg">
-          <div class="meta">${fmt(c.at)} • <strong>${c.from}</strong> [${c.role}]</div>
-          <div>${c.text.replace(/</g,"&lt;")}</div>
+      list.innerHTML = chats.slice(-200).map(c=>`
+        <div class="msg ${c.from===me.username?'me':''}">
+          <div class="meta">${fmt(c.at)} • <strong>${esc(c.from)}</strong> [${c.role}]</div>
+          <div>${esc(c.text)}</div>
         </div>
       `).join("");
       list.scrollTop = list.scrollHeight;
     }
 
-    function send(){
+    // ===== Language detection (very simple)
+    function detectLang(s){
+      if(langSel.value!=="auto") return langSel.value;
+      const trWords = ["merhaba","selam","nasıl","üzgün","moral","yardım","teşekkür","lütfen","kanka","kanki","knk"];
+      const enWords = ["hello","hi","how","sad","help","thanks","please","buddy"];
+      const L = s.toLowerCase();
+      let trScore = trWords.reduce((a,w)=>a+(L.includes(w)?1:0),0);
+      // contains Turkish chars?
+      if(/[çğıöşü]/i.test(s)) trScore+=2;
+      let enScore = enWords.reduce((a,w)=>a+(L.includes(w)?1:0),0);
+      return trScore>=enScore ? "tr" : "en";
+    }
+
+    // ===== Sentiment (very rough)
+    const NEG = ["üzgün","moralim bozuk","kötü hissediyorum","bunaldım","yorgunum","kaygı","anksiyete","depresif","ağlıyorum","zor","stres","korku","endişe","yalnızım"];
+    const POS = ["harika","mükemmel","iyi","süper","seviniyorum","mutlu","şahane","başardım"];
+    function polarity(s){
+      const L=s.toLowerCase();
+      let score=0;
+      NEG.forEach(w=>{ if(L.includes(w)) score--; });
+      POS.forEach(w=>{ if(L.includes(w)) score++; });
+      return score; // -neg .. +pos
+    }
+
+    // ===== Crisis detection (self-harm / safety)
+    function isCrisis(s){
+      const L=s.toLowerCase();
+      const keys = [
+        "intihar","kendime zarar","yaşamak istemiyorum","kendimi öldüreceğim","bıçak","canıma kıy",
+        "suicide","kill myself","self harm"
+      ];
+      return keys.some(k=>L.includes(k));
+    }
+
+    // ===== Bot core
+    function replyEmpathy(lang, text){
+      const score = polarity(text);
+      const soft = TONE==="soft";
+      const openQ = lang==="tr"
+        ? ["Bunu ne zamandır hissediyorsun?","Sence bu duyguyu tetikleyen ne olmuş olabilir?","Şu an sana en çok ne iyi gelir?","Bunu yalnız taşımak zorunda değilsin, istersen küçük bir plan yapalım."]
+        : ["How long have you been feeling this?","What do you think triggered it?","What would help you most right now?","You don’t have to carry this alone—shall we make a tiny plan?"];
+      const ground = lang==="tr"
+        ? "Topraklanma denemesi: gördüğün 5 şey, dokunduğun 4 şey, duyduğun 3 ses, aldığın 2 koku, 1 tat."
+        : "Grounding: 5 things you see, 4 you touch, 3 sounds, 2 smells, 1 taste.";
+
+      if(isCrisis(text)){
+        return lang==="tr"
+          ? "Bunu duyduğuma çok üzüldüm ve ciddiye alıyorum. **Güvenliğin en öncelikli.** Lütfen şu an güvendiğin birini ara veya bulunduğun yerde acil hizmetleri **112**’yi ara. İstersen birlikte nefesi yavaşlatıp 4-4-6 nefes (4 sn al, 4 sn tut, 6 sn ver) yapalım. Şu an yanındayım; istersen birkaç dakikalık bir destek planı da yapabiliriz."
+          : "I’m really sorry you’re feeling this. **Your safety matters most.** Please contact someone you trust right now or call your local emergency number. If you’re in Türkiye, dial **112**. We can also do a quick 4-4-6 breathing to settle a bit. I’m here, and we can make a short support plan together.";
+      }
+
+      // gentle templates
+      if(score<=-1){
+        return lang==="tr"
+          ? `${soft?"Seni duyuyorum; zor bir şey taşıyorsun. ":""}Böyle hissetmen çok anlaşılır. ${ground} \n\n${openQ[0]}`
+          : `${soft?"I hear you; you’re carrying something heavy. ":""}It’s totally understandable to feel this way. ${ground}\n\n${openQ[0]}`;
+      }
+      if(score>=1){
+        return lang==="tr"
+          ? `${soft?"Sevindim! ":""}Bu hissi korumak için bugün **küçük 1 adım** seçelim mi? Mesela 20 dk odak + 5 dk mola. ${openQ[2]}`
+          : `${soft?"Love to hear that! ":""}To keep the momentum, shall we pick **one tiny step** for today? e.g., 20m focus + 5m break. ${openQ[2]}`;
+      }
+      // neutral
+      return lang==="tr"
+        ? `${soft?"Anlıyorum, biraz karmaşık görünüyor. ":""}İstersen iki yoldan ilerleyelim: (1) duyguyu düzenleyecek mini rutin, (2) sorunun köküne inen 1-2 soru. ${openQ[1]}`
+        : `${soft?"Got it—this feels a bit tangled. ":""}We can try two tracks: (1) a tiny regulation routine, (2) 1–2 root-cause questions. ${openQ[1]}`;
+    }
+
+    function replyAssistant(lang, text){
+      const L=text.toLowerCase();
+
+      // quick intents
+      if(/(selam|merhaba|hello|hi)\b/.test(L)){
+        return lang==="tr" ? "Selam! Nasıl yardımcı olabilirim? İstersen bir hedef yaz, 3 küçük adıma bölelim." :
+                             "Hey there! How can I help? Share a goal and we’ll break it into 3 tiny steps.";
+      }
+      if(/(plan|çalışma planı|study plan)/.test(L)){
+        return lang==="tr"
+          ? "Hızlı çalışma planı: 1) 25 dk odak (Pomodoro) × 3, 2) 10 dk özet çıkar, 3) 15 dk test çöz. Akşam 20 dk tekrar. Hazır mıyız?"
+          : "Quick study plan: 1) 25m focus (Pomodoro) × 3, 2) 10m notes/summary, 3) 15m quiz. Evening: 20m review. Ready?";
+      }
+      if(/(3 küçük adım|3 small steps|3 steps)/.test(L)){
+        return lang==="tr"
+          ? "Bugün için 3 küçük adım: (1) 15 dk derli toplu alan hazırlığı, (2) 20 dk tek görev, (3) 5 dk mini rapor (ne yaptım, sırada ne var)."
+          : "Three tiny steps for today: (1) 15m tidy workspace, (2) 20m single-task focus, (3) 5m mini report (done + next).";
+      }
+
+      // fallback: general helpful tone
+      return lang==="tr"
+        ? "Anladım. Bunu netleştirmek için 1 hedef, 1 engel ve 1 sonraki adımı yazalım mı? İstersen örnek bir şablon vereyim."
+        : "Got it. Shall we note 1 goal, 1 obstacle, and 1 next step? I can give you a quick template.";
+    }
+
+    function composeReply(text){
+      const lang = detectLang(text);
+      if(MODE==="empathy") return replyEmpathy(lang, text);
+      return replyAssistant(lang, text);
+    }
+
+    // ===== Send & bot
+    function pushMine(text){
+      YANLIK_AUTH.pushChat({ from: me.username, role: me.role, text });
+    }
+    function pushBot(text){
+      YANLIK_AUTH.pushChat({ from: "YanlikAI", role: "bot", text });
+    }
+
+    async function send(){
       const text = input.value.trim();
       if(!text) return;
-      YANLIK_AUTH.pushChat({ from: me.username, role: me.role, text });
-      input.value = "";
+      pushMine(text);
+      input.value=""; render();
+
+      // typing…
+      typing.style.display="inline-flex";
+      await new Promise(r=>setTimeout(r, Math.min(1200, 300 + text.length*15)));
+
+      const botText = composeReply(text);
+      pushBot(botText);
+      typing.style.display="none";
       render();
     }
 
     btn.onclick = send;
-    input.addEventListener("keydown", e => { if(e.key==="Enter") send(); });
+    input.addEventListener("keydown", e=>{ if(e.key==="Enter") send(); });
 
+    // Quick prompts
+    document.getElementById("quick").onclick = (e)=>{
+      if(e.target.tagName!=="BUTTON") return;
+      input.value = e.target.dataset.t;
+      input.focus();
+    };
+
+    // init
     render();
-    setInterval(render, 3000);
+    setInterval(render, 5000);
   </script>
 </body>
 </html>
