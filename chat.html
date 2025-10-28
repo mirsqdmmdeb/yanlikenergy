@@ -1,414 +1,700 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Yanlik • Sohbet</title>
-  <link rel="stylesheet" href="style.css">
-  <style>
-    :root{
-      --bg:#000814;--fg:#e8f0ff;--muted:#9bb3cc;--acc:#00c9ff;--acc2:#0077ff;
-      --card:#0f1b2e; --panel:#121a2b;
-    }
-    *{box-sizing:border-box}
-    body{
-      font-family:system-ui,Segoe UI,Roboto,Arial;
-      margin:0; height:100vh; display:grid;
-      grid-template-columns: 280px 1fr;
-      grid-template-rows: 64px 1fr 120px;
-      grid-template-areas:
-        "side header"
-        "side main"
-        "side footer";
-      background: radial-gradient(1000px 600px at 10% 0%, #02182a 0%, #000 60%);
-      color:var(--fg);
-    }
-    header{
-      grid-area:header; background:rgba(0,0,0,.35); backdrop-filter:blur(8px);
-      display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 16px;
-    }
-    .brand{display:flex;align-items:center;gap:10px;color:var(--acc);font-weight:800;text-shadow:0 0 10px #00c9ff77}
-    .pill{background:#0f1b2e;border:1px solid rgba(255,255,255,.06);padding:6px 8px;border-radius:999px;color:var(--muted)}
-    .controls{display:flex;gap:8px;flex-wrap:wrap}
-    .seg{display:flex;gap:4px;background:#0f1b2e;border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:2px}
-    .seg button{border:0;background:transparent;color:#9fd3ff;padding:6px 10px;border-radius:8px;cursor:pointer}
-    .seg button.active{background:linear-gradient(135deg,var(--acc2),var(--acc));color:#02131a;font-weight:800}
-    select, .chip{
-      background:#0f1b2e;color:#fff;border:1px solid rgba(255,255,255,.06);
-      border-radius:10px;padding:8px 10px
-    }
-    .chip{cursor:pointer}
-    #side{
-      grid-area:side;background:rgba(0,0,0,.35);backdrop-filter:blur(8px);padding:12px;border-right:1px solid rgba(255,255,255,.08);
-      display:flex;flex-direction:column;gap:12px;overflow:auto;
-    }
-    .card{background:var(--panel);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:10px}
-    .title{font-weight:800;color:#9fd3ff;margin:4px 0 8px}
-    .row{display:flex;gap:8px}
-    .col{display:flex;flex-direction:column;gap:8px}
-    .rooms li{list-style:none;margin:6px 0;display:flex;justify-content:space-between;gap:8px}
-    .rooms button{border:0;border-radius:8px;padding:4px 8px;background:#162541;color:#9fd3ff;cursor:pointer}
-    .rooms button.active{background:linear-gradient(135deg,var(--acc2),var(--acc));color:#02131a;font-weight:800}
-    .muted{color:var(--muted)}
-    main{ grid-area:main; overflow:auto; padding:12px 16px;}
-    .msg{ margin:10px 0; padding:10px 12px; border-radius:12px;
-      border:1px solid rgba(255,255,255,.06); background:rgba(255,255,255,.04); max-width:900px}
-    .me{ background:linear-gradient(180deg, rgba(0,201,255,.12), rgba(255,255,255,.03)); border-color:#00c9ff33;}
-    .meta{ font-size:12px; color:var(--muted); margin-bottom:4px; }
-    .trline{margin-top:6px;font-size:13px;color:#d7eaff}
-    .hint{font-size:12px;color:#88a9c9}
-    #typing{ display:none; color:var(--muted); font-size:12px; gap:6px; align-items:center; margin:8px 0 }
-    .dot{ width:6px; height:6px; border-radius:50%; background:var(--muted); animation:b 1s infinite alternate; }
-    .dot:nth-child(2){ animation-delay:.2s } .dot:nth-child(3){ animation-delay:.4s }
-    @keyframes b { to{ transform:translateY(-2px); opacity:.6; } }
-    footer{
-      grid-area:footer; background:rgba(0,0,0,.35); backdrop-filter:blur(8px);
-      padding:10px 12px; display:flex; flex-direction:column; gap:8px;
-    }
-    input, textarea{
-      background:#0e1423;color:#fff;border:0;border-radius:10px;padding:10px
-    }
-    .send{background:linear-gradient(135deg,var(--acc2),var(--acc));border:0;color:#02131a;font-weight:800;
-      padding:12px 16px;border-radius:10px;cursor:pointer}
-    .quick{display:flex;gap:8px;flex-wrap:wrap}
-    .quick button{background:#0f1b2e;border:1px solid rgba(255,255,255,.06);color:#9fd3ff;padding:6px 10px;border-radius:999px;cursor:pointer}
-    .bar{display:flex;gap:8px;align-items:center}
-    .grow{flex:1}
-    .danger{background:#ff6b6b;color:#fff;border:0;border-radius:8px;padding:6px 8px;cursor:pointer}
-  </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>YanlikAI • Sohbet</title>
+
+<!-- ====== Styles ====== -->
+<style>
+:root{
+  --bg:#050b18;          /* default theme: Neon Blue */
+  --panel:#0b1324;
+  --panel-2:#0e1b33;
+  --text:#e8f0ff;
+  --muted:#9bb3cc;
+  --acc:#00c9ff;
+  --acc2:#0077ff;
+  --glass: rgba(255,255,255,.06);
+  --ring: 0 0 0 2px #00c9ff55 inset, 0 10px 30px rgba(0,0,0,.45);
+  --shadow: 0 10px 40px rgba(0,0,0,.4);
+  --radius: 14px;
+}
+/* Altın temaya geçince root-alt sınıfı */
+:root.theme-gold{
+  --bg:#0f0a00;
+  --panel:#1a1304;
+  --panel-2:#201707;
+  --text:#fffaee;
+  --muted:#dfc9a1;
+  --acc:#ffd166;
+  --acc2:#ff9f1c;
+  --glass: rgba(255,220,160,.08);
+  --ring: 0 0 0 2px #ffd16655 inset, 0 10px 30px rgba(0,0,0,.55);
+}
+
+/* Reset & base */
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0; font-family:system-ui,Segoe UI,Inter,Roboto,Arial; color:var(--text);
+  background: radial-gradient(1200px 700px at 0% 0%, #031022 0%, #000 65%);
+  overflow:hidden;
+}
+
+/* Background particles canvas sits behind everything */
+#bgCanvas{
+  position:fixed; inset:0; z-index:-1; background: linear-gradient(180deg, rgba(2,12,25,.6), rgba(0,0,0,.8));
+  filter: saturate(1.1) contrast(1.05);
+}
+
+/* Layout grid */
+.app{
+  height:100%; display:grid;
+  grid-template-columns: 320px 1fr;
+  grid-template-rows: 70px 48px 1fr 160px;
+  grid-template-areas:
+    "side head"
+    "side tools"
+    "side main"
+    "side foot";
+}
+
+/* Header (glass) */
+header{
+  grid-area:head; display:flex; align-items:center; justify-content:space-between; gap:12px;
+  padding:12px 16px; backdrop-filter: blur(12px);
+  background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+  border-bottom:1px solid rgba(255,255,255,.12);
+  animation: drop-in .6s ease both;
+}
+.brand{display:flex; align-items:center; gap:10px}
+.logo{
+  width:34px; height:34px; border-radius:10px;
+  background: conic-gradient(from 220deg,var(--acc),var(--acc2),var(--acc));
+  box-shadow: 0 0 24px var(--acc2);
+  animation: spin-slow 10s linear infinite;
+}
+.brand h1{ margin:0; font-size:18px; color:var(--acc); text-shadow:0 0 14px color-mix(in srgb,var(--acc),transparent 60%)}
+.pill{
+  background: var(--panel); border:1px solid var(--glass); border-radius:999px;
+  padding:6px 10px; color:var(--muted)
+}
+.controls{display:flex; gap:8px; flex-wrap:wrap}
+.seg{display:flex; gap:4px; background:var(--panel); border:1px solid var(--glass); border-radius:12px; padding:3px}
+.seg button{
+  border:0; background:transparent; color:#9fd3ff; padding:6px 10px; border-radius:8px; cursor:pointer;
+  transition: transform .12s ease, background .2s;
+}
+.seg button.active{ background:linear-gradient(135deg,var(--acc2),var(--acc)); color:#02131a; font-weight:800; box-shadow: var(--ring); }
+select,.chip{
+  background:var(--panel); color:var(--text); border:1px solid var(--glass);
+  border-radius:10px; padding:8px 10px; cursor:pointer
+}
+button.chip{ transition: transform .12s ease}
+button.chip:hover{ transform: translateY(-1px)}
+
+/* Sidebar */
+#side{
+  grid-area:side; padding:12px; border-right:1px solid rgba(255,255,255,.08);
+  backdrop-filter: blur(8px);
+  background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+  overflow:auto; animation: slide-right .6s ease both;
+}
+.card{
+  background:var(--panel); border:1px solid var(--glass); border-radius:var(--radius); padding:12px;
+  box-shadow: var(--shadow); margin-bottom:12px;
+  transition: transform .15s ease, box-shadow .25s ease;
+}
+.card:hover{ transform: translateY(-2px); box-shadow: 0 18px 40px rgba(0,0,0,.35) }
+.title{ font-weight:800; color:#9fd3ff; margin:6px 0 10px }
+.rooms li{ list-style:none; margin:8px 0; display:flex; justify-content:space-between; gap:8px; align-items:center }
+.rooms button{ border:0; border-radius:8px; padding:6px 10px; background:#14264a; color:#9fd3ff; cursor:pointer }
+.rooms button.active{ background:linear-gradient(135deg,var(--acc2),var(--acc)); color:#02131a; font-weight:800; box-shadow: var(--ring) }
+.hint{ font-size:12px; color:var(--muted) }
+
+/* Toolbar */
+#toolbar{
+  grid-area:tools; display:flex; align-items:center; gap:8px; padding:8px 12px;
+  border-bottom:1px solid rgba(255,255,255,.08);
+  background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+}
+#toolbar input,#toolbar select,#toolbar button{
+  background:var(--panel); color:var(--text); border:1px solid var(--glass); border-radius:10px; padding:8px 10px
+}
+#toolbar .danger{ background:#ff6b6b; border:0; color:white }
+
+/* Main (messages) */
+main{
+  grid-area:main; overflow:auto; padding:14px 16px; position:relative;
+  animation: fade-in .5s ease both;
+}
+.msg{
+  max-width: min(860px, 90%);
+  margin:12px 0; padding:12px 14px; border-radius:12px; position:relative;
+  border:1px solid var(--glass); background: color-mix(in srgb, white 6%, transparent);
+  transform-origin: 10% 90%;
+  animation: pop-in .35s cubic-bezier(.2,.9,.2,1.1) both;
+}
+.msg.me{
+  margin-left:auto; background: linear-gradient(135deg,var(--acc2),var(--acc));
+  color:#05121b; border-color: transparent; box-shadow: 0 10px 30px color-mix(in srgb,var(--acc),transparent 70%);
+  clip-path: polygon(0 0,100% 0,100% 100%,10px 100%,0 calc(100% - 10px)); /* bubble tail */
+}
+.msg.bot{
+  background: linear-gradient(180deg, var(--panel-2), var(--panel));
+}
+.meta{ font-size:12px; color:var(--muted); margin-bottom:6px; display:flex; gap:10px; flex-wrap:wrap}
+
+/* Message hover ghost trail */
+.msg::after{
+  content:""; position:absolute; inset:-2px; border-radius:inherit; pointer-events:none;
+  background: radial-gradient(400px 40px at var(--mx,50%) 100%, color-mix(in srgb, var(--acc), transparent 80%), transparent 70%);
+  opacity:0; transition: opacity .25s ease;
+}
+.msg:hover::after{ opacity:.8 }
+
+/* Actions + Reactions */
+.act{ position:absolute; right:8px; top:6px; display:flex; gap:6px; opacity:.9; flex-wrap:wrap }
+.act button{ background:var(--panel); color:#9fd3ff; border:1px solid var(--glass); border-radius:8px; padding:4px 8px; cursor:pointer; font-size:12px }
+.pin{ position:absolute; left:-10px; top:-10px; background:#ffd166; color:#000; padding:2px 6px; border-radius:8px; font-size:12px; box-shadow:var(--shadow) }
+.reac{ display:flex; gap:8px; margin-top:8px; font-size:14px }
+.reac button{ background:var(--panel); color:#fff; border:1px solid var(--glass); border-radius:999px; padding:2px 10px; cursor:pointer }
+
+/* Typing */
+#typing{
+  display:none; color:var(--muted); font-size:12px; gap:6px; align-items:center; margin:8px 2px;
+  animation: fade-in .4s ease both;
+}
+.typ{ width:6px;height:6px;border-radius:50%; background:var(--muted); animation: bounce 1s infinite alternate }
+.typ:nth-child(2){ animation-delay:.2s } .typ:nth-child(3){ animation-delay:.4s }
+
+/* Footer input */
+footer{
+  grid-area:foot; display:flex; flex-direction:column; gap:8px; padding:10px 12px;
+  backdrop-filter: blur(10px);
+  background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+  border-top:1px solid rgba(255,255,255,.12);
+}
+.quick{ display:flex; gap:8px; flex-wrap:wrap }
+.quick button{ background:var(--panel); border:1px solid var(--glass); color:#9fd3ff; padding:6px 10px; border-radius:999px; cursor:pointer }
+.bar{ display:flex; gap:8px; align-items:flex-start }
+input,textarea{
+  background:var(--panel); color:var(--text); border:1px solid var(--glass); border-radius:12px; padding:12px; width:100%;
+  transition: box-shadow .15s ease, transform .05s ease;
+}
+input:focus,textarea:focus{ outline:none; box-shadow: var(--ring); transform: translateY(-1px); }
+.send{ background:linear-gradient(135deg,var(--acc2),var(--acc)); border:0; color:#031018; font-weight:800; padding:12px 16px; border-radius:12px; cursor:pointer; box-shadow: var(--ring); }
+.danger{ background:#ff6b6b; border:0; color:white; border-radius:10px; padding:8px 10px; cursor:pointer }
+
+/* Emoji / Mention / Command palette popovers */
+.pop{
+  position:absolute; bottom:170px; left:340px; background:var(--panel); border:1px solid var(--glass); border-radius:12px; padding:8px; display:none;
+  max-width:440px; max-height:260px; overflow:auto; box-shadow:var(--shadow); animation: float-up .2s ease both;
+}
+.emojiBox button{ background:transparent; border:0; font-size:22px; cursor:pointer; padding:6px }
+.menu div{ padding:8px 10px; cursor:pointer; border-radius:8px }
+.menu div:hover{ background:#162c55 }
+.mentionBox div{ padding:8px 10px; cursor:pointer; border-radius:8px }
+.mentionBox div:hover{ background:#162c55 }
+
+/* Batch loader button (old messages) */
+.batch{ position:sticky; top:6px; display:flex; justify-content:center; margin-bottom:6px }
+.batch button{ background:#162c55; color:#9fd3ff; border:1px solid var(--glass); border-radius:999px; padding:6px 10px; cursor:pointer }
+
+/* Fast mode reduces shadows for speed */
+.fast *{ box-shadow:none !important; text-shadow:none !important }
+
+/* Animations */
+@keyframes drop-in{ from{opacity:0; transform: translateY(-14px)} to{opacity:1; transform:none} }
+@keyframes slide-right{ from{opacity:0; transform: translateX(-20px)} to{opacity:1; transform:none} }
+@keyframes fade-in{ from{opacity:0} to{opacity:1} }
+@keyframes pop-in{ from{opacity:0; transform: translateY(8px) scale(.98)} to{opacity:1; transform: none} }
+@keyframes bounce{ to{ transform: translateY(-2px); opacity:.7 } }
+@keyframes float-up{ from{opacity:0; transform: translateY(6px)} to{opacity:1; transform:none} }
+@keyframes spin-slow{ to{ transform: rotate(360deg) } }
+
+/* Scrollbars */
+main::-webkit-scrollbar{ width:8px } main::-webkit-scrollbar-thumb{ background:#133; border-radius:8px }
+#side::-webkit-scrollbar{ width:8px } #side::-webkit-scrollbar-thumb{ background:#133; border-radius:8px }
+</style>
 </head>
+
 <body>
-  <script src="./auth.js"></script>
-  <script>
-    const sess = YANLIK_AUTH.requireAuth('login.html'); // giriş şart
-    if(!sess) document.write("Yönlendiriliyorsunuz...");
-  </script>
+<canvas id="bgCanvas"></canvas>
 
-  <!-- SOL PANEL: Rooms + Şablonlar + Notlar -->
-  <aside id="side">
-    <!-- Rooms -->
-    <div class="card">
-      <div class="title">Kanallar</div>
-      <ul id="roomList" class="rooms"></ul>
-      <div class="row">
-        <input id="roomName" placeholder="Yeni kanal adı" />
-        <button id="addRoom" class="chip">Ekle</button>
-      </div>
-      <p class="hint">Not: Admin paneli global akışı gösterir; odalar bu sayfaya özel ek katmandır.</p>
-    </div>
-
-    <!-- Şablonlar -->
-    <div class="card">
-      <div class="title">Şablonlar</div>
-      <div class="col" id="tpls"></div>
-    </div>
-
-    <!-- Notlarım -->
-    <div class="card">
-      <div class="title">Notlarım</div>
-      <textarea id="notes" rows="8" placeholder="Kısa notlarını buraya kaydet..."></textarea>
-      <div class="row">
-        <button id="saveNotes" class="chip">Kaydet</button>
-        <button id="clearNotes" class="danger">Temizle</button>
-      </div>
-      <p class="hint">Notlar cihazında saklanır (LocalStorage).</p>
-    </div>
-  </aside>
-
-  <!-- ÜST BAR -->
+<div class="app">
+  <!-- ====== Header ====== -->
   <header>
-    <div class="brand">💬 YanlikAI <span class="pill" id="userBadge">yükleniyor…</span></div>
+    <div class="brand">
+      <div class="logo"></div>
+      <h1>YanlikAI</h1>
+      <span class="pill" id="who">yükleniyor…</span>
+    </div>
     <div class="controls">
-      <!-- Mod -->
-      <div class="seg" id="modeSeg" role="tablist" aria-label="Mod">
+      <div class="seg" id="modeSeg">
         <button data-mode="empathy" class="active">Empati</button>
         <button data-mode="assistant">Asistan</button>
       </div>
-      <!-- Ton -->
-      <div class="seg" id="toneSeg" role="tablist" aria-label="Ton">
+      <div class="seg" id="toneSeg">
         <button data-tone="soft" class="active">Yumuşak</button>
         <button data-tone="neutral">Nötr</button>
       </div>
-      <!-- Dil -->
-      <select id="langSel" title="Dil">
-        <option value="auto" selected>Dil: Otomatik</option>
-        <option value="tr">Türkçe</option>
-        <option value="en">English</option>
-      </select>
-      <!-- Çeviri -->
-      <div class="seg" id="trSeg" title="Yan çeviri">
-        <button data-tr="off" class="active">Çeviri: Kapalı</button>
-        <button data-tr="tr">→ Türkçe</button>
-        <button data-tr="en">→ English</button>
+      <div class="seg" id="themeSeg" title="Tema">
+        <button data-theme="neon" class="active">Neon</button>
+        <button data-theme="gold">Altın</button>
       </div>
-      <button class="chip" id="logoutBtn" title="Çıkış">Çıkış</button>
+      <div class="seg" id="perfSeg" title="Performans">
+        <button data-fast="off" class="active">Standart</button>
+        <button data-fast="on">Hızlı</button>
+      </div>
+      <button class="chip" id="logoutBtn">Çıkış</button>
     </div>
   </header>
 
-  <!-- MESAJLAR -->
-  <main id="chatList"></main>
-  <div id="typing"><span>YanlikAI yazıyor</span> <span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+  <!-- ====== Sidebar ====== -->
+  <aside id="side">
+    <div class="card">
+      <div class="title">Kanallar</div>
+      <ul id="roomList" class="rooms"></ul>
+      <div class="row" style="gap:8px">
+        <input id="roomName" placeholder="Yeni kanal adı"/>
+        <button id="addRoom" class="chip">Ekle</button>
+      </div>
+      <p class="hint">Admin akışı globâldir; odalar bu sayfaya özeldir.</p>
+      <div class="card" style="margin-top:8px">
+        <div class="title">Sabitlenenler</div>
+        <div id="pinsBox"></div>
+      </div>
+      <div class="card" id="permBox" style="margin-top:8px; display:none">
+        <div class="title">Oda Yetkileri</div>
+        <div class="col" style="display:flex; flex-direction:column; gap:8px">
+          <select id="permMode">
+            <option value="rw">Herkes: Okuma-Yazma</option>
+            <option value="ro">Herkes: Sadece Okuma</option>
+            <option value="allow">Üye Sınırlı</option>
+          </select>
+          <div class="row">
+            <input id="permUser" placeholder="kullanıcı ekle (allow)"/>
+            <button id="permAdd" class="chip">Ekle</button>
+          </div>
+          <div id="permList" class="col"></div>
+        </div>
+      </div>
+    </div>
 
-  <!-- GÖNDERME ALANI -->
+    <div class="card">
+      <div class="title">Şablonlar</div>
+      <div class="quick" id="tpls"></div>
+    </div>
+
+    <div class="card">
+      <div class="title">Notlarım</div>
+      <textarea id="notes" rows="8" placeholder="Kısa notlarını kaydet…"></textarea>
+      <div class="row" style="gap:8px">
+        <button id="saveNotes" class="chip">Kaydet</button>
+        <button id="clearNotes" class="danger">Temizle</button>
+      </div>
+      <p class="hint">Yerel (LocalStorage)</p>
+    </div>
+  </aside>
+
+  <!-- ====== Toolbar ====== -->
+  <div id="toolbar">
+    <input id="search" placeholder="Ara (/): metin veya kullanıcı…" style="flex:1"/>
+    <select id="userFilter" title="Kullanıcı">
+      <option value="all">Hepsi</option>
+      <option value="me">Ben</option>
+      <option value="bot">Bot</option>
+    </select>
+    <button id="exportJson">Dışa aktar (JSON)</button>
+    <button id="exportTxt">Dışa aktar (TXT)</button>
+    <button id="clearRoom" class="danger">Odayı temizle</button>
+  </div>
+
+  <!-- ====== Messages ====== -->
+  <main id="chatList">
+    <div class="batch" id="batchTop" style="display:none"><button id="loadOlder">Daha fazla yükle</button></div>
+  </main>
+  <div id="typing"><span>YanlikAI yazıyor</span> <span class="typ"></span><span class="typ"></span><span class="typ"></span></div>
+
+  <!-- ====== Footer ====== -->
   <footer>
     <div class="quick" id="quick"></div>
     <div class="bar">
-      <input id="msgInput" class="grow" placeholder="Mesaj yaz ve Enter’a bas..." autocomplete="off"/>
+      <input id="msgInput" placeholder="Mesaj yaz (':' → emoji, '@' → mention, Ctrl+K komut paleti)…" autocomplete="off"/>
+      <input id="fileInput" type="file" style="display:none"/>
+      <button id="emojiBtn" class="chip" title="Emoji">😊</button>
+      <button id="fileBtn" class="chip" title="Dosya">📎</button>
       <button id="sendBtn" class="send">Gönder</button>
     </div>
+    <!-- Popovers -->
+    <div class="pop emojiBox" id="emojiBox"></div>
+    <div class="pop mentionBox" id="mentionBox"></div>
+    <div class="pop menu" id="cmdBox"></div>
   </footer>
+</div>
 
-  <script>
-    // ======= Basit depolar (client-only ek özellikler)
-    const LS_ROOMS = "yanlik:rooms";
-    const LS_NOTES = (user)=>`yanlik:notes:${user}`;
-    const me = YANLIK_AUTH.getSession();
+<!-- ====== Scripts ====== -->
+<script src="./auth.js"></script>
+<script>
+/* ===== Session & Auth ===== */
+const sess = YANLIK_AUTH.requireAuth('login.html');
+if(!sess){ document.write("Yönlendiriliyorsunuz…"); }
 
-    // Başlık rozeti
-    document.getElementById("userBadge").textContent = `${me.display} (${me.role})`;
+/* ===== Background particles ===== */
+const cv = document.getElementById('bgCanvas'); const cx = cv.getContext('2d');
+function fit(){ cv.width=innerWidth; cv.height=innerHeight } fit(); addEventListener('resize', fit);
+const P = Array.from({length: 60}, ()=>({ x:Math.random()*cv.width, y:Math.random()*cv.height, r:1+Math.random()*2, vx:(Math.random()-.5)*.35, vy:(Math.random()-.5)*.35, c: Math.random()<.5?'#00c9ff88':'#0077ff66' }));
+function loop(){
+  cx.clearRect(0,0,cv.width,cv.height);
+  for(const p of P){
+    p.x+=p.vx; p.y+=p.vy;
+    if(p.x<0||p.x>cv.width) p.vx*=-1; if(p.y<0||p.y>cv.height) p.vy*=-1;
+    cx.beginPath(); cx.arc(p.x,p.y,p.r,0,Math.PI*2); cx.fillStyle=p.c; cx.fill();
+  }
+  // faint links
+  for(let i=0;i<P.length;i++) for(let j=i+1;j<P.length;j++){
+    const a=P[i], b=P[j]; const dx=a.x-b.x, dy=a.y-b.y; const d=Math.hypot(dx,dy);
+    if(d<120){ cx.globalAlpha = 1 - d/120; cx.strokeStyle='#00c9ff22'; cx.beginPath(); cx.moveTo(a.x,a.y); cx.lineTo(b.x,b.y); cx.stroke(); cx.globalAlpha=1; }
+  }
+  requestAnimationFrame(loop);
+}
+loop();
 
-    // ======= Room store (admin global feed’i bozmadan, ek katman)
-    function readRooms(){
-      try{ return JSON.parse(localStorage.getItem(LS_ROOMS)) || { current:"Genel", items:["Genel"] }; }
-      catch{ return { current:"Genel", items:["Genel"] }; }
-    }
-    function writeRooms(x){ localStorage.setItem(LS_ROOMS, JSON.stringify(x)); }
-    let ROOMS = readRooms(); // { current, items[] }
+/* ===== Broadcast sync ===== */
+const chan = new BroadcastChannel("yanlik-chat");
+chan.onmessage = ev => { const {type,payload}=ev.data||{}; if(type==="refresh") scheduleRender(); if(type==="room-change"){ ROOMS.current=payload; saveRooms(ROOMS); renderRooms(); scheduleRender(); } };
+const ping = (type,payload)=> chan.postMessage({type,payload});
 
-    // ======= Notlar
-    const notesEl = document.getElementById("notes");
-    notesEl.value = localStorage.getItem(LS_NOTES(me.username)) || "";
-    document.getElementById("saveNotes").onclick = ()=>{ localStorage.setItem(LS_NOTES(me.username), notesEl.value); };
-    document.getElementById("clearNotes").onclick = ()=>{ if(confirm("Notları temizle?")){ notesEl.value=""; localStorage.removeItem(LS_NOTES(me.username)); } };
+/* ===== Stores & helpers ===== */
+const LS_ROOMS="yanlik:rooms";
+const LS_NOTES=u=>`yanlik:notes:${u}`;
+const LS_ROOM_LOG=r=>`yanlik:roomlog:${r}`;
+const LS_REACTIONS="yanlik:reactions";
+const LS_PINS=r=>`yanlik:pins:${r}`;
+const LS_PERM=r=>`yanlik:perm:${r}`;
+const LS_PREF="yanlik:prefs";
 
-    // ======= UI refs
-    const list = document.getElementById("chatList");
-    const input = document.getElementById("msgInput");
-    const btn   = document.getElementById("sendBtn");
-    const typing= document.getElementById("typing");
-    const langSel = document.getElementById("langSel");
-    const quickBox= document.getElementById("quick");
+const me = YANLIK_AUTH.getSession();
+document.getElementById("who").textContent = `${me.display} (${me.role})`;
 
-    // ======= Mod / Ton / Çeviri
-    let MODE="empathy", TONE="soft", TR_TARGET="off";
-    document.getElementById("modeSeg").onclick = (e)=>{ if(e.target.tagName!=="BUTTON") return; MODE=e.target.dataset.mode; [...e.currentTarget.children].forEach(b=>b.classList.toggle("active", b.dataset.mode===MODE)); };
-    document.getElementById("toneSeg").onclick = (e)=>{ if(e.target.tagName!=="BUTTON") return; TONE=e.target.dataset.tone; [...e.currentTarget.children].forEach(b=>b.classList.toggle("active", b.dataset.tone===TONE)); };
-    document.getElementById("trSeg").onclick   = (e)=>{ if(e.target.tagName!=="BUTTON") return; TR_TARGET=e.target.dataset.tr; [...e.currentTarget.children].forEach(b=>b.classList.toggle("active", b.dataset.tr===TR_TARGET)); render(); };
+const prefs = readJSON(LS_PREF,{fast:false, theme:'neon'});
+applyPrefs();
 
-    // ======= Rooms UI
-    const roomList = document.getElementById("roomList");
-    function renderRooms(){
-      roomList.innerHTML = (ROOMS.items||[]).map(r=>`
-        <li>
-          <button class="${r===ROOMS.current?'active':''}" onclick="setRoom('${r.replace(/'/g,"&#39;")}')"># ${r}</button>
-          ${r!=="Genel"?`<button onclick="delRoom('${r.replace(/'/g,"&#39;")}')">Sil</button>`:""}
-        </li>
-      `).join("");
-    }
-    window.setRoom = (name)=>{ ROOMS.current = name; writeRooms(ROOMS); render(); renderRooms(); };
-    window.delRoom = (name)=>{
-      if(!confirm(`#${name} silinsin mi?`)) return;
-      ROOMS.items = ROOMS.items.filter(x=>x!==name);
-      if(ROOMS.current===name) ROOMS.current="Genel";
-      writeRooms(ROOMS); renderRooms(); render();
-    };
-    document.getElementById("addRoom").onclick = ()=>{
-      const v = (document.getElementById("roomName").value||"").trim();
-      if(!v) return;
-      if(!ROOMS.items.includes(v)) ROOMS.items.push(v);
-      ROOMS.current = v;
-      document.getElementById("roomName").value="";
-      writeRooms(ROOMS); renderRooms(); render();
-    };
-    renderRooms();
+function readJSON(k,def){ try{const v=JSON.parse(localStorage.getItem(k)); return v==null?def:v; }catch{return def;} }
+function writeJSON(k,v){ localStorage.setItem(k,JSON.stringify(v)); }
+function readRooms(){ return readJSON(LS_ROOMS,{current:"Genel",items:["Genel"]}); }
+function saveRooms(x){ writeJSON(LS_ROOMS,x); }
+let ROOMS = readRooms();
 
-    // ======= Quick templates (oda’ya göre öneriler)
-    const TEMPLATES = {
-      Genel: [
-        "Selam! Bugün nasılsın?",
-        "Biraz moralim bozuk.",
-        "Bugün için 3 küçük adım öner."
-      ],
-      "Çalışma": [
-        "Hızlı çalışma planı yapar mısın?",
-        "Pomodoro ile 2 saatlik plan oluştur.",
-        "Zaman yönetimi için ipuçları ver."
-      ],
-      "Destek": [
-        "Kaygımı azaltmak için nefes egzersizi ver.",
-        "Topraklanma tekniği anlatır mısın?",
-        "Kısa bir motivasyon cümlesi yaz."
-      ]
-    };
-    function renderTemplates(){
-      const list = TEMPLATES[ROOMS.current] || TEMPLATES.GENEL || TEMPLATES["Genel"];
-      quickBox.innerHTML = (list||[]).map(t=>`<button data-t="${t.replace(/"/g,"&quot;")}">${t}</button>`).join("");
-    }
-    quickBox.onclick = (e)=>{ if(e.target.tagName!=="BUTTON") return; input.value=e.target.dataset.t; input.focus(); };
+/* Notes */
+const notesEl = document.getElementById("notes");
+notesEl.value = localStorage.getItem(LS_NOTES(me.username))||"";
+document.getElementById("saveNotes").onclick=()=> localStorage.setItem(LS_NOTES(me.username),notesEl.value);
+document.getElementById("clearNotes").onclick=()=>{ if(confirm("Notları temizle?")){ notesEl.value=""; localStorage.removeItem(LS_NOTES(me.username)); } };
 
-    // ======= Dil algılama + basit (yerel) çeviri (deneysel)
-    function detectLang(s){
-      if(langSel.value!=="auto") return langSel.value;
-      const trQ = ["merhaba","selam","nasıl","üzgün","moral","yardım","teşekkür","lütfen","kanka","kanki","knk"];
-      const enQ = ["hello","hi ","how ","sad","help","thanks","please","buddy"];
-      const L = s.toLowerCase();
-      let trScore = trQ.reduce((a,w)=>a+(L.includes(w)?1:0),0);
-      if(/[çğıöşü]/i.test(s)) trScore+=2;
-      let enScore = enQ.reduce((a,w)=>a+(L.includes(w)?1:0),0);
-      return trScore>=enScore ? "tr" : "en";
-    }
-    // mini sözlük: yalnız kısa cümleleri idare eder
-    const DICT_TR_EN = {
-      "merhaba":"hello","selam":"hi","nasılsın":"how are you","moralim bozuk":"i feel down",
-      "yardım":"help","lütfen":"please","teşekkür":"thanks","küçük adım":"small step",
-      "nefes egzersizi":"breathing exercise","topraklanma":"grounding"
-    };
-    const DICT_EN_TR = {
-      "hello":"merhaba","hi":"selam","how are you":"nasılsın","i feel down":"moralim bozuk",
-      "help":"yardım","please":"lütfen","thanks":"teşekkürler","small step":"küçük adım",
-      "breathing exercise":"nefes egzersizi","grounding":"topraklanma"
-    };
-    function naiveTranslate(s, target){
-      const L = s.toLowerCase();
-      const map = target==="en" ? DICT_TR_EN : DICT_EN_TR;
-      let out = s;
-      Object.keys(map).forEach(k=>{
-        const re = new RegExp("\\b"+k+"\\b","gi");
-        out = out.replace(re, (m)=> {
-          const t = map[k];
-          // büyük harf koruması (basit)
-          if(m[0]===m[0].toUpperCase()) return t.charAt(0).toUpperCase()+t.slice(1);
-          return t;
-        });
-      });
-      return out;
-    }
+/* UI refs */
+const list = document.getElementById("chatList");
+const input = document.getElementById("msgInput");
+const sendBtn = document.getElementById("sendBtn");
+const typing = document.getElementById("typing");
+const roomList = document.getElementById("roomList");
+const pinsBox = document.getElementById("pinsBox");
+const searchEl = document.getElementById("search");
+const userFilterEl = document.getElementById("userFilter");
+const emojiBtn = document.getElementById("emojiBtn");
+const emojiBox = document.getElementById("emojiBox");
+const mentionBox = document.getElementById("mentionBox");
+const fileBtn = document.getElementById("fileBtn");
+const fileInput = document.getElementById("fileInput");
+const attachInfoEl = document.createElement('div'); attachInfoEl.className='hint'; document.querySelector('footer .bar').appendChild(attachInfoEl);
+const permBox = document.getElementById("permBox");
+const permModeEl = document.getElementById("permMode");
+const permUserEl = document.getElementById("permUser");
+const permAddBtn = document.getElementById("permAdd");
+const permListEl = document.getElementById("permList");
+const batchTop = document.getElementById("batchTop");
+const loadOlderBtn = document.getElementById("loadOlder");
 
-    // ======= Empati / Asistan botu (önceki sürümden)
-    const NEG = ["üzgün","moralim bozuk","kötü hissediyorum","bunaldım","yorgunum","kaygı","anksiyete","depresif","ağlıyorum","zor","stres","korku","endişe","yalnızım"];
-    const POS = ["harika","mükemmel","iyi","süper","seviniyorum","mutlu","şahane","başardım"];
-    function polarity(s){ const L=s.toLowerCase(); let sc=0; NEG.forEach(w=>{ if(L.includes(w)) sc--; }); POS.forEach(w=>{ if(L.includes(w)) sc++; }); return sc; }
-    function isCrisis(s){
-      const L=s.toLowerCase();
-      return ["intihar","kendime zarar","yaşamak istemiyorum","kendimi öldüreceğim","canıma kıy","suicide","kill myself","self harm"].some(k=>L.includes(k));
-    }
-    function replyEmpathy(lang, text){
-      const sc = polarity(text);
-      const soft = TONE==="soft";
-      const openQ = lang==="tr" ? ["Bunu ne zamandır hissediyorsun?","Sence tetikleyen ne oldu?","Şu an en çok ne iyi gelir?","İstersen küçük bir plan yapalım."] : ["How long have you felt this?","What do you think triggered it?","What would help most right now?","We can make a tiny plan if you want."];
-      const ground = lang==="tr" ? "Topraklanma: 5 gör, 4 dokun, 3 ses, 2 koku, 1 tat." : "Grounding: 5 see, 4 touch, 3 sounds, 2 smells, 1 taste.";
-      if(isCrisis(text)){
-        return lang==="tr" ? "Bunu ciddiye alıyorum. **Güvenliğin öncelik.** Yakınını ara veya **112**’yi ara. İstersen 4-4-6 nefes yapalım: 4 sn al, 4 tut, 6 ver. Yanındayım."
-                           : "I take this seriously. **Your safety first.** Call someone you trust or local emergency (TR: **112**). We can do 4-4-6 breathing: inhale 4, hold 4, exhale 6. I’m here.";
-      }
-      if(sc<=-1) return lang==="tr" ? `${soft?"Seni duyuyorum. ":""}Böyle hissetmen anlaşılır. ${ground}\n\n${openQ[0]}` :
-                                     `${soft?"I hear you. ":""}It’s understandable to feel this way. ${ground}\n\n${openQ[0]}`;
-      if(sc>=1)  return lang==="tr" ? `${soft?"Sevindim! ":""}Bunu korumak için **1 küçük adım** seçelim: 20 dk odak + 5 dk mola. ${openQ[2]}`
-                                     : `${soft?"Nice! ":""}To keep it, pick **one tiny step**: 20m focus + 5m break. ${openQ[2]}`;
-      return lang==="tr" ? `${soft?"Anlıyorum. ":""}İki hat: (1) mini düzenleme rutini, (2) kök soruya 1-2 adım. ${openQ[1]}`
-                         : `${soft?"Got it. ":""}Two tracks: (1) tiny regulation, (2) 1–2 root-cause questions. ${openQ[1]}`;
-    }
-    function replyAssistant(lang, text){
-      const L=text.toLowerCase();
-      if(/(selam|merhaba|hello|hi)\b/.test(L)) return lang==="tr" ? "Selam! Nasıl yardımcı olabilirim? Hedefini yaz, 3 küçük adıma bölelim." :
-                                                                    "Hey! How can I help? Share a goal, we’ll break it into 3 tiny steps.";
-      if(/(plan|çalışma planı|study plan)/.test(L)) return lang==="tr"
-        ? "Hızlı plan: 25 dk odak × 3, 10 dk özet, 15 dk test. Akşam 20 dk tekrar."
-        : "Quick plan: 25m focus × 3, 10m notes, 15m quiz. Evening 20m review.";
-      if(/(3 küçük adım|3 small steps|3 steps)/.test(L)) return lang==="tr"
-        ? "Bugün 3 adım: (1) 15 dk düzen, (2) 20 dk tek görev, (3) 5 dk mini rapor."
-        : "Three steps: (1) 15m tidy, (2) 20m single-task, (3) 5m mini report.";
-      return lang==="tr" ? "Anladım. 1 hedef, 1 engel, 1 sonraki adım yazalım mı? İstersem şablon verebilirim."
-                         : "Got it. Shall we note 1 goal, 1 obstacle, 1 next step? I can share a template.";
-    }
-    function composeReply(text){
-      const lang = detectLang(text);
-      return MODE==="empathy" ? replyEmpathy(lang,text) : replyAssistant(lang,text);
-    }
+/* Owner/Admin visibility */
+if(["owner","admin"].includes(me.role)) permBox.style.display="block";
 
-    // ======= Render + çeviri çizgisi
-    function fmt(t){ return new Date(t).toLocaleTimeString("tr-TR",{hour:'2-digit',minute:'2-digit'}); }
-    function esc(x){ return (x||"").replace(/</g,"&lt;"); }
-    function render(){
-      // global akış (admin görsün) + oda filtresi (yerel)
-      const all = YANLIK_AUTH.listChats(); // {id,at,from,role,text}
-      const room = ROOMS.current;
-      const roomLog = readRoomLog(room);   // {text,room} içerenler
-      // birleştir (aynı dizene koy)
-      const merged = mergeLogs(all, roomLog);
-      document.title = `Yanlik • #${room}`;
-      // çeviri hedefi
-      const showTrans = TR_TARGET!=="off";
-      list.innerHTML = merged.slice(-200).map(m=>{
-        // çeviri yalnızca görüntü tarafında, ham kaydı bozma
-        let tr = "";
-        if(showTrans){
-          const srcLang = detectLang(m.text);
-          if(TR_TARGET==="tr" && srcLang!=="tr") tr = naiveTranslate(m.text,"tr");
-          if(TR_TARGET==="en" && srcLang!=="en") tr = naiveTranslate(m.text,"en");
-        }
-        return `
-        <div class="msg ${m.from===me.username?'me':''}">
-          <div class="meta">${fmt(m.at)} • <strong>${esc(m.from)}</strong> [${m.role}] • #${esc(m.room||'Genel')}</div>
-          <div>${esc(m.text)}</div>
-          ${tr && tr!==m.text ? `<div class="trline">↳ ${esc(tr)}</div>` : ""}
-        </div>`;
-      }).join("");
-      list.scrollTop = list.scrollHeight;
-      renderTemplates();
-    }
+/* Mode / Tone / Theme / Perf */
+let MODE="empathy", TONE="soft";
+document.getElementById("modeSeg").onclick = e=>{ if(e.target.tagName!=="BUTTON")return; MODE=e.target.dataset.mode; toggleAct(e.currentTarget, e.target); scheduleRender(); };
+document.getElementById("toneSeg").onclick = e=>{ if(e.target.tagName!=="BUTTON")return; TONE=e.target.dataset.tone; toggleAct(e.currentTarget, e.target); };
+document.getElementById("themeSeg").onclick = e=>{
+  if(e.target.tagName!=="BUTTON")return;
+  const th = e.target.dataset.theme; prefs.theme=th; writeJSON(LS_PREF,prefs); applyPrefs();
+  toggleAct(e.currentTarget, e.target);
+};
+document.getElementById("perfSeg").onclick = e=>{
+  if(e.target.tagName!=="BUTTON")return;
+  const on = e.target.dataset.fast==="on";
+  prefs.fast=on; writeJSON(LS_PREF,prefs); applyPrefs();
+  toggleAct(e.currentTarget, e.target);
+};
+function toggleAct(group, target){ [...group.children].forEach(b=>b.classList.toggle("active", b===target)); }
+function applyPrefs(){
+  document.body.classList.toggle('fast', !!prefs.fast);
+  document.documentElement.classList.toggle('theme-gold', prefs.theme==='gold');
+}
 
-    // Yerel oda logu (admin globaline ek)
-    const LS_ROOM_LOG = (room)=>`yanlik:roomlog:${room}`;
-    function readRoomLog(room){ try{ return JSON.parse(localStorage.getItem(LS_ROOM_LOG(room))) || []; }catch{ return []; } }
-    function pushRoomLog(room, item){
-      const arr = readRoomLog(room);
-      arr.push(item);
-      if(arr.length>1000) arr.shift();
-      localStorage.setItem(LS_ROOM_LOG(room), JSON.stringify(arr));
-    }
-    // global + oda logunu zaman damgasına göre kaba birleştir
-    function mergeLogs(globalArr, roomArr){
-      const tag = (x)=> ({ id:x.id||("loc_"+Math.random().toString(36).slice(2,8)), at:x.at, from:x.from, role:x.role, text:x.text, room:x.room });
-      const all = [...(globalArr||[]).map(m=>tag({...m, room: m.room||"Genel"})), ...(roomArr||[]).map(tag)];
-      return all.sort((a,b)=> new Date(a.at)-new Date(b.at));
-    }
+/* Rooms */
+function renderRooms(){
+  roomList.innerHTML = (ROOMS.items||[]).map(r=>`
+    <li onmousemove="hoverMeta(event)" onmouseleave="clearMeta(event)">
+      <button class="${r===ROOMS.current?'active':''}" onclick="setRoom('${r.replace(/'/g,'&#39;')}')"># ${r}</button>
+      ${r!=="Genel"?`<button onclick="delRoom('${r.replace(/'/g,'&#39;')}')">Sil</button>`:""}
+    </li>
+  `).join("");
+  renderPins(); renderPerm();
+}
+window.setRoom = (name)=>{ ROOMS.current=name; saveRooms(ROOMS); renderRooms(); scheduleRender(); ping("room-change",name); };
+window.delRoom = (name)=>{ if(!confirm(`#${name} silinsin mi?`))return; ROOMS.items=ROOMS.items.filter(x=>x!==name); if(ROOMS.current===name) ROOMS.current="Genel"; saveRooms(ROOMS); renderRooms(); scheduleRender(); ping("refresh"); };
+document.getElementById("addRoom").onclick = ()=>{
+  const v=(document.getElementById("roomName").value||"").trim(); if(!v)return;
+  if(!ROOMS.items.includes(v)) ROOMS.items.push(v);
+  ROOMS.current=v; document.getElementById("roomName").value="";
+  saveRooms(ROOMS); renderRooms(); scheduleRender(); ping("room-change",v);
+};
 
-    // ======= Gönderim
-    async function send(){
-      const text = input.value.trim();
-      if(!text) return;
-      const room = ROOMS.current;
+/* Templates */
+const TPL={Genel:["Selam! Bugün nasılsın?","Biraz moralim bozuk.","3 küçük adım önersene."],"Çalışma":["Hızlı çalışma planı","Pomodoro 2 saat","Zaman yönetimi ipucu"],"Destek":["Nefes egzersizi ver","Topraklanma tekniği anlat","Kısa motivasyon cümlesi"]};
+function renderTpl(){ const list=TPL[ROOMS.current]||TPL.Genel; document.getElementById("tpls").innerHTML = list.map(t=>`<button class="chip" data-t="${t.replace(/"/g,'&quot;')}">${t}</button>`).join("") }
+document.getElementById("tpls").onclick = e=>{ if(e.target.matches('button[data-t]')){ input.value=e.target.dataset.t; input.focus(); } };
 
-      // 1) global akışa bas (admin de görsün)
-      YANLIK_AUTH.pushChat({ from: me.username, role: me.role, text });
-      // 2) odalı kopyayı yerel loga bas
-      pushRoomLog(room, { id:"m_"+Math.random().toString(36).slice(2,9), at:new Date().toISOString(), from:me.username, role:me.role, text, room });
+/* Lang & naive translate */
+function detectLang(s){ const L=s.toLowerCase(); const tr=/[çğıöşü]/.test(L)||/(merhaba|selam|nasıl|yardım|lütfen|teşekkür|kanka|hocam)/.test(L); if(tr) return 'tr'; return 'en'; }
 
-      input.value=""; render();
+/* Bot logic */
+const NEG=["üzgün","moralim bozuk","kötü hissediyorum","bunaldım","yorgunum","kaygı","anksiyete","depresif","ağlıyorum","zor","stres","korku","endişe","yalnızım"];
+const POS=["harika","mükemmel","iyi","süper","seviniyorum","mutlu","şahane","başardım"];
+function polarity(s){ const L=s.toLowerCase(); let sc=0; NEG.forEach(w=>{ if(L.includes(w)) sc--; }); POS.forEach(w=>{ if(L.includes(w)) sc++; }); return sc; }
+function crisis(s){ const L=s.toLowerCase(); return ["intihar","kendime zarar","yaşamak istemiyorum","suicide","kill myself","self harm","canıma kıy"].some(k=>L.includes(k)); }
+function replyEmp(lang, t){
+  if(crisis(t)) return lang==='tr' ? "Bunu ciddiye alıyorum. Güvenliğin öncelik — **112**’yi ara veya güvendiğin birini ara. 4-4-6 nefes: 4 al, 4 tut, 6 ver. Yanındayım." :
+                                     "I take this seriously. Your safety first — call **112** or someone you trust. 4-4-6 breathing. I’m here.";
+  const sc=polarity(t);
+  if(sc<=-1) return lang==='tr' ? "Seni duyuyorum. Böyle hissetmen anlaşılır. Topraklanma: 5 gör, 4 dokun, 3 ses, 2 koku, 1 tat. Bunu ne zamandır hissediyorsun?" :
+                                  "I hear you. Understandable. Grounding: 5 see, 4 touch, 3 sounds, 2 smells, 1 taste. How long have you felt this?";
+  if(sc>=1)  return lang==='tr' ? "Süper! Bunu sürdürmek için tek küçük adım: 20 dk odak + 5 dk mola. Şu an ne en çok yardımcı olur?" :
+                                  "Nice! Keep it with one tiny step: 20m focus + 5m break. What would help most now?";
+  return lang==='tr' ? "Anlıyorum. İki hat: (1) ritmi düzenleyelim, (2) kök soruya küçük adımlar. Sence tetikleyen ne oldu?" :
+                       "Got it. Two tracks: (1) regulate rhythm, (2) small root-cause steps. What triggered it?";
+}
+function replyAssist(lang, t){
+  const L=t.toLowerCase();
+  if(/(selam|merhaba|hello|hi)\b/.test(L)) return lang==='tr'?"Selam! Hedefini yaz, 3 küçük adıma bölelim.":"Hey! Share a goal; we’ll split into 3 tiny steps.";
+  if(/(plan|çalışma planı|study plan)/.test(L)) return lang==='tr'?"Plan: 25 dk odak ×3, 10 dk özet, 15 dk test; akşam 20 dk tekrar.":"Plan: 25m focus ×3, 10m notes, 15m quiz; evening 20m review.";
+  if(/(3 küçük adım|3 steps)/.test(L)) return lang==='tr'?"Bugün: 15 dk düzen, 20 dk tek görev, 5 dk mini rapor.":"Today: 15m tidy, 20m single-task, 5m mini-report.";
+  return lang==='tr'?"Anladım. 1 hedef, 1 engel, 1 sonraki adım yazalım mı?":"Got it. 1 goal, 1 obstacle, 1 next step?";
+}
+function botReply(text){ const lang = detectLang(text); return MODE==="empathy" ? replyEmp(lang,text) : replyAssist(lang,text); }
 
-      // typing simülasyon
-      typing.style.display="inline-flex";
-      await new Promise(r=>setTimeout(r, Math.min(1200, 300 + text.length*15)));
+/* Logs */
+function roomLog(r){ return readJSON(LS_ROOM_LOG(r),[]); }
+function writeRoomLog(r,a){ writeJSON(LS_ROOM_LOG(r),a); }
+function pushRoomLog(r,item){ const a=roomLog(r); a.push(item); if(a.length>4000) a.shift(); writeRoomLog(r,a); }
+function mergeLogs(g, r){ const tag=x=>({ id:x.id||("loc_"+Math.random().toString(36).slice(2,8)), at:x.at||new Date().toISOString(), from:x.from, role:x.role, text:x.text, room:x.room, atts:x.atts||[] }); const all=[...(g||[]).map(m=>tag({...m,room:m.room||"Genel"})), ...(r||[]).map(tag)]; return all.sort((a,b)=> new Date(a.at)-new Date(b.at)); }
 
-      const botText = composeReply(text);
+/* Pins & reactions & permissions */
+function pins(room){ return readJSON(LS_PINS(room),[]); }
+function savePins(room,arr){ writeJSON(LS_PINS(room),arr); }
+function reactions(){ return readJSON(LS_REACTIONS,{}); }
+function saveReactions(x){ writeJSON(LS_REACTIONS,x); }
+function addReaction(id,emo){ const R=reactions(); R[id]=R[id]||{}; R[id][emo]=(R[id][emo]||0)+1; saveReactions(R); scheduleRender(); ping("refresh"); }
+function togglePin(room,msg){ let P=pins(room); const i=P.findIndex(x=>x.id===msg.id); if(i>=0) P.splice(i,1); else P.push(msg); savePins(room,P); renderPins(); scheduleRender(); ping("refresh"); }
+function renderPins(){ const P=pins(ROOMS.current); pinsBox.innerHTML = P.length ? P.map(p=>`<div class="hint">• ${new Date(p.at).toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})} — ${p.from}: ${p.text}</div>`).join("") : '<div class="hint">Yok</div>'; }
+function canEdit(m){ if(m.from!==me.username) return false; return (Date.now()-new Date(m.at).getTime())/1000 <= 300; }
+function canDelete(m){ return (m.from===me.username)||(["owner","admin"].includes(me.role)); }
+function roomPerm(r){ return readJSON(LS_PERM(r),{mode:"rw",allow:[]}); }
+function saveRoomPerm(r,o){ writeJSON(LS_PERM(r),o); }
+function renderPerm(){ const p=roomPerm(ROOMS.current); permModeEl.value=p.mode; permListEl.innerHTML = p.allow.map(u=>`<div class="row"><div class="chip">@${u}</div><button class="danger" onclick="rmAllow('${u}')">Sil</button></div>`).join("") || '<div class="hint">Liste boş.</div>'; }
+window.rmAllow = u=>{ const p=roomPerm(ROOMS.current); p.allow=p.allow.filter(x=>x!==u); saveRoomPerm(ROOMS.current,p); renderPerm(); };
 
-      // bot’u da iki tarafa yaz
-      YANLIK_AUTH.pushChat({ from:"YanlikAI", role:"bot", text: botText });
-      pushRoomLog(room, { id:"m_"+Math.random().toString(36).slice(2,9), at:new Date().toISOString(), from:"YanlikAI", role:"bot", text: botText, room });
+/* Render (windowed) */
+const PAGE=220; let page=1;
+function currentFeed(){ const all=YANLIK_AUTH.listChats(); const room=ROOMS.current; return mergeLogs(all, roomLog(room)); }
+function applyFilters(feed){ const q=(searchEl.value||"").toLowerCase(); const uf=userFilterEl.value; if(q) feed=feed.filter(m=>(m.text||"").toLowerCase().includes(q)||(m.from||"").toLowerCase().includes(q)); if(uf==="me") feed=feed.filter(m=>m.from===me.username); else if(uf==="bot") feed=feed.filter(m=> (m.role==="bot"||m.from==="YanlikAI")); return feed; }
+function sliceWindow(feed){ const n=PAGE*page; return feed.slice(-n); }
+function fmt(t){ return new Date(t).toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}); }
+function esc(s){ return (s||"").replace(/</g,"&lt;"); }
 
-      typing.style.display="none";
-      render();
-    }
+function draw(feed){
+  const R=reactions(), perm=roomPerm(ROOMS.current);
+  const permTag = perm.mode==="ro" ? `<span class="pill">Sadece Okuma</span>` : (perm.mode==="allow" ? `<span class="pill">Üye Sınırlı</span>` : "");
+  const total=feed.length, shown=sliceWindow(feed).length;
+  batchTop.style.display = total>shown ? "flex":"none";
 
-    // ======= Events
-    document.getElementById("logoutBtn").onclick = ()=>{ YANLIK_AUTH.logout(); location.href="login.html"; };
-    document.getElementById("sendBtn").onclick = send;
-    document.getElementById("msgInput").addEventListener("keydown", e=>{ if(e.key==="Enter") send(); });
+  const frag = document.createDocumentFragment();
+  const windowed = sliceWindow(feed);
 
-    // ======= İlk çizim + periyodik yenileme
-    render();
-    setInterval(render, 5000);
-  </script>
+  list.innerHTML=""; // reset
+  list.appendChild(batchTop);
+
+  for(const m of windowed){
+    const id=m.id;
+    const pinHere = pins(ROOMS.current).some(x=>x.id===id);
+    const wrap=document.createElement('div');
+    wrap.className = `msg ${m.from===me.username?'me':'bot'}`;
+    wrap.id = `m_${id}`;
+    wrap.innerHTML = `
+      ${pinHere?`<div class="pin">📌 Sabit</div>`:""}
+      <div class="meta">${fmt(m.at)} • <strong>${esc(m.from)}</strong> [${m.role}] ${permTag}</div>
+      <div class="txt">${esc(m.text).replace(/@([\w.-]+)/g,'<span style="background:#203b6a;padding:2px 6px;border-radius:8px">@$1</span>')}</div>
+      <div class="reac">
+        <button onclick="reactMsg('${id}','👍')">👍 ${R[id]?.['👍']||0}</button>
+        <button onclick="reactMsg('${id}','❤️')">❤️ ${R[id]?.['❤️']||0}</button>
+        <button onclick="reactMsg('${id}','✨')">✨ ${R[id]?.['✨']||0}</button>
+      </div>
+      <div class="act">
+        <button onclick="pinMsg('${id}')">${pinHere?'Unpin':'Pin'}</button>
+        ${canEdit(m)?`<button onclick="editMsg('${id}')">Düzenle</button>`:""}
+        ${canDelete(m)?`<button onclick="delMsg('${id}')">Sil</button>`:""}
+      </div>
+    `;
+    wrap.addEventListener('mousemove',e=>{
+      const r=e.currentTarget.getBoundingClientRect();
+      e.currentTarget.style.setProperty('--mx', (e.clientX - r.left)+'px');
+    });
+    frag.appendChild(wrap);
+  }
+
+  list.appendChild(frag);
+  list.scrollTop = list.scrollHeight;
+}
+
+let _sch=false;
+function scheduleRender(force){ if(_sch && !force) return; _sch=true; (window.requestIdleCallback||window.requestAnimationFrame)(()=>{ render(); _sch=false; }); }
+function render(){ renderTpl(); renderPins(); renderPerm(); draw(applyFilters(currentFeed())); }
+
+/* Actions */
+window.reactMsg = (id,emo)=> addReaction(id,emo);
+window.pinMsg = (id)=>{ const msg=currentFeed().find(x=>x.id===id); if(!msg) return; togglePin(ROOMS.current, msg); };
+window.editMsg = (id)=>{
+  const node = document.getElementById("m_"+id);
+  const txt = node.querySelector(".txt").textContent;
+  if(node.querySelector("textarea")) return;
+  const ta = document.createElement('textarea'); ta.value = txt; ta.style.marginTop='8px';
+  const ok = document.createElement('button'); ok.textContent='Kaydet'; ok.className='chip'; ok.style.marginLeft='6px';
+  const cx = document.createElement('button'); cx.textContent='İptal'; cx.className='danger'; cx.style.marginLeft='6px';
+  const row = document.createElement('div'); row.style.marginTop='6px'; row.appendChild(ta); row.appendChild(ok); row.appendChild(cx);
+  node.querySelector(".txt").after(row);
+  ok.onclick=()=>{
+    const v=ta.value.trim(); if(!v) return;
+    const arr=roomLog(ROOMS.current); const i=arr.findIndex(x=>x.id===id);
+    if(i>=0){ arr[i].text=v; arr[i].editedAt=new Date().toISOString(); writeRoomLog(ROOMS.current,arr); }
+    scheduleRender(); ping("refresh");
+  };
+  cx.onclick=()=> row.remove();
+};
+window.delMsg = (id)=>{ if(!confirm("Mesaj silinsin mi?"))return; const arr=roomLog(ROOMS.current).filter(x=>x.id!==id); writeRoomLog(ROOMS.current,arr); scheduleRender(); ping("refresh"); };
+
+/* Toolbar */
+document.getElementById("exportJson").onclick=()=>{ const data=currentFeed(); const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=`yanlik_${ROOMS.current}_${Date.now()}.json`; a.click(); URL.revokeObjectURL(a.href); };
+document.getElementById("exportTxt").onclick=()=>{ const data=currentFeed().map(m=>`[${m.at}] ${m.from} [${m.role}] #${m.room||'Genel'}\n${m.text}\n`).join("\n"); const blob=new Blob([data],{type:"text/plain;charset=utf-8"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=`yanlik_${ROOMS.current}_${Date.now()}.txt`; a.click(); URL.revokeObjectURL(a.href); };
+document.getElementById("clearRoom").onclick=()=>{ if(!confirm(`#${ROOMS.current} yerel kayıtları silinsin mi?`))return; writeRoomLog(ROOMS.current,[]); page=1; scheduleRender(); ping("refresh"); };
+
+/* Emoji / Mention / Command palette */
+const EMOJIS="😀😁😂🤣😊🙂😉😍😘😎🤩😴🤔😢😭😡👍👎🙏👏💪🔥✨🌟🎯🎉🚀❤️🧠📌📎📝".split("");
+function buildEmoji(){ emojiBox.innerHTML = EMOJIS.map(e=>`<button data-e="${e}">${e}</button>`).join(""); emojiBox.onclick=e=>{ if(e.target.dataset.e){ insertAtCursor(input, e.target.dataset.e+" "); hidePop(emojiBox); input.focus(); } }; }
+function insertAtCursor(el, text){ const s=el.selectionStart, e=el.selectionEnd, v=el.value; el.value=v.slice(0,s)+text+v.slice(e); el.selectionStart=el.selectionEnd=s+text.length; }
+function showPop(el){ el.style.display='block'; el.style.opacity='1'; }
+function hidePop(el){ el.style.display='none'; }
+emojiBtn.onclick=()=>{ if(emojiBox.style.display==='block'){ hidePop(emojiBox); } else { buildEmoji(); showPop(emojiBox); } };
+document.addEventListener('click', (e)=>{ if(!emojiBox.contains(e.target) && e.target!==emojiBtn) hidePop(emojiBox); });
+
+function users(){ const g=YANLIK_AUTH.listChats().map(x=>x.from); const r=ROOMS.items.flatMap(room=>roomLog(room).map(x=>x.from)); return Array.from(new Set([...g,...r,me.username,"YanlikAI"])); }
+function showMention(prefix){ const arr=users().filter(u=>u.toLowerCase().startsWith(prefix.toLowerCase())).slice(0,8); if(!arr.length){ hidePop(mentionBox); return; } mentionBox.innerHTML = arr.map(u=>`<div data-u="${u}">@${u}</div>`).join(""); showPop(mentionBox); mentionBox.onclick=e=>{ const u=e.target.dataset.u; if(!u) return; const val=input.value; const idx=val.lastIndexOf("@"); input.value = val.slice(0,idx+1) + u + " " + val.slice(input.selectionStart); hidePop(mentionBox); input.focus(); }; }
+
+function showCmd(){ const items=[{k:"/clear",d:"Bu odayı temizle"},{k:"/help",d:"Kısayolları göster"},{k:"/fast",d:"Hızlı Mod aç/kapa"},{k:"/gold",d:"Altın tema"},{k:"/neon",d:"Neon tema"}]; const html=items.map(i=>`<div data-k="${i.k}"><b>${i.k}</b> — ${i.d}</div>`).join(""); document.getElementById("cmdBox").innerHTML=html; showPop(document.getElementById("cmdBox")); document.getElementById("cmdBox").onclick=e=>{ const k=e.target.closest('div')?.dataset?.k; if(!k) return; runCmd(k); hidePop(document.getElementById("cmdBox")); }; }
+function runCmd(k){ if(k==="/clear") document.getElementById("clearRoom").click(); if(k==="/help") alert("Kısayollar: / arama • Ctrl+K komut paleti • Ctrl+Enter gönder • : emoji • @ mention • PageUp daha eski mesaj"); if(k==="/fast"){ prefs.fast=!prefs.fast; writeJSON(LS_PREF,prefs); applyPrefs(); scheduleRender(true); } if(k==="/gold"){ prefs.theme='gold'; writeJSON(LS_PREF,prefs); applyPrefs(); scheduleRender(true);} if(k==="/neon"){ prefs.theme='neon'; writeJSON(LS_PREF,prefs); applyPrefs(); scheduleRender(true);} }
+
+input.addEventListener('input', ()=>{
+  const v=input.value;
+  if(v.endsWith(":")) showPop(emojiBox);
+  const idx=v.lastIndexOf("@");
+  if(idx>=0){ const pref=v.slice(idx+1).trim(); if(pref.length>=1) showMention(pref); else hidePop(mentionBox); } else hidePop(mentionBox);
+});
+document.addEventListener('keydown', e=>{
+  if(e.key==="/" && document.activeElement!==searchEl){ e.preventDefault(); searchEl.focus(); }
+  if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='k'){ e.preventDefault(); showCmd(); }
+  if((e.ctrlKey||e.metaKey) && e.key==='Enter'){ e.preventDefault(); send(); }
+  if(e.key==="PageUp"){ e.preventDefault(); page++; scheduleRender(); }
+  if(e.key==="PageDown"){ e.preventDefault(); page=Math.max(1,page-1); scheduleRender(); }
+});
+
+/* File (<=1MB demo) */
+let pendingAtts=[];
+fileBtn.onclick=()=> fileInput.click();
+fileInput.onchange=async()=>{
+  const f=fileInput.files[0]; if(!f) return;
+  if(f.size>1024*1024){ alert("Dosya 1 MB sınırı (demo)."); fileInput.value=""; return; }
+  const data=await f.arrayBuffer(); const b64=btoa(String.fromCharCode(...new Uint8Array(data)));
+  pendingAtts.push({ name:f.name, type:f.type, size:f.size, data:`data:${f.type};base64,${b64}` });
+  attachInfoEl.textContent = `Eklenecek: ${pendingAtts.map(a=>a.name).join(", ")}`;
+  fileInput.value="";
+};
+
+/* Send + bot typing with wave */
+async function send(){
+  const text=input.value.trim();
+  const p=roomPerm(ROOMS.current);
+  if(p.mode==="ro" && !["owner","admin"].includes(me.role)) return alert("Bu oda sadece okuma.");
+  if(p.mode==="allow" && !["owner","admin"].includes(me.role) && !p.allow.includes(me.username)) return alert("Bu oda sınırlı.");
+  if(!text && pendingAtts.length===0) return;
+
+  const id1="m_"+Math.random().toString(36).slice(2,9);
+  YANLIK_AUTH.pushChat({ id:id1, from:me.username, role:me.role, text, atts:pendingAtts });
+  pushRoomLog(ROOMS.current, { id:id1+"_r", at:new Date().toISOString(), from:me.username, role:me.role, text, room:ROOMS.current, atts:pendingAtts });
+
+  input.value=""; attachInfoEl.textContent=""; pendingAtts=[];
+  scheduleRender(); ping("refresh");
+
+  typing.style.display="inline-flex";
+  await new Promise(r=>setTimeout(r, Math.min(1100, 350 + text.length*12)));
+
+  const botText = botReply(text||"[dosya gönderildi]");
+  const id2="m_"+Math.random().toString(36).slice(2,9);
+  YANLIK_AUTH.pushChat({ id:id2, from:"YanlikAI", role:"bot", text:botText });
+  pushRoomLog(ROOMS.current, { id:id2+"_r", at:new Date().toISOString(), from:"YanlikAI", role:"bot", text:botText, room:ROOMS.current });
+
+  typing.style.display="none";
+  scheduleRender(); ping("refresh");
+}
+
+/* Hover meta glow for list items */
+window.hoverMeta = (e)=>{ const li=e.currentTarget; li.style.transform='translateX(2px)'; li.style.filter='brightness(1.1)'; };
+window.clearMeta = (e)=>{ const li=e.currentTarget; li.style.transform=''; li.style.filter=''; };
+
+/* Toolbar search debounce */
+let tSearch; const debounce=(fn,ms)=> (...a)=>{ clearTimeout(tSearch); tSearch=setTimeout(()=>fn(...a),ms); };
+searchEl.oninput = debounce(()=>{ page=1; scheduleRender(); }, 140);
+userFilterEl.onchange = ()=>{ page=1; scheduleRender(); };
+
+/* Permissions UI */
+permModeEl.onchange=()=>{ const p=roomPerm(ROOMS.current); p.mode=permModeEl.value; saveRoomPerm(ROOMS.current,p); scheduleRender(); };
+permAddBtn.onclick=()=>{ const v=(permUserEl.value||"").trim(); if(!v) return; const p=roomPerm(ROOMS.current); if(!p.allow.includes(v)) p.allow.push(v); saveRoomPerm(ROOMS.current,p); permUserEl.value=""; renderPerm(); };
+
+/* Init */
+renderRooms(); render(); 
+sendBtn.onclick = send;
+input.addEventListener('keydown', e=>{ if(e.key==="Enter" && !e.shiftKey && !e.ctrlKey) send(); });
+document.getElementById("logoutBtn").onclick=()=>{ YANLIK_AUTH.logout(); location.href="login.html"; };
+
+/* Service Worker tiny cache */
+if('serviceWorker' in navigator){
+  const sw = `
+  const C='yanlik-v2';
+  self.addEventListener('install',e=>{e.waitUntil(caches.open(C).then(c=>c.addAll(['./','./chat.html']))); self.skipWaiting();});
+  self.addEventListener('activate',e=>{e.waitUntil(self.clients.claim());});
+  self.addEventListener('fetch',e=>{e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).then(res=>{const cp=res.clone(); caches.open(C).then(c=>c.put(e.request,cp)); return res;})));});
+  `;
+  const url=URL.createObjectURL(new Blob([sw],{type:'text/javascript'}));
+  navigator.serviceWorker.register(url).catch(()=>{});
+}
+</script>
 </body>
 </html>
