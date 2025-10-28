@@ -1,262 +1,131 @@
-/* ============================================================
-   YANLIK • auth.js v4
-   Roles: owner, admin, standard, guest
-   - Passwords: salted SHA-256 (WebCrypto)
-   - Hard permissions:
-       * ONLY owner ("mirsqdmmdevs") can change roles / delete users / change others' passwords
-       * Admin cannot touch owner; cannot grant/revoke roles
-       * IP visibility: owner full; admin masked unless owner allows (settings.ipShareAllowed)
-   - Active sessions + idle tools
-   ============================================================ */
-(function (global) {
-  "use strict";
+// auth.js — Yanlik (client-only)
+(function (W) {
+  const KEY_USERS = "yanlik:users";
+  const KEY_SESSION = "yanlik:session";
+  const KEY_SETTINGS = "yanlik:settings";
+  const KEY_CHATS = "yanlik:chats";
 
-  const KEY_USERS      = "yanlik.auth.users.v4";
-  const KEY_SESSION    = "yanlik.auth.session.v4";
-  const KEY_SESSION_ID = "yanlik.auth.sessionId.v4";
-  const KEY_SESSIONS   = "yanlik.auth.sessions.v2";
-  const KEY_SETTINGS   = "yanlik.auth.settings.v1"; // { ipShareAllowed:false }
+  function nowIso(){ return new Date().toISOString(); }
+  function read(key, def){ try{ return JSON.parse(localStorage.getItem(key)) ?? def; }catch{ return def; } }
+  function write(key, val){ localStorage.setItem(key, JSON.stringify(val)); }
+  function uid(){ return "u_" + Math.random().toString(36).slice(2,10); }
 
-  const jget = (k, d=null) => { try{ return JSON.parse(localStorage.getItem(k) || (d===null?"null":JSON.stringify(d))); }catch{ return d; } };
-  const jset = (k, v)      => { try{ localStorage.setItem(k, JSON.stringify(v)); }catch{} };
-  const jdel = (k)         => { try{ localStorage.removeItem(k); }catch{} };
-
-  const nowIso = () => new Date().toISOString();
-  const rid = (n=8) => Math.random().toString(36).slice(2,2+n);
-
-  // ---------- WebCrypto helpers (SHA-256) ----------
-  async function sha256(buf){
-    const d = await crypto.subtle.digest("SHA-256", buf);
-    return Array.from(new Uint8Array(d)).map(b=>b.toString(16).padStart(2,"0")).join("");
-  }
-  async function hashPw(password, saltHex){
-    const enc = new TextEncoder();
-    const salt = hexToBytes(saltHex);
-    const data = new Uint8Array([...salt, ...enc.encode(password)]);
-    return sha256(data);
-  }
-  function hexToBytes(hex){ const a=[]; for(let i=0;i<hex.length;i+=2){a.push(parseInt(hex.slice(i,i+2),16));} return new Uint8Array(a); }
-  function randomHex(n=16){ return Array.from(crypto.getRandomValues(new Uint8Array(n))).map(b=>b.toString(16).padStart(2,"0")).join(""); }
-
-  // ---------- seed (local demo) ----------
-  async function seedIfNeeded(){
-    const had = jget(KEY_USERS, null);
-    if (Array.isArray(had) && had.length > 0) return;
-
-    // owner: mirsqdmmdevs / no1hastasi
-    const s1 = randomHex(16);
-    const h1 = await hashPw("no1hastasi", s1);
-
-    // helper admin: sudvci / qwe124q
-    const s2 = randomHex(16);
-    const h2 = await hashPw("qwe124q", s2);
-
-    // standard: user / 1234
-    const s3 = randomHex(16);
-    const h3 = await hashPw("1234", s3);
-
-    const seed = [
-      { id:"u-"+rid(), username:"mirsqdmmdevs", role:"owner",   display:"Owner",    salt:s1, pwHash:h1, createdAt:nowIso(), lastLoginAt:null, lastLoginIp:null },
-      { id:"u-"+rid(), username:"sudvci",       role:"admin",   display:"Admin",    salt:s2, pwHash:h2, createdAt:nowIso(), lastLoginAt:null, lastLoginIp:null },
-      { id:"u-"+rid(), username:"user",         role:"standard",display:"Kullanıcı",salt:s3, pwHash:h3, createdAt:nowIso(), lastLoginAt:null, lastLoginIp:null },
+  // --- seed (ilk kurulumda owner + admin) ---
+  function seed(){
+    const users = read(KEY_USERS, []);
+    if(users.length) return;
+    const base = nowIso();
+    const data = [
+      { id: uid(), username:"mirsqdmmdevs", role:"owner",   display:"Owner", pw:"no1hastasi", createdAt:base, lastLoginAt:null, lastIp:null },
+      { id: uid(), username:"sudvci",       role:"admin",   display:"Admin", pw:"qwe124q",    createdAt:base, lastLoginAt:null, lastIp:null },
     ];
-    jset(KEY_USERS, seed);
-    jset(KEY_SESSIONS, []);
-    jset(KEY_SETTINGS, { ipShareAllowed: false });
-    jdel(KEY_SESSION); jdel(KEY_SESSION_ID);
+    write(KEY_USERS, data);
+    write(KEY_SETTINGS, { ipShareAllowed:false });
+    if(!read(KEY_CHATS, null)) write(KEY_CHATS, []);
   }
+  seed();
 
-  // ---------- core stores ----------
-  function listUsers(){ return jget(KEY_USERS, []); }
-  function saveUsers(arr){ jset(KEY_USERS, Array.isArray(arr)?arr:[]); }
-  function getSettings(){ return jget(KEY_SETTINGS, { ipShareAllowed:false }); }
-  function setSettings(patch, actor){
-    if(!actor || actor.role!=="owner") throw new Error("Yetki dışı");
-    const cur = getSettings();
-    jset(KEY_SETTINGS, Object.assign({}, cur, patch||{}));
-  }
-
-  // ---------- sessions ----------
-  function getSession(){ return jget(KEY_SESSION, null); }
-  function setSession(sess){ jset(KEY_SESSION, sess); }
-  function getSessionId(){ return localStorage.getItem(KEY_SESSION_ID) || null; }
-  function setSessionId(id){ localStorage.setItem(KEY_SESSION_ID, id); }
-  function getSessions(){ return jget(KEY_SESSIONS, []); }
-  function saveSessions(arr){ jset(KEY_SESSIONS, Array.isArray(arr)?arr:[]); }
-  function _startSessionRecord(user, ip){
-    const sid = "s-"+rid(10);
-    const now = Date.now();
-    const ua  = navigator.userAgent || "unknown";
-    const rec = { id:sid, userId:user.id, username:user.username, role:user.role, startedAt:nowIso(), lastSeen:now, ip:ip||null, ua, active:true };
-    const arr = getSessions(); arr.unshift(rec); saveSessions(arr.slice(0,500));
-    setSessionId(sid);
-    localStorage.setItem(KEY_SESSIONS+".ping", String(now));
-    return sid;
-  }
-  function endSession(sessionId){
-    const arr = getSessions().map(s => s.id===sessionId ? {...s, active:false, endedAt:nowIso()} : s);
-    saveSessions(arr);
-  }
-  function pingSession(){ const sid=getSessionId(); if(!sid) return; const arr=getSessions().map(s => s.id===sid ? {...s, lastSeen:Date.now()} : s); saveSessions(arr); }
-
-  // ---------- utils ----------
-  function findByUsername(username){ return listUsers().find(u=>u.username===username); }
-  function maskIp(ip){
-    if(!ip) return "-";
-    // 1.2.3.4 → 1.2.3.x (IPv4 kaba maskeleme)
-    const parts = ip.split(".");
-    if(parts.length===4) { parts[3]="x"; return parts.join("."); }
-    return ip.slice(0, ip.length-4) + "xxxx";
-  }
-
-  // ---------- auth ----------
-  async function loginAsync(username, password, {ip}={}){
-    username=(username||"").trim(); password=(password||"").trim();
-    if(!username || !password) throw new Error("Eksik bilgi");
-    const users = listUsers();
-    const user = users.find(u=>u.username===username);
-    if(!user) throw new Error("Kullanıcı bulunamadı");
-    const testHash = await hashPw(password, user.salt);
-    if(testHash !== user.pwHash) throw new Error("Parola hatalı");
-
-    const sess = { id:user.id, username:user.username, display:user.display||user.username, role:user.role||"standard", loginAt:nowIso(), guest:false };
-    setSession(sess);
-    // kayıtlar
-    user.lastLoginAt = sess.loginAt;
-    if(ip) user.lastLoginIp = ip;
-    saveUsers(users);
-    _startSessionRecord(user, ip||null);
-    return sess;
-  }
-
-  function loginGuest(displayName){
-    const user = { id:"guest-"+rid(), username:"guest-"+rid(), role:"guest" };
-    const sess = { id:user.id, username:user.username, display:displayName||"Misafir", role:"guest", loginAt:nowIso(), guest:true };
-    setSession(sess);
-    _startSessionRecord(user, null);
-    return sess;
-  }
-
-  function logout(redirectUrl){
-    const sid = getSessionId(); if(sid) endSession(sid);
-    jdel(KEY_SESSION); jdel(KEY_SESSION_ID);
-    if(redirectUrl) location.href = redirectUrl;
-  }
-
-  function requireAuth(redirectUrl, opts={}){
-    const sess = getSession();
-    const allowGuest = !!opts.allowGuest;
-    const requireRole = opts.requireRole || null;
-    if(!sess){ if(redirectUrl) location.href=redirectUrl; return null; }
-    if(requireRole && sess.role !== requireRole){ if(redirectUrl) location.href="index.html"; return null; }
-    if(!allowGuest && (sess.guest || sess.role==="guest")){ if(redirectUrl) location.href="login.html"; return null; }
-    return sess;
-  }
-
-  // ---------- admin-safe listings ----------
-  function listUsersForAdmin(viewer){
-    const settings = getSettings();
-    const canSeeFullIp = viewer?.role === "owner";
-    const adminMaySeeIp = settings.ipShareAllowed && viewer?.role === "admin";
-
-    return (listUsers()||[]).map(u => {
-      const o = {
-        id:u.id, username:u.username, display:u.display||u.username,
-        role:u.role||"standard", createdAt:u.createdAt||null,
-        lastLoginAt:u.lastLoginAt||null,
-        lastLoginIp: null
-      };
-      if(canSeeFullIp) {
-        o.lastLoginIp = u.lastLoginIp || null;
-      } else if(adminMaySeeIp && u.role!=="owner") {
-        o.lastLoginIp = u.lastLoginIp ? maskIp(u.lastLoginIp) : null;
-      } else {
-        o.lastLoginIp = null;
-      }
-      return o;
-    });
-  }
-
-  // ---------- register / change password ----------
-  async function registerUserAsync({ username, password, display }){
-    username=(username||"").trim(); password=(password||"").trim(); display=(display||username).trim();
-    if(!username || !password) throw new Error("Kullanıcı adı ve parola gerekli");
-    if(username.length<3) throw new Error("Kullanıcı adı en az 3 karakter");
-    if(password.length<4) throw new Error("Parola en az 4 karakter");
-    if(findByUsername(username)) throw new Error("Bu kullanıcı adı zaten kullanılıyor");
-
-    const salt = randomHex(16);
-    const pwHash = await hashPw(password, salt);
-    const users = listUsers();
-    const newU = { id:"u-"+rid(), username, role:"standard", display, salt, pwHash, createdAt:nowIso(), lastLoginAt:null, lastLoginIp:null };
-    users.push(newU); saveUsers(users);
-    return { id:newU.id, username:newU.username, display:newU.display, role:newU.role };
-  }
-
-  async function changePasswordAsync(actorSess, username, newPassword){
-    newPassword=(newPassword||"").trim();
-    if(newPassword.length<4) throw new Error("Parola en az 4 karakter");
-    const users = listUsers();
-    const idx = users.findIndex(u=>u.username===username);
-    if(idx<0) throw new Error("Kullanıcı bulunamadı");
-
-    const target = users[idx];
-    const actorIsOwner = actorSess?.role==="owner";
-    const actorIsSelf  = actorSess && actorSess.username === username;
-
-    if(!actorIsOwner && !actorIsSelf) throw new Error("Yetki dışı");
-    if(target.role==="owner" && !actorIsOwner) throw new Error("Owner şifresi sadece owner tarafından değiştirilebilir");
-
-    const salt = randomHex(16);
-    const pwHash = await hashPw(newPassword, salt);
-    users[idx].salt = salt; users[idx].pwHash = pwHash;
-    saveUsers(users);
-    return true;
-  }
-
-  // ---------- role & delete (owner-only) ----------
-  function changeRole(actorSess, targetId, newRole){
-    if(actorSess?.role!=="owner") throw new Error("Sadece owner rol atayabilir");
-    const users = listUsers();
-    const idx = users.findIndex(u=>u.id===targetId); if(idx<0) throw new Error("Kullanıcı yok");
-    if(users[idx].role==="owner") throw new Error("Owner rolü değiştirilemez");
-    if(!["admin","standard","guest"].includes(newRole)) throw new Error("Geçersiz rol");
-    users[idx].role = newRole; saveUsers(users); return true;
-  }
-  function deleteUser(actorSess, targetId){
-    if(actorSess?.role!=="owner") throw new Error("Sadece owner silebilir");
-    const users = listUsers();
-    const victim = users.find(u=>u.id===targetId);
-    if(!victim) throw new Error("Kullanıcı yok");
-    if(victim.role==="owner") throw new Error("Owner silinemez");
-    saveUsers(users.filter(u=>u.id!==targetId));
-    return true;
-  }
-
-  // ---------- export ----------
+  // --- public api ---
   const API = {
-    // boot
-    seedIfNeeded,
-    // session
-    getSession, setSession, getSessionId, getSessions, pingSession, logout, requireAuth,
-    // auth
-    loginAsync, loginGuest,
-    // users
-    listUsers, saveUsers, listUsersForAdmin, registerUserAsync, changePasswordAsync,
-    changeRole, deleteUser,
-    // settings
-    getSettings, setSettings,
-    // util
-    maskIp
+    // login / logout / session
+    login({username, password}){
+      const users = read(KEY_USERS, []);
+      const u = users.find(x=>x.username===username && x.pw===password);
+      if(!u) throw new Error("Kullanıcı ya da parola hatalı");
+      u.lastLoginAt = nowIso();
+      // IP: client-side, gerçek IP alınamaz; simülasyon
+      u.lastIp = u.lastIp || "192.168.1.22"; 
+      write(KEY_USERS, users);
+      write(KEY_SESSION, { id:u.id, username:u.username, role:u.role, display:u.display });
+      return { username:u.username, role:u.role, display:u.display };
+    },
+    logout(){ localStorage.removeItem(KEY_SESSION); },
+    getSession(){ return read(KEY_SESSION, null); },
+
+    // guard
+    requireAuth(redirectTo="login.html", opt={}){
+      const s = API.getSession();
+      if(!s){ location.href = redirectTo; return null; }
+      if(opt.requireRole){
+        const roles = Array.isArray(opt.requireRole) ? opt.requireRole : [opt.requireRole];
+        if(!roles.includes(s.role)){ location.href = redirectTo; return null; }
+      }
+      return s;
+    },
+
+    // users (admin/owner görünümü için)
+    listUsersForAdmin(viewer){
+      if(!viewer) throw new Error("session");
+      const users = read(KEY_USERS, []);
+      const settings = read(KEY_SETTINGS, { ipShareAllowed:false });
+      return users.map(u=>{
+        const masked = u.lastIp ? u.lastIp.split(".").slice(0,3).join(".") + ".x" : null;
+        return {
+          id: u.id,
+          username: u.username,
+          display: u.display,
+          role: u.role,
+          createdAt: u.createdAt,
+          lastLoginAt: u.lastLoginAt,
+          lastLoginIp: viewer.role==="owner" ? u.lastIp : (settings.ipShareAllowed && u.role!=="owner" ? masked : null)
+        };
+      });
+    },
+    getSettings(){ return read(KEY_SETTINGS, { ipShareAllowed:false }); },
+    setSettings(patch, viewer){
+      if(viewer?.role!=="owner") throw new Error("OWNER_ONLY");
+      const s = API.getSettings();
+      write(KEY_SETTINGS, Object.assign({}, s, patch));
+    },
+
+    // owner: create / change role / delete / change password
+    createUser(viewer, { username, password, role="standard", display }){
+      if(viewer?.role!=="owner") throw new Error("OWNER_ONLY");
+      username=(username||"").trim(); password=(password||"").trim();
+      if(!username || username.length<3) throw new Error("Kullanıcı adı kısa");
+      if(!password || password.length<4) throw new Error("Parola kısa");
+      const users=read(KEY_USERS, []);
+      if(users.some(x=>x.username===username)) throw new Error("Bu kullanıcı adı var");
+      if(!["owner","admin","standard","guest"].includes(role)) throw new Error("Rol yok");
+      if(role==="owner") throw new Error("Yeni owner oluşturulamaz");
+      const u={ id:uid(), username, pw:password, role, display:display||username, createdAt:nowIso(), lastLoginAt:null, lastIp:null };
+      users.push(u); write(KEY_USERS, users);
+      return { id:u.id, username:u.username, display:u.display, role:u.role };
+    },
+    changeRole(viewer, id, role){
+      if(viewer?.role!=="owner") throw new Error("OWNER_ONLY");
+      const users=read(KEY_USERS, []);
+      const u=users.find(x=>x.id===id); if(!u) throw new Error("Yok");
+      if(u.role==="owner") throw new Error("Owner dokunulmaz");
+      if(!["admin","standard","guest"].includes(role)) throw new Error("Rol yok");
+      u.role=role; write(KEY_USERS, users);
+    },
+    deleteUser(viewer, id){
+      if(viewer?.role!=="owner") throw new Error("OWNER_ONLY");
+      const users=read(KEY_USERS, []);
+      const u=users.find(x=>x.id===id); if(!u) throw new Error("Yok");
+      if(u.role==="owner") throw new Error("Owner dokunulmaz");
+      write(KEY_USERS, users.filter(x=>x.id!==id));
+    },
+    changePassword(viewer, username, newPassword){
+      const users=read(KEY_USERS, []);
+      const target=users.find(x=>x.username===username);
+      if(!target) throw new Error("Yok");
+      if(viewer.role!=="owner" && viewer.username!==username) throw new Error("FORBIDDEN");
+      if(target.role==="owner" && viewer.role!=="owner") throw new Error("OWNER_ONLY");
+      if(!newPassword || newPassword.length<4) throw new Error("Parola kısa");
+      target.pw=newPassword; write(KEY_USERS, users);
+    },
+
+    // chats
+    listChats(){ return read(KEY_CHATS, []); },
+    pushChat({ from, role, text }){
+      const arr = read(KEY_CHATS, []);
+      arr.push({ id:"m_"+Math.random().toString(36).slice(2,9), at:nowIso(), from, role, text });
+      if(arr.length>2000) arr.shift();
+      write(KEY_CHATS, arr);
+    }
   };
 
-  // async seed (because hashing)
-  seedIfNeeded().then(()=>{ global.YANLIK_AUTH = API; }).catch(e=>{ console.error(e); global.YANLIK_AUTH = API; });
-
-  // storage sync notice (admin pages can listen)
-  window.addEventListener("storage", (e)=>{
-    if(e.key && (e.key.startsWith(KEY_SESSIONS))) {
-      // listeners in admin pages will react
-    }
-  });
+  W.YANLIK_AUTH = API;
 })(window);
