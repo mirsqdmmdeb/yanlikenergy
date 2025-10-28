@@ -7,27 +7,39 @@
   <style>
     :root{--c1:#00c9ff;--c2:#0077ff;--bg:#000;--fg:#e8f0ff}
     *{box-sizing:border-box}
-    body{margin:0;min-height:100vh;display:grid;place-items:center;background:radial-gradient(1200px 700px at 0% 0%,#02182a 0%,#000 60%);color:var(--fg);font-family:system-ui,Segoe UI,Roboto}
+    body{
+      margin:0;min-height:100vh;display:grid;place-items:center;
+      background:radial-gradient(1200px 700px at 0% 0%,#02182a 0%,#000 60%);
+      color:var(--fg);font-family:system-ui,Segoe UI,Roboto
+    }
     .wrap{text-align:center;padding:32px}
     h1{margin:0 0 10px;font-size:2.4rem;color:var(--c1);text-shadow:0 0 16px #00c9ff55}
     p{margin:8px 0 18px;color:#9bb3cc}
     .row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
-    a{display:inline-block;padding:10px 16px;border-radius:12px;text-decoration:none;font-weight:700;color:#02131a;background:linear-gradient(135deg,var(--c2),var(--c1));box-shadow:0 0 18px #00c9ff33}
-    a:hover{filter:brightness(1.1)}
+    a{
+      display:inline-block;padding:10px 16px;border-radius:12px;text-decoration:none;font-weight:700;
+      color:#02131a;background:linear-gradient(135deg,var(--c2),var(--c1));
+      box-shadow:0 0 18px #00c9ff33;transition:transform .12s ease, filter .12s ease
+    }
+    a:hover{filter:brightness(1.1);transform:translateY(-1px)}
     .k{margin-top:14px;font-size:.9rem;color:#89a9c9}
     .k kbd{background:#0f1b2e;border:1px solid #ffffff18;border-radius:6px;padding:2px 6px}
   </style>
 </head>
 <body>
+  <!-- auth.js gerekli değilse silebilirsin; tutmak zararsız -->
   <script src="./auth.js"></script>
+
   <div class="wrap">
     <h1>Yanlik Energy</h1>
     <p>Hızlı, modern ve akıcı sohbet.</p>
+
     <div class="row">
       <a href="chat.html">Sohbet</a>
       <a href="login.html">Giriş</a>
-      <a href="admin.html">Admin</a>
+      <a href="signup.html">Üye Ol</a>
     </div>
+
     <p class="k">Kısayollar: <kbd>/</kbd> Arama · <kbd>Ctrl</kbd> + <kbd>K</kbd> Komut Paleti · <kbd>Ctrl</kbd> + <kbd>Enter</kbd> Gönder</p>
   </div>
 </body>
