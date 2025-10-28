@@ -1,84 +1,73 @@
 <!DOCTYPE html>
-<html lang="tr" data-theme="neon-blue">
+<html lang="tr">
 <head>
-  <meta charset="utf-8" />
-  <title>Yanlik v2 •  </title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="Neon mavi/altın temalı, sekmeli, gelişmiş konuşma arayüzü. API gerektirmez." />
-  <link rel="manifest" href="./manifest.json" />
-  <meta name="theme-color" content="#0f172a" />
-  <meta http-equiv="Content-Security-Policy"
-        content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; font-src 'self'">
-  <link rel="stylesheet" href="./style.css" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Yanlik • Chat</title>
+  <link rel="stylesheet" href="./style.css?v=ui4" />
+  <script>
+    try {
+      const s = JSON.parse(localStorage.getItem("yanlik.settings")) || {};
+      document.documentElement.setAttribute("data-theme", s.theme || "neon-blue");
+    } catch {
+      document.documentElement.setAttribute("data-theme", "neon-blue");
+    }
+  </script>
 </head>
+
 <body>
   <div class="app">
-
-    <!-- Sol panel (isteğe bağlı konuşma listesi kalsın) -->
+    <!-- Sidebar -->
     <aside class="sidebar">
       <div class="brand">
-        <div class="dot"></div><strong>Yanlik</strong><span class="badge">neon</span>
+        <div class="dot"></div>
+        <strong>YANLIK</strong>
+        <span class="badge">v4</span>
       </div>
-      <button id="newChatBtn" class="btn block">+ Yeni konuşma</button>
-      <div id="threadList" class="threads" aria-label="Konuşmalar"></div>
-      <div class="sidebar-footer">
-        <button id="exportBtn" class="btn subtle">Dışa aktar</button>
-        <button id="importBtn" class="btn subtle">İçe aktar</button>
-        <input id="importFile" type="file" accept="application/json" hidden />
+      <div class="search">
+        <input type="search" placeholder="Ara..." />
+      </div>
+      <div class="threads">
+        <div class="thread">
+          <span class="name">Genel Chat</span>
+          <span class="mini">Aktif</span>
+        </div>
       </div>
     </aside>
 
+    <!-- Main -->
     <section class="main">
-      <!-- SEKME ŞERİDİ -->
-      <div class="tabs" id="tabBar" role="tablist" aria-label="Sekmeler">
-        <button id="addTabBtn" class="tab add" title="Yeni sekme">＋</button>
-      </div>
-
-      <!-- ÜST BAR -->
-      <header class="topbar">
+      <div class="topbar">
         <div class="title">
-          <h1 id="threadTitle">Yeni Konuşma</h1>
-          <small id="statusPill" class="pill">● Hazır</small>
+          <h2 id="threadTitle">Yanlık Chat</h2>
+          <span class="pill" id="statusPill">Hazır</span>
         </div>
-        <div class="actions">
-          <div class="search">
-            <input id="searchInput" type="search" placeholder="Mesajlarda ara…" />
-          </div>
-          <button id="settingsOpen" class="btn ghost" onclick="location.href='./settings.html'">Ayarlar</button>
+        <div class="btn-group">
+          <button class="btn ghost tooltip" data-tip="Ayarlar" onclick="location.href='settings.html'">⚙️</button>
+          <button class="btn ghost tooltip" data-tip="Çıkış" onclick="YANLIK_AUTH.logout()">🚪</button>
         </div>
-      </header>
-
-      <!-- ÖNERİ ÇİPLERİ -->
-      <div class="suggest">
-        <button class="chip" data-suggest="/help">/help</button>
-        <button class="chip" data-suggest="özetle">Özetle</button>
-        <button class="chip" data-suggest="/calc 12*(3+4)/5">Hesap</button>
-        <button class="chip" data-suggest="tema neon-altın yap">Tema: Neon Altın</button>
       </div>
 
-      <!-- Sohbet -->
-      <div id="chatList" class="chat" aria-live="polite"></div>
-      <div id="typing" class="typing" style="display:none;">Yazıyor…</div>
+      <div class="tabs">
+        <div class="tab active"><span class="name">Chat</span></div>
+        <div class="tab add" onclick="UI.toast('Yeni sekme oluşturulacak...','success')">＋</div>
+      </div>
 
-      <!-- Composer -->
-      <footer class="composer">
-        <textarea id="messageInput" placeholder="Mesaj yazın…"></textarea>
+      <div class="chat" id="chatList"></div>
+      <div class="typing" id="typing" style="display:none;">Yanıt hazırlanıyor...</div>
+
+      <div class="composer">
+        <textarea id="messageInput" placeholder="Mesaj yaz..."></textarea>
         <div class="composer-actions">
-          <button id="multiSelBtn" class="btn ghost" title="Çoklu seçim">Seç</button>
-          <button id="clearBtn" class="btn ghost" title="Konuşmayı temizle">Temizle</button>
+          <span class="hint">Enter → Gönder</span>
           <button id="sendBtn" class="btn primary">Gönder</button>
         </div>
-        <small class="hint">Enter → Gönder, Shift+Enter → Satır (Ayarlar’dan değiştir)</small>
-      </footer>
+      </div>
     </section>
   </div>
 
-  <script src="./state.js"></script>
-  <script src="./chat.js"></script>
-  <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./sw.js').catch(()=>{});
-    }
-  </script>
+  <script src="./ui.js?v=ui4"></script>
+  <script src="./auth.js"></script>
+  <script src="./chat_enhanced.js?v=ui4"></script>
 </body>
 </html>
