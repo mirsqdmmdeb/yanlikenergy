@@ -1,18 +1,14 @@
-// Neon ağ animasyonu (her sayfada kullan)
+// Neon ağ animasyonu
 const bg = document.createElement("canvas");
 bg.id = "bg";
 document.body.prepend(bg);
 const ctx = bg.getContext("2d");
-
 function fit(){ bg.width = innerWidth; bg.height = innerHeight; }
 fit(); addEventListener("resize", fit);
 
 const P = Array.from({length:60},()=>({
-  x: Math.random()*bg.width,
-  y: Math.random()*bg.height,
-  vx:(Math.random()-.5)*.4,
-  vy:(Math.random()-.5)*.4,
-  r:1+Math.random()*2
+  x: Math.random()*bg.width, y: Math.random()*bg.height,
+  vx:(Math.random()-.5)*.4,  vy:(Math.random()-.5)*.4, r:1+Math.random()*2
 }));
 
 (function draw(){
@@ -25,7 +21,7 @@ const P = Array.from({length:60},()=>({
     ctx.fillStyle="#00c9ff55"; ctx.fill();
   }
   for(let i=0;i<P.length;i++) for(let j=i+1;j<P.length;j++){
-    const a=P[i],b=P[j],d=Math.hypot(a.x-b.x,a.y-b.y);
+    const a=P[i], b=P[j], d=Math.hypot(a.x-b.x,a.y-b.y);
     if(d<130){ ctx.globalAlpha=1-d/130; ctx.strokeStyle="#00c9ff22";
       ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke(); ctx.globalAlpha=1; }
   }
