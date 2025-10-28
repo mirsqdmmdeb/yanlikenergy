@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <title>Giriş • Yanlik</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="./style.css?v=ui4" />
+</head>
+<body>
+  <main style="display:grid;place-items:center;min-height:100vh;padding:24px;">
+    <div class="card" style="max-width:420px;width:100%;">
+      <h2>Giriş</h2>
+      <form id="loginForm">
+        <label class="field"><span>Kullanıcı adı</span><input id="u" name="u" required /></label>
+        <label class="field"><span>Parola</span><input id="p" name="p" type="password" required /></label>
+        <div class="btn-group" style="margin-top:12px;justify-content:flex-end;">
+          <button type="button" class="btn ghost" onclick="location.href='index.html'">Geri</button>
+          <button type="submit" class="btn primary">Giriş Yap</button>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <script src="./ui.js?v=ui4"></script>
+  <script src="./login.js"></script>
+</body>
+</html>
