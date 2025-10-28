@@ -9,6 +9,45 @@
 <body>
   <script src="./auth.js"></script>
   <script>
+// === Sohbet Görüntüleme ===
+const convosBox = document.getElementById("convosBox");
+document.getElementById("loadConvos").onclick = () => {
+  convosBox.innerHTML = "";
+  const keys = Object.keys(localStorage).filter(k => k.startsWith("yanlik.convo."));
+  if(keys.length === 0){
+    convosBox.innerHTML = "<p>Henüz kayıtlı sohbet yok.</p>";
+    return;
+  }
+  keys.forEach((key,i)=>{
+    const convo = JSON.parse(localStorage.getItem(key));
+    const preview = convo.messages
+      ?.filter(m=>m.role==="user")
+      .slice(-1)[0]?.text?.slice(0,60) || "(boş)";
+    const div = document.createElement("div");
+    div.className="thread";
+    div.innerHTML = `
+      <span class="name">#${i+1} ${key.replace("yanlik.convo.","")}</span>
+      <span class="mini">${preview}</span>
+      <div class="ops">
+        <button class="btn soft tooltip" data-tip="Aç">🔍</button>
+        <button class="btn soft tooltip" data-tip="Sil">🗑️</button>
+      </div>`;
+    div.querySelectorAll("button")[0].onclick=()=>{
+      const w = window.open("", "_blank");
+      w.document.write("<pre style='white-space:pre-wrap;font-family:monospace;'>"+
+        JSON.stringify(convo,null,2)+"</pre>");
+      w.document.title = "Sohbet " + key;
+    };
+    div.querySelectorAll("button")[1].onclick=()=>{
+      if(!confirm("Bu sohbet silinsin mi?")) return;
+      localStorage.removeItem(key);
+      UI.toast("Sohbet silindi","warn");
+      div.remove();
+    };
+    convosBox.appendChild(div);
+  });
+  UI.toast(`${keys.length} sohbet bulundu`,"success");
+};
     const s = YANLIK_AUTH.requireAuth('./login.html');
     if(!s) document.write("Yönlendiriliyorsunuz...");
   </script>
