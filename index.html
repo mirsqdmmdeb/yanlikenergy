@@ -2,10 +2,11 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Yanlik • Chat</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Yanlik • Sohbet</title>
   <link rel="stylesheet" href="./style.css?v=ui4" />
   <script>
+    // Tema yükle
     try {
       const s = JSON.parse(localStorage.getItem("yanlik.settings")) || {};
       document.documentElement.setAttribute("data-theme", s.theme || "neon-blue");
@@ -14,15 +15,14 @@
     }
   </script>
 </head>
-
 <body>
   <div class="app">
-    <!-- Sidebar -->
+    <!-- Kenar -->
     <aside class="sidebar">
       <div class="brand">
         <div class="dot"></div>
         <strong>YANLIK</strong>
-        <span class="badge">v4</span>
+        <span class="badge">v5.0</span>
       </div>
       <div class="search">
         <input type="search" placeholder="Ara..." />
@@ -35,25 +35,24 @@
       </div>
     </aside>
 
-    <!-- Main -->
+    <!-- Ana -->
     <section class="main">
       <div class="topbar">
         <div class="title">
-          <h2 id="threadTitle">Yanlık Chat</h2>
+          <h2 id="threadTitle">Sohbet</h2>
           <span class="pill" id="statusPill">Hazır</span>
         </div>
         <div class="btn-group">
           <button class="btn ghost tooltip" data-tip="Ayarlar" onclick="location.href='settings.html'">⚙️</button>
-          <button class="btn ghost tooltip" data-tip="Çıkış" onclick="YANLIK_AUTH.logout()">🚪</button>
         </div>
       </div>
 
       <div class="tabs">
         <div class="tab active"><span class="name">Chat</span></div>
-        <div class="tab add" onclick="UI.toast('Yeni sekme oluşturulacak...','success')">＋</div>
+        <div class="tab add" onclick="UI.toast('Yeni sekme yakında…','success')">＋</div>
       </div>
 
-      <div class="chat" id="chatList"></div>
+      <div class="chat" id="chatList" style="aspect-ratio:12/8;max-height:80vh;margin:auto;"></div>
       <div class="typing" id="typing" style="display:none;">Yanıt hazırlanıyor...</div>
 
       <div class="composer">
@@ -65,11 +64,15 @@
       </div>
     </section>
   </div>
-<script src="./ui.js?v=ui4"></script>
-<script src="./chat_core.js"></script>
-<script src="./chat_lang.js"></script>
-<script src="./chat_empathetic.js"></script>
-<script src="./chat_crisis.js"></script>
-<script src="./chat_ui.js"></script>
+
+  <!-- Script sırası -->
+  <script src="./ui.js?v=ui4"></script>
+  <script src="./chat_core.js"></script>
+  <script src="./chat_lang.js"></script>
+  <script src="./chat_smalltalk.js"></script>       <!-- normal sohbet (yeni) -->
+  <script src="./chat_empathetic.js"></script>      <!-- empati (gelişmiş yeni) -->
+  <script src="./chat_crisis.js"></script>
+  <script src="./chat_ui.js"></script>
+  <script src="./chat_boot.js"></script>
 </body>
 </html>
