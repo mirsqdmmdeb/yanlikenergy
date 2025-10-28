@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Yanlik • Kayıt</title>
+  <link rel="stylesheet" href="./style.css"/>
+  <style>
+    body{background:#071226;color:#eee;font-family:Inter,system-ui,Arial;margin:0;display:flex;align-items:center;justify-content:center;height:100vh}
+    .card{background:rgba(255,255,255,0.03);padding:24px;border-radius:12px;width:360px;box-shadow:0 6px 30px rgba(0,0,0,.6)}
+    h2{color:#8be5ff;text-align:center;margin:0 0 12px}
+    label{display:block;font-size:.9rem;color:#cfd8e3;margin-top:10px}
+    input{width:100%;padding:10px;border-radius:8px;border:0;background:#0e1723;color:#fff;font-size:14px}
+    .row{margin-top:14px}
+    button{width:100%;padding:10px;border-radius:8px;border:0;background:linear-gradient(90deg,#00c9ff,#92fe9d);font-weight:700;color:#000;cursor:pointer}
+    .muted{font-size:.85rem;color:#9fb3c8;margin-top:10px;text-align:center}
+    a{color:#8be5ff;text-decoration:none}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Yeni Üye Ol</h2>
+    <form id="regForm">
+      <label for="username">Kullanıcı Adı</label>
+      <input id="username" name="username" required minlength="3" />
+
+      <label for="display">Görünen İsim (isteğe bağlı)</label>
+      <input id="display" name="display" placeholder="Adın (opsiyonel)" />
+
+      <label for="password">Şifre</label>
+      <input id="password" name="password" type="password" required minlength="4" />
+
+      <div class="row">
+        <button type="submit">Kayıt Ol</button>
+      </div>
+    </form>
+
+    <div class="muted">
+      Zaten hesabın var mı? <a href="login.html">Giriş yap</a>
+    </div>
+  </div>
+
+  <script src="./auth.js"></script>
+  <script>
+    const form = document.getElementById('regForm');
+    function toast(msg){ alert(msg); }
+
+    form.addEventListener('submit', (e)=>{
+      e.preventDefault();
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value.trim();
+      const display  = document.getElementById('display').value.trim();
+
+      try{
+        const newU = YANLIK_AUTH.registerUser({ username, password, display });
+        toast("Kayıt başarılı! Giriş sayfasına yönlendiriliyorsun.");
+        location.href = "login.html";
+      }catch(err){
+        toast("Hata: " + (err.message || err));
+      }
+    });
+  </script>
+</body>
+</html>
