@@ -16,6 +16,12 @@
   </script>
 </head>
 <body>
+<!-- 💡 Login kontrolü (sohbetten önce çalışmalı) -->
+<script src="./auth.js"></script>
+<script>
+  const sess = YANLIK_AUTH.requireAuth('./login.html');
+  if(!sess) document.write("Yönlendiriliyorsunuz...");
+</script>
   <div class="app">
     <!-- Kenar -->
     <aside class="sidebar">
