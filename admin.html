@@ -1,146 +1,109 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="tr">
 <head>
-  <meta charset="utf-8" />
-  <title>Admin Panel • Yanlik</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <link rel="stylesheet" href="./style.css?v=ui4" />
+  <meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Yanlik • Admin</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body{font-family:system-ui;margin:20px;background:#0b1222;color:#e8f0ff}
+    .row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+    .tabs{display:flex;gap:8px;margin:12px 0}
+    .tabs button{padding:8px 12px;border:0;border-radius:10px;background:#14203a;color:#9fd3ff;cursor:pointer}
+    .tabs button.active{background:#00c9ff;color:#02131a;font-weight:700}
+    .box{background:#121a2b;border-radius:12px;padding:12px}
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:8px;border-bottom:1px solid rgba(255,255,255,.06);text-align:left}
+    .muted{color:#9bb3cc}
+    .chat{white-space:pre-wrap;word-break:break-word}
+  </style>
 </head>
 <body>
-<script src="./auth.js"></script>
-<script>
-  const wait = setInterval(()=>{
-    if(window.YANLIK_AUTH){
-      clearInterval(wait);
-      // index: misafir serbestse allowGuest:true
-      const s = YANLIK_AUTH.requireAuth('./login.html', { allowGuest:true });
-      if(!s) document.write("Yönlendiriliyorsunuz...");
-      // idle auto-logout (öneri)
-      let last = Date.now();
-      ['click','keydown','mousemove','touchstart'].forEach(ev=>document.addEventListener(ev,()=>last=Date.now()));
-      setInterval(()=>{ if(Date.now()-last>30*60*1000){ YANLIK_AUTH.logout('login.html'); } }, 15000); // 30 dk idle
-      setInterval(()=>{ try{ YANLIK_AUTH.pingSession(); }catch{} }, 10000);
-    }
-  },50);
-</script>
-<script src="./auth.js"></script>
-<script>
-  const s = YANLIK_AUTH.requireAuth('./login.html');
-  if(!s) document.write("Yönlendiriliyorsunuz...");
-</script>
   <script src="./auth.js"></script>
   <script>
-// === Sohbet Görüntüleme ===
-const convosBox = document.getElementById("convosBox");
-document.getElementById("loadConvos").onclick = () => {
-  convosBox.innerHTML = "";
-  const keys = Object.keys(localStorage).filter(k => k.startsWith("yanlik.convo."));
-  if(keys.length === 0){
-    convosBox.innerHTML = "<p>Henüz kayıtlı sohbet yok.</p>";
-    return;
-  }
-  keys.forEach((key,i)=>{
-    const convo = JSON.parse(localStorage.getItem(key));
-    const preview = convo.messages
-      ?.filter(m=>m.role==="user")
-      .slice(-1)[0]?.text?.slice(0,60) || "(boş)";
-    const div = document.createElement("div");
-    div.className="thread";
-    div.innerHTML = `
-      <span class="name">#${i+1} ${key.replace("yanlik.convo.","")}</span>
-      <span class="mini">${preview}</span>
-      <div class="ops">
-        <button class="btn soft tooltip" data-tip="Aç">🔍</button>
-        <button class="btn soft tooltip" data-tip="Sil">🗑️</button>
-      </div>`;
-    div.querySelectorAll("button")[0].onclick=()=>{
-      const w = window.open("", "_blank");
-      w.document.write("<pre style='white-space:pre-wrap;font-family:monospace;'>"+
-        JSON.stringify(convo,null,2)+"</pre>");
-      w.document.title = "Sohbet " + key;
-    };
-    div.querySelectorAll("button")[1].onclick=()=>{
-      if(!confirm("Bu sohbet silinsin mi?")) return;
-      localStorage.removeItem(key);
-      UI.toast("Sohbet silindi","warn");
-      div.remove();
-    };
-    convosBox.appendChild(div);
-  });
-  UI.toast(`${keys.length} sohbet bulundu`,"success");
-};
-    const s = YANLIK_AUTH.requireAuth('./login.html');
+    const s = YANLIK_AUTH.requireAuth('login.html', { requireRole: ['owner','admin'] });
     if(!s) document.write("Yönlendiriliyorsunuz...");
   </script>
 
-  <main style="padding:24px;">
-    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;">
-      <h2>Admin Panel</h2>
-      <div>
-        <span style="color:var(--muted);margin-right:10px">Giriş yapan: <strong id="who"></strong></span>
-        <button id="logoutBtn" class="btn ghost icon" title="Çıkış">🚪</button>
-      </div>
+  <h1>Admin Paneli</h1>
+  <div class="row">
+    <p id="who" class="muted">Yükleniyor…</p>
+    <p>
+      <button onclick="YANLIK_AUTH.logout();location.href='login.html'">Çıkış</button>
+    </p>
+  </div>
+
+  <div class="tabs">
+    <button id="tabUsers" class="active">Üyeler</button>
+    <button id="tabChats">Sohbetler</button>
+  </div>
+
+  <div id="viewUsers" class="box">
+    <div class="row" style="margin-bottom:10px">
+      <div class="muted">Owner “Ayarlar → IP paylaşımı” açık ise admin IP’yi maskeli görür.</div>
+      <button onclick="toggleIpShare()">IP paylaşımı (owner)</button>
     </div>
+    <table>
+      <thead><tr><th>Kullanıcı</th><th>Görünen İsim</th><th>Rol</th><th>Oluşturma</th><th>Son Giriş</th><th>IP</th></tr></thead>
+      <tbody id="uBody"></tbody>
+    </table>
+  </div>
 
-    <section style="margin-top:18px;max-width:900px;">
-<section style="margin-top:36px;max-width:900px;">
-  <h3>Sohbet Kayıtları</h3>
-  <button class="btn soft" id="loadConvos">Sohbetleri Göster</button>
-  <div id="convosBox" style="margin-top:10px;"></div>
-</section>
+  <div id="viewChats" class="box" style="display:none">
+    <div class="row"><div class="muted">Son 2000 mesajdan en yenileri</div><button onclick="loadChats()">Yenile</button></div>
+    <div id="chatList"></div>
+  </div>
 
-      <h3>Kullanıcılar</h3>
-      <div id="usersBox" style="margin-top:10px"></div>
-      <div style="margin-top:12px;display:flex;gap:8px;align-items:center">
-        <input id="newUserName" placeholder="kullanıcı adı" />
-        <input id="newUserPass" placeholder="parola" />
-        <button id="addUser" class="btn primary">Ekle</button>
-      </div>
-    </section>
-  </main>
-
-  <script src="./ui.js?v=ui4"></script>
   <script>
-    const KEY="yanlik.auth.users.v1";
-    const who=document.getElementById("who");
-    const sess=YANLIK_AUTH.getSession();
-    who.textContent=sess?.display||sess?.username||"—";
-    const usersBox=document.getElementById("usersBox");
-    const getUsers=()=>JSON.parse(localStorage.getItem(KEY)||"[]");
-    const saveUsers=(arr)=>localStorage.setItem(KEY,JSON.stringify(arr));
-    const render=()=>{
-      usersBox.innerHTML="";
-      getUsers().forEach((u,i)=>{
-        const row=document.createElement("div");
-        row.className="thread";
-        row.innerHTML=`<span class="name">${u.username}</span>
-          <span class="mini">${u.display||""}</span>
-          <div class="ops">
-            <button class="btn soft tooltip" data-tip="Şifre değiştir">🔑</button>
-            <button class="btn soft tooltip" data-tip="Sil">🗑️</button>
-          </div>`;
-        row.querySelectorAll("button")[0].onclick=()=>{
-          const nw=prompt("Yeni parola:"); if(!nw) return;
-          const list=getUsers(); list[i].password=nw; saveUsers(list); UI.toast("Parola güncellendi","success"); render();
-        };
-        row.querySelectorAll("button")[1].onclick=()=>{
-          if(!confirm("Kullanıcı silinsin mi?")) return;
-          const list=getUsers(); list.splice(i,1); saveUsers(list); UI.toast("Kullanıcı silindi","warn"); render();
-        };
-        usersBox.appendChild(row);
-      });
-    };
-    render();
-    document.getElementById("addUser").onclick=()=>{
-      const n=document.getElementById("newUserName").value.trim();
-      const p=document.getElementById("newUserPass").value.trim();
-      if(!n||!p) return UI.toast("Boş bırakma","error");
-      const arr=getUsers();
-      if(arr.find(x=>x.username===n)) return UI.toast("Kullanıcı var","warn");
-      arr.push({username:n,password:p});
-      saveUsers(arr); render(); UI.toast("Eklendi","success");
-    };
-    document.getElementById("logoutBtn").onclick=()=>YANLIK_AUTH.logout("index.html");
+    const sess = YANLIK_AUTH.getSession();
+    document.getElementById("who").textContent = `Giriş: ${sess.display} (${sess.role})`;
+
+    const tUsers = document.getElementById("tabUsers");
+    const tChats = document.getElementById("tabChats");
+    const vUsers = document.getElementById("viewUsers");
+    const vChats = document.getElementById("viewChats");
+    tUsers.onclick = ()=>{ tUsers.classList.add("active"); tChats.classList.remove("active"); vUsers.style.display="block"; vChats.style.display="none"; };
+    tChats.onclick = ()=>{ tChats.classList.add("active"); tUsers.classList.remove("active"); vChats.style.display="block"; vUsers.style.display="none"; };
+
+    function fmt(t){ return t ? new Date(t).toLocaleString() : "-"; }
+
+    function loadUsers(){
+      const rows = YANLIK_AUTH.listUsersForAdmin(sess);
+      const tb = document.getElementById("uBody");
+      tb.innerHTML = rows.map(r=>`
+        <tr>
+          <td>${r.username}</td>
+          <td>${r.display||"-"}</td>
+          <td>${r.role}</td>
+          <td>${fmt(r.createdAt)}</td>
+          <td>${fmt(r.lastLoginAt)}</td>
+          <td>${r.lastLoginIp||"-"}</td>
+        </tr>
+      `).join("");
+    }
+
+    function loadChats(){
+      const list = YANLIK_AUTH.listChats();
+      const out = document.getElementById("chatList");
+      if(!list.length){ out.innerHTML='<p class="muted">Mesaj yok.</p>'; return; }
+      const latest = list.slice(-200).map(m=>`
+        <div style="padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06)">
+          <div class="muted">${fmt(m.at)} • <strong>${m.from}</strong> [${m.role}]</div>
+          <div class="chat">${(m.text||"").replace(/</g,"&lt;")}</div>
+        </div>`).join("");
+      out.innerHTML = latest;
+    }
+
+    function toggleIpShare(){
+      if(sess.role!=="owner") return alert("Sadece owner");
+      const set = YANLIK_AUTH.getSettings();
+      YANLIK_AUTH.setSettings({ ipShareAllowed: !set.ipShareAllowed }, sess);
+      alert("Ayar: ipShareAllowed = "+(!set.ipShareAllowed));
+      loadUsers();
+    }
+
+    loadUsers();
+    loadChats();
+    setInterval(loadChats, 15000);
   </script>
 </body>
 </html>
