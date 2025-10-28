@@ -4,45 +4,48 @@
 <meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Yanlik • Giriş</title>
 <style>
-:root{--c1:#00c9ff;--c2:#0077ff;--bg:#050b18;--fg:#e8f0ff}
-*{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--fg);font-family:system-ui,Segoe UI,Roboto;min-height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden}
-nav{position:fixed;top:0;left:0;right:0;display:flex;gap:18px;justify-content:center;padding:12px;background:rgba(0,0,0,.35);backdrop-filter:blur(10px);z-index:5}
-nav a{color:var(--c1);text-decoration:none;font-weight:700} nav a:hover{color:var(--c2)}
-.card{width:min(420px,92%);background:rgba(255,255,255,.06);border:1px solid #ffffff18;border-radius:16px;padding:20px;backdrop-filter:blur(10px);box-shadow:0 0 24px #00c9ff22;text-align:center}
-h1{margin:0 0 8px;color:var(--c1);text-shadow:0 0 18px #00c9ffaa}
-input{width:100%;background:#0f1b2e;color:var(--fg);border:1px solid #ffffff1a;border-radius:12px;padding:12px;margin:6px 0}
-.btn{width:100%;background:linear-gradient(135deg,var(--c2),var(--c1));border:none;border-radius:12px;padding:12px 16px;color:#06141c;font-weight:800}
-a.link{color:var(--c1);text-decoration:none} a.link:hover{text-decoration:underline}
-.msg{display:none;margin-top:8px;border-radius:10px;padding:10px 12px} .err{background:#1e0b0b;border:1px solid #ff6b6b;color:#ffdada}
+:root{--c1:#00c9ff;--c2:#0077ff;--fg:#e8f0ff}
+*{box-sizing:border-box} body{margin:0;height:100svh;display:flex;align-items:center;justify-content:center;
+font-family:system-ui,Segoe UI,Roboto;color:var(--fg);overflow:hidden}
+#bg{position:fixed;inset:0;z-index:-1;background:radial-gradient(1000px 600px at 0 0,#031630 0%,#000 70%)}
+.card{width:min(430px,92vw);padding:22px;background:rgba(255,255,255,.06);border:1px solid #ffffff18;border-radius:18px;
+backdrop-filter:blur(10px);box-shadow:0 0 30px #00c9ff22}
+h1{margin:0 0 10px;color:var(--c1);text-shadow:0 0 18px #00c9ffaa}
+input{width:100%;margin:8px 0;padding:12px;border-radius:12px;border:1px solid #ffffff1a;background:#0f1b2e;color:var(--fg)}
+.btn{width:100%;padding:12px 16px;border:0;border-radius:12px;background:linear-gradient(135deg,var(--c2),var(--c1));
+color:#06141c;font-weight:800}
+.links{margin-top:10px;display:flex;justify-content:space-between;font-size:.95rem}
+.links a{color:var(--c1);text-decoration:none}
+.err{display:none;margin-top:8px;background:#1e0b0b;border:1px solid #ff6b6b;color:#ffdada;border-radius:10px;padding:10px}
 </style>
 </head>
 <body>
-<nav>
-  <a href="index.html">Ana Sayfa</a>
-  <a href="chat.html">Sohbet</a>
-  <a href="ayarlar.html">Ayarlar</a>
-  <a href="hakkinda.html">Hakkında</a>
-</nav>
+<canvas id="bg"></canvas>
 
 <div class="card">
   <h1>Giriş Yap</h1>
-  <input id="user" placeholder="Kullanıcı adı">
-  <input id="pass" type="password" placeholder="Şifre">
-  <button class="btn" id="go">Giriş</button>
-  <div id="m" class="msg err"></div>
-  <p style="margin-top:10px"><a class="link" href="signup.html">Hesabın yok mu? Üye Ol</a></p>
+  <input id="user" placeholder="Kullanıcı adı" autocomplete="username">
+  <input id="pass" type="password" placeholder="Şifre" autocomplete="current-password">
+  <button id="go" class="btn">Giriş</button>
+  <div id="m" class="err"></div>
+  <div class="links">
+    <a href="index.html">Ana sayfa</a>
+    <a href="signup.html">Üye ol</a>
+  </div>
 </div>
 
 <script src="bg.js"></script>
 <script src="memory.js"></script>
 <script>
-document.getElementById('go').onclick=()=>{
-  const u=document.getElementById('user').value.trim();
-  const p=document.getElementById('pass').value.trim();
+const m=document.getElementById('m');
+document.getElementById('go').onclick=login;
+document.addEventListener('keydown',e=>{if(e.key==='Enter')login();});
+function login(){
+  const u=user.value.trim(), p=pass.value.trim();
   const ok = YANLIK_MEM.login(u,p);
-  const m=document.getElementById('m');
-  if(ok){ location.href='chat.html'; } else { m.style.display='block'; m.textContent='Hatalı kullanıcı adı veya şifre'; }
-};
+  if(ok) location.href='chat.html';
+  else { m.textContent='Hatalı kullanıcı adı veya şifre'; m.style.display='block'; }
+}
 </script>
 </body>
 </html>
