@@ -2,61 +2,51 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Ayarlar • Yanlik v2</title>
-  <link rel="stylesheet" href="./style.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Yanlik • Ayarlar</title>
+  <link rel="stylesheet" href="./style.css?v=ui4" />
 </head>
 <body>
-  <div class="app" style="grid-template-columns:1fr;">
-    <section class="main">
-      <header class="topbar">
-        <div class="title"><h1>Ayarlar</h1></div>
-        <div class="actions"><a class="btn ghost" href="./index.html">Sohbete dön</a></div>
-      </header>
-      <div class="card" style="margin:16px; padding:16px;">
-        <div class="grid">
-          <label class="field"><span>Tema</span>
-            <select id="theme"><option value="system">Sistem</option><option value="light">Açık</option><option value="dark">Koyu</option></select>
-          </label>
-          <label class="field"><span>Dil</span>
-            <select id="language"><option value="tr">Türkçe</option><option value="en">English</option><option value="de">Deutsch</option></select>
-          </label>
-          <label class="field switch"><input id="memory" type="checkbox"/><span>Konuşmaları hatırla</span></label>
-          <label class="field switch"><input id="typingIndicator" type="checkbox"/><span>Yazma göstergesi</span></label>
-          <label class="field switch"><input id="sendSound" type="checkbox"/><span>Gönderme sesi</span></label>
-          <label class="field"><span>Gönderme</span>
-            <select id="sendBehavior"><option value="enter">Enter → Gönder</option><option value="ctrlenter">Ctrl+Enter → Gönder</option></select>
-          </label>
-          <label class="field"><span>Yaratıcılık (0–1)</span><input id="temperature" type="range" min="0" max="1" step="0.05"/></label>
-          <label class="field"><span>Sistem mesajı</span><textarea id="systemPrompt" rows="3"></textarea></label>
-        </div>
-        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px;">
-          <button id="resetBtn" class="btn ghost">Varsayılan</button>
-          <button id="saveBtn" class="btn primary">Kaydet</button>
-        </div>
+  <main style="display:grid;place-items:center;min-height:100vh;padding:20px;">
+    <div class="card" style="max-width:480px;width:100%;">
+      <h2>Ayarlar</h2>
+      <div class="field">
+        <label>Tema</label>
+        <select id="themeSelect">
+          <option value="neon-blue">Neon Mavi</option>
+          <option value="neon-gold">Neon Altın</option>
+          <option value="light">Açık Tema</option>
+        </select>
       </div>
-    </section>
-  </div>
+      <div class="field">
+        <label>Gönderme davranışı</label>
+        <select id="sendSelect">
+          <option value="enter">Enter ile gönder</option>
+          <option value="ctrl">Ctrl + Enter ile gönder</option>
+        </select>
+      </div>
+      <div class="btn-group" style="margin-top:14px;">
+        <button class="btn primary" id="saveBtn">Kaydet</button>
+        <button class="btn ghost" onclick="history.back()">Geri</button>
+      </div>
+    </div>
+  </main>
 
-  <script src="./state.js"></script>
+  <script src="./ui.js?v=ui4"></script>
   <script>
-    const $=s=>document.querySelector(s);
-    const el={theme:$("#theme"),language:$("#language"),memory:$("#memory"),typingIndicator:$("#typingIndicator"),sendSound:$("#sendSound"),sendBehavior:$("#sendBehavior"),temperature:$("#temperature"),systemPrompt:$("#systemPrompt"),saveBtn:$("#saveBtn"),resetBtn:$("#resetBtn")};
-    const DEF=window.__yanlik.DEFAULTS;
-    function fill(){
-      const s=window.__yanlik.getSettings();
-      el.theme.value=s.theme; el.language.value=s.language; el.memory.checked=s.memory;
-      el.typingIndicator.checked=s.typingIndicator; el.sendSound.checked=s.sendSound;
-      el.sendBehavior.value=s.sendBehavior; el.temperature.value=String(s.temperature);
-      el.systemPrompt.value=s.systemPrompt||"";
-    }
-    function save(){
-      const next={ theme:el.theme.value, language:el.language.value, memory:el.memory.checked, typingIndicator:el.typingIndicator.checked, sendSound:el.sendSound.checked, sendBehavior:el.sendBehavior.value, temperature:Number(el.temperature.value), systemPrompt:el.systemPrompt.value.trim() };
-      window.__yanlik.setSettings(next);
-      alert("Kaydedildi.");
-    }
-    function reset(){ window.__yanlik.setSettings(DEF); fill(); alert("Varsayılanlara dönüldü."); }
-    fill(); el.saveBtn.addEventListener("click",save); el.resetBtn.addEventListener("click",reset);
+    const KEY="yanlik.settings";
+    const themeSel=document.getElementById("themeSelect");
+    const sendSel=document.getElementById("sendSelect");
+    const saved=JSON.parse(localStorage.getItem(KEY)||"{}");
+    if(saved.theme) themeSel.value=saved.theme;
+    if(saved.sendBehavior) sendSel.value=saved.sendBehavior;
+
+    document.getElementById("saveBtn").onclick=()=>{
+      const s={theme:themeSel.value,sendBehavior:sendSel.value};
+      localStorage.setItem(KEY,JSON.stringify(s));
+      document.documentElement.setAttribute("data-theme",s.theme);
+      UI.toast("Ayarlar kaydedildi.","success");
+    };
   </script>
 </body>
 </html>
