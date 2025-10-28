@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Yanlik • Üye Ol</title>
+<style>
+:root{--c1:#00c9ff;--c2:#0077ff;--fg:#e8f0ff}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;
+  font-family:system-ui,Segoe UI,Roboto,Arial;color:var(--fg);
+  background:radial-gradient(1000px 600px at 0 0,#031630 0%,#000 70%);
+  overflow:hidden;
+}
+h1{color:var(--c1);text-shadow:0 0 16px #00c9ff66;margin-bottom:8px;font-size:2.2rem;}
+p{color:#9bb3cc;margin-bottom:18px}
+form{
+  width:min(96vw,420px);
+  display:flex;flex-direction:column;gap:10px;
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.1);
+  padding:24px 22px;border-radius:18px;
+  backdrop-filter:blur(10px);
+  box-shadow:0 0 40px #00c9ff22;
+  animation:fadein .8s ease both;
+}
+label{font-size:.9rem;color:#b8cbe2}
+input{
+  padding:11px 12px;border-radius:10px;border:none;
+  background:#0f1b2e;color:var(--fg);
+}
+.row{display:flex;gap:8px}
+button{
+  background:linear-gradient(135deg,var(--c2),var(--c1));
+  color:#02131a;font-weight:800;border:none;border-radius:10px;
+  padding:11px 14px;cursor:pointer;
+  transition:transform .15s ease,box-shadow .25s ease;
+}
+button:hover{transform:translateY(-2px);box-shadow:0 0 20px #00c9ffaa}
+a{color:var(--c1);text-decoration:none;font-size:.9rem;text-align:center;margin-top:6px}
+a:hover{text-decoration:underline}
+.small{font-size:.85rem;color:#8fa9c6}
+.help{font-size:.8rem;color:#7ea6c9}
+.str{height:8px;background:#0f1b2e;border-radius:8px;overflow:hidden;border:1px solid #17304f}
+.str>i{display:block;height:100%;width:0;background:linear-gradient(90deg,#ff6b6b,#ffd166,#00c9ff);transition:width .25s ease}
+canvas{position:fixed;inset:0;z-index:-1}
+@keyframes fadein{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+.toggle{
+  position:absolute;right:10px;top:50%;transform:translateY(-50%);
+  font-size:.9rem;color:#9bb3cc;cursor:pointer;user-select:none
+}
+.input-wrap{position:relative}
+.err{background:#1e0b0b;border:1px solid #ff6b6b;color:#ffdada;padding:8px 10px;border-radius:10px;margin-top:2px;display:none}
+.ok{background:#0b1e13;border:1px solid #26d07c;color:#d8ffea;padding:8px 10px;border-radius:10px;margin-top:2px;display:none}
+</style>
+</head>
+<body>
+<canvas id="bg"></canvas>
+
+<h1>Yanlik Energy</h1>
+<p>Hızlıca hesabını oluştur</p>
+
+<form id="f">
+  <label>Kullanıcı adı</label>
+  <input id="user" placeholder="örn. mirsqdmmdevs" required>
+
+  <label>Görünen ad</label>
+  <input id="disp" placeholder="Profilde görünen ad" required>
+
+  <label>Şifre</label>
+  <div class="input-wrap">
+    <input id="pass" type="password" placeholder="••••••••" required>
+    <span class="toggle" data-for="pass">Göster</span>
+  </div>
+  <div class="str" aria-hidden="true"><i id="meter"></i></div>
+  <div class="help">En az 8 karakter, harf + rakam önerilir.</div>
+
+  <label>Şifre (tekrar)</label>
+  <div class="input-wrap">
+    <input id="pass2" type="password" placeholder="••••••••" required>
+    <span class="toggle" data-for="pass2">Göster</span>
+  </div>
+
+  <div class="row" style="align-items:center;justify-content:space-between;margin-top:6px">
+    <label class="small"><input type="checkbox" id="terms" required> Koşulları kabul ediyorum</label>
+    <button type="submit">Üye Ol</button>
+  </div>
+
+  <div id="msgErr" class="err"></div>
+  <div id="msgOk" class="ok"></div>
+
+  <a href="login.html">Zaten hesabın var mı? Giriş yap</a>
+</form>
+
+<script src="./auth.js"></script>
+<script>
+/* === Parçacık animasyonu === */
+const c=document.getElementById("bg"),x=c.getContext("2d");
+function fit(){c.width=innerWidth;c.height=innerHeight}
+addEventListener("resize",fit);fit();
+const P=Array.from({length:60},()=>({x:Math.random()*c.width,y:Math.random()*c.height,vx:(Math.random()-.5)*.6,vy:(Math.random()-.5)*.6,r:1+Math.random()*2}));
+(function draw(){
+  x.clearRect(0,0,c.width,c.height);
+  for(const a of P){
+    a.x+=a.vx;a.y+=a.vy;
+    if(a.x<0||a.x>c.width)a.vx*=-1;if(a.y<0||a.y>c.height)a.vy*=-1;
+    x.beginPath();x.arc(a.x,a.y,a.r,0,6.283);x.fillStyle="#00c9ff55";x.fill();
+  }
+  for(let i=0;i<P.length;i++)for(let j=i+1;j<P.length;j++){
+    const dx=P[i].x-P[j].x,dy=P[i].y-P[j].y,d=Math.hypot(dx,dy);
+    if(d<120){x.globalAlpha=1-d/120;x.strokeStyle="#00c9ff22";x.beginPath();x.moveTo(P[i].x,P[i].y);x.lineTo(P[j].x,P[j].y);x.stroke();x.globalAlpha=1;}
+  }
+  requestAnimationFrame(draw);
+})();
+
+/* === UI helpers === */
+const $=s=>document.querySelector(s);
+const $$=s=>document.querySelectorAll(s);
+function show(el,msg){ el.textContent=msg; el.style.display='block'; }
+function hide(el){ el.style.display='none'; }
+
+/* === Şifre gücü === */
+const pass=$('#pass'), pass2=$('#pass2'), meter=$('#meter'), err=$('#msgErr'), ok=$('#msgOk');
+pass.addEventListener('input',()=>{
+  const v=pass.value;
+  let sc=0;
+  if(v.length>=8) sc+=30;
+  if(/[A-ZÇĞİÖŞÜ]/.test(v)) sc+=15;
+  if(/[a-zçğıöşü]/.test(v)) sc+=15;
+  if(/[0-9]/.test(v)) sc+=20;
+  if(/[^A-Za-z0-9çğıöşüÇĞİÖŞÜ]/.test(v)) sc+=20;
+  meter.style.width = Math.min(100,sc)+'%';
+});
+
+/* === Göster/Gizle === */
+$$('.toggle').forEach(t=>{
+  t.onclick=()=>{
+    const id=t.dataset.for, el=document.getElementById(id);
+    el.type = el.type==='password' ? 'text' : 'password';
+    t.textContent = el.type==='password' ? 'Göster' : 'Gizle';
+  };
+});
+
+/* === Kayıt akışı === */
+const form=$('#f');
+form.addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  hide(err); hide(ok);
+
+  const u=$('#user').value.trim();
+  const d=$('#disp').value.trim();
+  const p1=pass.value, p2=pass2.value;
+
+  if(!/^[a-zA-Z0-9_.-]{3,}$/.test(u)) return show(err,"Kullanıcı adı en az 3 karakter; harf/rakam/._- kullanılabilir.");
+  if(p1!==p2) return show(err,"Şifreler eşleşmiyor.");
+  if(p1.length<8) return show(err,"Şifre en az 8 karakter olmalı.");
+  if(!$('#terms').checked) return show(err,"Devam için koşulları kabul etmelisin.");
+
+  // Önce auth.js varsa onu kullan
+  try{
+    if(window.YANLIK_AUTH && typeof YANLIK_AUTH.signup==='function'){
+      const okReg = await Promise.resolve(YANLIK_AUTH.signup(u,p1,d));
+      if(!okReg){ show(err,"Kayıt başarısız: kullanıcı adı kullanımda olabilir."); return; }
+      show(ok,"Kayıt başarılı! Giriş sayfasına yönlendiriliyorsun…");
+      setTimeout(()=>location.href="login.html?u="+encodeURIComponent(u),700);
+      return;
+    }
+  }catch(ex){ /* altta fallback'e geçeceğiz */ }
+
+  // === Fallback (localStorage + SHA-256 hash) ===
+  try{
+    const enc = new TextEncoder();
+    const buf = await crypto.subtle.digest('SHA-256', enc.encode(p1));
+    const hash = Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+    const KEY='yanlik:users';
+    const users = JSON.parse(localStorage.getItem(KEY)||'[]');
+    if(users.some(x=>x.username===u)) return show(err,"Bu kullanıcı adı zaten alınmış.");
+    users.push({username:u, pass:'sha256:'+hash, display:d, role:'member', createdAt:new Date().toISOString()});
+    localStorage.setItem(KEY, JSON.stringify(users));
+    show(ok,"Kayıt başarılı! Giriş sayfasına yönlendiriliyorsun…");
+    setTimeout(()=>location.href="login.html?u="+encodeURIComponent(u),800);
+  }catch(ex){
+    console.error(ex);
+    show(err,"Tarayıcı kayıt işlemini engelledi. Lütfen farklı bir tarayıcıda tekrar dene.");
+  }
+});
+</script>
+</body>
+</html>
