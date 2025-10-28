@@ -4,66 +4,31 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Yanlik • Ana Sayfa</title>
-  <link rel="stylesheet" href="style.css">
   <style>
-    body {
-      background: radial-gradient(circle at top left, #02182a, #000);
-      color: #e8f0ff;
-      font-family: system-ui;
-      margin: 0;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-    }
-    h1 {
-      font-size: 2.4em;
-      color: #00c9ff;
-      text-shadow: 0 0 15px #00c9ff88;
-      margin-bottom: 10px;
-    }
-    p {
-      color: #9bb3cc;
-      font-size: 1.1em;
-    }
-    .btns {
-      margin-top: 30px;
-      display: flex;
-      gap: 20px;
-    }
-    a.button {
-      padding: 10px 18px;
-      border-radius: 10px;
-      text-decoration: none;
-      background: linear-gradient(135deg,#0077ff,#00c9ff);
-      color: #02131a;
-      font-weight: 600;
-      box-shadow: 0 0 15px rgba(0,201,255,.3);
-      transition: transform .15s ease, box-shadow .15s ease;
-    }
-    a.button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 0 25px rgba(0,201,255,.6);
-    }
+    :root{--c1:#00c9ff;--c2:#0077ff;--bg:#000;--fg:#e8f0ff}
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;display:grid;place-items:center;background:radial-gradient(1200px 700px at 0% 0%,#02182a 0%,#000 60%);color:var(--fg);font-family:system-ui,Segoe UI,Roboto}
+    .wrap{text-align:center;padding:32px}
+    h1{margin:0 0 10px;font-size:2.4rem;color:var(--c1);text-shadow:0 0 16px #00c9ff55}
+    p{margin:8px 0 18px;color:#9bb3cc}
+    .row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+    a{display:inline-block;padding:10px 16px;border-radius:12px;text-decoration:none;font-weight:700;color:#02131a;background:linear-gradient(135deg,var(--c2),var(--c1));box-shadow:0 0 18px #00c9ff33}
+    a:hover{filter:brightness(1.1)}
+    .k{margin-top:14px;font-size:.9rem;color:#89a9c9}
+    .k kbd{background:#0f1b2e;border:1px solid #ffffff18;border-radius:6px;padding:2px 6px}
   </style>
 </head>
 <body>
   <script src="./auth.js"></script>
-  <script>
-    // Giriş kontrolü
-    const s = YANLIK_AUTH.getSession();
-    </script>
-
-  <h1>Yanlik Energy</h1>
-  <p>Akıllı konuşma ve yönetim platformuna hoş geldin ⚡</p>
-
-  <div class="btns">
-    <a class="button" href="chat.html">Sohbet</a>
-    <a class="button" href="admin.html">Admin Paneli</a>
-    <a class="button" href="login.html">Giriş</a>
+  <div class="wrap">
+    <h1>Yanlik Energy</h1>
+    <p>Hızlı, modern ve akıcı sohbet.</p>
+    <div class="row">
+      <a href="chat.html">Sohbet</a>
+      <a href="login.html">Giriş</a>
+      <a href="admin.html">Admin</a>
+    </div>
+    <p class="k">Kısayollar: <kbd>/</kbd> Arama · <kbd>Ctrl</kbd> + <kbd>K</kbd> Komut Paleti · <kbd>Ctrl</kbd> + <kbd>Enter</kbd> Gönder</p>
   </div>
-
-  <p style="margin-top:40px;font-size:0.9em;color:#555">© 2025 Yanlik</p>
 </body>
 </html>
