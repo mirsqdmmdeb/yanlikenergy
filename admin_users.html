@@ -14,16 +14,19 @@
     .muted{color:#9fb3c8;font-size:.9rem}
     .switch{display:inline-flex;align-items:center;gap:8px}
     .switch input{transform:scale(1.2)}
+    .card{background:rgba(255,255,255,0.04);padding:12px;border-radius:10px;margin:14px 0}
+    .row{display:flex;gap:10px;flex-wrap:wrap}
+    input,select{background:#0e1723;color:#fff;border:0;border-radius:8px;padding:8px}
   </style>
 </head>
 <body>
   <script src="./auth.js"></script>
   <script>
-    // owner/admin sayfası; sadece girişli admin/owner görür
-    const check = setInterval(()=>{
+    // owner/admin erişimi; owner ekstra yetkiler (oluşturma, rol/sil)
+    const ready = setInterval(()=>{
       if(window.YANLIK_AUTH){
-        clearInterval(check);
-        const s = YANLIK_AUTH.requireAuth('login.html', { requireRole: 'admin' }); // owner da "admin" check'ini geçer
+        clearInterval(ready);
+        const s = YANLIK_AUTH.requireAuth('login.html', { requireRole: 'admin' });
         if(!s) document.write("Yönlendiriliyorsunuz...");
         window.__viewer = s;
         renderAll();
@@ -41,12 +44,30 @@
     </div>
   </header>
 
+  <!-- Owner’a özel: IP yetkisi -->
   <section id="ownerPanel" style="display:none;margin-top:8px">
     <div class="switch">
       <label>Yardımcı adminler IP görebilsin (maskeli):</label>
       <input type="checkbox" id="ipShareToggle"/>
     </div>
-    <span class="muted">⚠️ Owner açıksa adminler IP’yi <b>maskeli</b> görür (ör. 1.2.3.x). Owner daima tam görür.</span>
+    <span class="muted">Owner açıksa adminler IP’yi <b>maskeli</b> görür (ör. 1.2.3.x). Owner daima tam görür.</span>
+  </section>
+
+  <!-- Owner’a özel: YENİ KULLANICI OLUŞTUR -->
+  <section id="createPanel" class="card" style="display:none">
+    <h3>Yeni Kullanıcı Oluştur</h3>
+    <div class="row">
+      <input id="newU" placeholder="Kullanıcı adı (min 3)" minlength="3">
+      <input id="newD" placeholder="Görünen isim (opsiyonel)">
+      <input id="newP" placeholder="Şifre (min 4)" minlength="4" type="password">
+      <select id="newR">
+        <option value="admin">admin</option>
+        <option value="standard" selected>standard</option>
+        <option value="guest">guest</option>
+      </select>
+      <button onclick="createUser()">Oluştur</button>
+    </div>
+    <div class="muted">Owner “owner” rolü oluşturamaz; tek owner sensin.</div>
   </section>
 
   <table id="usersTable">
@@ -63,9 +84,12 @@
       const sess = YANLIK_AUTH.getSession();
       document.getElementById('adminName').textContent = (sess?.display||sess?.username||"-");
 
-      // owner switch
-      const ownerPanel = document.getElementById('ownerPanel');
-      if(isOwner()){ ownerPanel.style.display = 'block';
+      // Owner panelleri
+      const owner = isOwner();
+      document.getElementById('ownerPanel').style.display  = owner ? 'block' : 'none';
+      document.getElementById('createPanel').style.display = owner ? 'block' : 'none';
+
+      if(owner){
         const set = YANLIK_AUTH.getSettings();
         const tgl = document.getElementById('ipShareToggle');
         tgl.checked = !!set.ipShareAllowed;
@@ -73,7 +97,7 @@
           try{ YANLIK_AUTH.setSettings({ ipShareAllowed: tgl.checked }, sess); alert("Ayar güncellendi"); renderTable(); }
           catch(e){ alert(e.message); tgl.checked = !tgl.checked; }
         };
-      } else { ownerPanel.style.display = 'none'; }
+      }
 
       renderTable();
     }
@@ -95,9 +119,7 @@
         const ipCell = r.lastLoginIp ? r.lastLoginIp : "-";
 
         const actions = [];
-        // Şifre değiştir: owner kendisi + herkes için; kullanıcı kendi sayfasında da yapabilir
         actions.push(`<button onclick="promptPwd('${r.username}')">Şifre</button>`);
-        // Sil & Rol: sadece owner ve hedef owner değilse
         if(isOwner() && !isTargetOwner){
           actions.push(`<button class="danger" onclick="delUser('${r.id}')">Sil</button>`);
         }
@@ -114,6 +136,34 @@
       }).join('');
     }
 
+    // --- Owner: yeni kullanıcı oluştur ---
+    async function createUser(){
+      const u = document.getElementById('newU').value.trim();
+      const d = document.getElementById('newD').value.trim();
+      const p = document.getElementById('newP').value.trim();
+      const r = document.getElementById('newR').value;
+
+      if(!u || u.length<3) return alert("Kullanıcı adı en az 3 karakter");
+      if(!p || p.length<4) return alert("Şifre en az 4 karakter");
+
+      try{
+        // 1) standard olarak oluştur (hash’li)
+        const created = await YANLIK_AUTH.registerUserAsync({ username:u, password:p, display:d });
+        // 2) rol isteniyorsa owner yetkisiyle değiştir
+        if(r !== "standard"){
+          YANLIK_AUTH.changeRole(YANLIK_AUTH.getSession(), created.id, r);
+        }
+        alert("Kullanıcı oluşturuldu: "+u+" ("+r+")");
+        // Formu temizle + tabloyu yenile
+        document.getElementById('newU').value="";
+        document.getElementById('newD').value="";
+        document.getElementById('newP').value="";
+        document.getElementById('newR').value="standard";
+        renderTable();
+      }catch(e){ alert(e.message || e); }
+    }
+
+    // Şifre değiştir (owner: herkesin; admin: sadece kendisi)
     async function promptPwd(username){
       const np = prompt("Yeni parola ("+username+")");
       if(!np) return;
