@@ -1,37 +1,24 @@
-<!doctype html>
-<html lang="tr">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Ayarlar • Yanlik</title>
-<link rel="stylesheet" href="yanlik.css">
-</head>
-<body>
-<canvas id="bg"></canvas>
-
-<div class="center card" style="width:min(500px,90vw);padding:24px;text-align:left">
+<!doctype html><html lang="tr"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Ayarlar • Yanlik</title><link rel="stylesheet" href="yanlik.css">
+</head><body><canvas id="bg"></canvas>
+<main class="page card" style="padding:24px;max-width:720px">
   <h1 style="color:#00c9ff;text-shadow:0 0 20px #00c9ffaa">Ayarlar</h1>
-  <label>Görünen Ad</label><input id="name" class="input">
-  <label>Mod</label>
-  <select id="persona" class="input">
-    <option>Arkadaş</option>
-    <option>Asistan</option>
-    <option>Koç</option>
-  </select>
-  <button id="save" class="btn neon" style="margin-top:12px;width:100%">Kaydet</button>
-</div>
-<div class="links">
-  <a href="index.html">🏠 Ana Sayfa</a>
-  <a href="chat.html">💬 Sohbet</a>
-</div>
-
-<script src="bg.js"></script><script src="memory.js"></script>
+  <label>Görünen Ad</label><input id="display" class="input">
+  <label>Dil</label><select id="lang" class="input"><option value="auto">Otomatik</option><option value="tr">Türkçe</option><option value="en">English</option></select>
+  <label>Tema (örnek)</label><select id="theme" class="input"><option value="mavi">Mavi</option><option value="altın">Altın</option></select>
+  <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+    <button id="save" class="btn neon">Kaydet</button>
+    <button id="exportBtn" class="btn">Veriyi Dışa Aktar</button>
+    <button id="clear" class="btn">Tüm Veriyi Sil</button>
+  </div>
+</main>
+<div class="links"><a href="index.html">Ana sayfa</a><a href="chat.html">Sohbet</a></div>
+<script src="bg.js"></script><script src="auth.js"></script><script src="memory.js"></script>
 <script>
-const p=YANLIK_MEM.loadProfile();
-name.value=p.name||""; persona.value=p.persona||"Arkadaş";
-save.onclick=()=>{
-YANLIK_MEM.saveProfile({name:name.value,persona:persona.value});
-alert("Kaydedildi ✅");}
-</script>
-</body>
-</html>
+YANLIK_AUTH.requireAuth('login.html');
+const p=YANLIK_MEM.loadProfile();display.value=p.display||'';lang.value=p.lang||'auto';theme.value=p.theme||'mavi';
+save.onclick=()=>{const pr=YANLIK_MEM.loadProfile();pr.display=display.value.trim()||'Kullanıcı';pr.lang=lang.value;pr.theme=theme.value;YANLIK_MEM.saveProfile(pr);alert('Kaydedildi ✅')};
+exportBtn.onclick=()=>{const blob=new Blob([YANLIK_MEM.exportAll()],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='yanlik_export.json';a.click();URL.revokeObjectURL(a.href)};
+clear.onclick=()=>{if(confirm('Tüm veriler silinsin mi?')){YANLIK_MEM.clearAll();alert('Silindi');location.reload();}}
+</script></body></html>
