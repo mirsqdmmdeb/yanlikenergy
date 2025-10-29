@@ -52,6 +52,10 @@
 
 <script src="bg.js"></script>
 <script>
+<script>
+  const t = localStorage.getItem('yanlik:theme') || 'mavi';
+  (function apply(t){ document.documentElement.className = (t==='mavi'?'':('theme-'+t.replace('ı','i'))); })(t);
+</script>
   // animasyon seçimi kalıcı
   const sel = document.getElementById('animPick');
   const saved = localStorage.getItem('yanlik:anim') || 'neon';
