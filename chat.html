@@ -1,71 +1,58 @@
 <!doctype html>
 <html lang="tr">
 <head>
-<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Yanlik • Sohbet</title>
-<style>
-:root{--c1:#00c9ff;--c2:#0077ff;--fg:#e8f0ff;--mut:#9bb3cc}
-*{box-sizing:border-box} body{margin:0;height:100svh;display:grid;grid-template-rows:1fr auto;overflow:hidden;
-font-family:system-ui,Segoe UI,Roboto;color:var(--fg)}
-#bg{position:fixed;inset:0;z-index:-1;background:radial-gradient(1000px 600px at 0 0,#031630 0%,#000 70%)}
-main{overflow:auto;padding:14px 10px}
-.wrap{max-width:980px;margin:0 auto}
-.msg{max-width:780px;margin:10px 0;padding:12px 14px;border-radius:12px;border:1px solid #ffffff18;background:rgba(255,255,255,.06);
-box-shadow:0 8px 24px rgba(0,0,0,.35);animation:pop .2s ease}
-.msg.me{margin-left:auto;background:linear-gradient(135deg,var(--c2),var(--c1));color:#06141c;border:0}
-.meta{font-size:12px;color:var(--mut);margin-bottom:6px}
-#typing{display:none;color:#9bb3cc;margin:6px 2px}
-@keyframes pop{from{opacity:0;transform:translateY(6px) scale(.985)}to{opacity:1;transform:none}}
-footer{position:sticky;bottom:0;background:rgba(0,0,0,.38);backdrop-filter:blur(10px);border-top:1px solid #ffffff18;padding:10px}
-.bar{max-width:980px;margin:0 auto;display:flex;gap:8px}
-#msg{flex:1;background:#0f1b2e;color:var(--fg);border:1px solid #ffffff1a;border-radius:12px;padding:12px}
-.btn{background:linear-gradient(135deg,var(--c2),var(--c1));border:none;border-radius:12px;padding:12px 16px;color:#06141c;font-weight:800}
-.links{position:fixed;left:10px;bottom:12px;display:flex;gap:10px;font-size:.95rem}
-.links a{color:#9fd3ff;text-decoration:none;background:#0f1b2eaa;border:1px solid #ffffff22;padding:6px 10px;border-radius:10px}
-@media (max-width:640px){ .msg{max-width:92vw} }
-</style>
+<link rel="stylesheet" href="yanlik.css">
 </head>
 <body>
 <canvas id="bg"></canvas>
 
-<main><div id="area" class="wrap"></div><div id="typing" class="wrap">Yanlik yazıyor… • • •</div></main>
+<main id="chatMain">
+  <div id="messages"></div>
+  <div id="typing">Yanlik yazıyor...</div>
+</main>
 
 <footer>
-  <div class="bar">
-    <input id="msg" placeholder="Mesaj yaz… (ör: '= 2+3*5', 'plan fizik', '5 dk sonra hatırlat', 'mod koç')">
-    <button id="send" class="btn">Gönder</button>
+  <div class="chatbar">
+    <input id="msg" class="input" placeholder="Mesaj yaz..." autocomplete="off">
+    <button id="send" class="btn neon">Gönder</button>
   </div>
   <div class="links">
-    <a href="index.html">Ana sayfa</a>
-    <a href="ayarlar.html">Ayarlar</a>
-    <a href="hakkinda.html">Hakkında</a>
+    <a href="index.html">🏠 Ana Sayfa</a>
+    <a href="ayarlar.html">⚙️ Ayarlar</a>
   </div>
 </footer>
 
 <script src="bg.js"></script>
+<script src="auth.js"></script>
 <script src="memory.js"></script>
 <script src="ai.js"></script>
-<script>
-const area=document.getElementById('area'), typing=document.getElementById('typing');
-const input=document.getElementById('msg'), send=document.getElementById('send');
-const profile=YANLIK_MEM.loadProfile(), memory=YANLIK_MEM.loadMemory();
 
-function esc(s){return (s||"").replace(/[<>&]/g,m=>({ '<':'&lt;','>':'&gt;','&':'&amp;'}[m]))}
-function time(){return new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})}
+<script>
+if(!YANLIK_AUTH.requireAuth("login.html")) return;
+const area=document.getElementById("messages"),typing=document.getElementById("typing"),
+input=document.getElementById("msg"),send=document.getElementById("send");
+
 function push(role,text){
-  const d=document.createElement('div'); d.className='msg '+(role==='me'?'me':'bot');
-  d.innerHTML=`<div class="meta">${time()} • ${role==='me'?'Ben':'Yanlik'}</div>${text}`;
-  area.appendChild(d); area.parentElement.scrollTop=area.parentElement.scrollHeight;
+ const d=document.createElement("div");
+ d.className="msg "+(role==="me"?"me":"bot");
+ d.innerHTML=`<div class='meta'>${new Date().toLocaleTimeString()} • ${role==="me"?"Ben":"Yanlik"}</div>${text}`;
+ area.appendChild(d); area.scrollTop=area.scrollHeight;
 }
+
 async function handleSend(){
-  const t=input.value.trim(); if(!t) return; push('me',esc(t)); input.value='';
-  typing.style.display='block'; await new Promise(r=>setTimeout(r,Math.min(900,300+t.length*8)));
-  const replies = YANLIK.respond(t,{profile,memory,saveProfile:p=>YANLIK_MEM.saveProfile(p),saveMemory:m=>YANLIK_MEM.saveMemory(m),
-    onNotify:p=>push('bot',esc(p.text)), history:Array.from(area.querySelectorAll('.msg')).slice(-20).map(n=>({text:n.textContent||''}))});
-  typing.style.display='none'; for(const m of replies) push('bot',esc(m.text));
+ const t=input.value.trim(); if(!t) return;
+ push("me",t); input.value=""; typing.style.display="block";
+ const replies=YANLIK_AI.respond(t);
+ await new Promise(r=>setTimeout(r,500));
+ typing.style.display="none";
+ replies.forEach(r=>push("bot",r.text));
 }
-send.onclick=handleSend; input.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();handleSend();}});
-push('bot','Selam! Ben <b>Yanlik</b>. “plan”, “madde madde”, “kısalt”, “= 2+2” gibi komutları deneyebilirsin.');
+send.onclick=handleSend;
+input.addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();handleSend();}});
+push("bot","Selam! Ben <b>Yanlik</b>. Hadi konuşalım 🔥");
 </script>
 </body>
 </html>
