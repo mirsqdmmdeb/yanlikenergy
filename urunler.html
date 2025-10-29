@@ -1,0 +1,23 @@
+<!doctype html><html lang="tr"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Ürünler • Yanlik</title><link rel="stylesheet" href="yanlik.css">
+</head><body><canvas id="bg"></canvas>
+<main class="page">
+  <h1>Ürün / Hizmetler</h1>
+  <input id="q" class="input" placeholder="Ara: sohbet, güvenlik, SEO…">
+  <div id="grid" class="grid cols-3" style="margin-top:12px"></div>
+</main>
+<div class="links"><a href="index.html">Ana sayfa</a><a href="hakkinda.html">Hakkımızda</a><a href="iletisim.html">İletişim</a></div>
+<script src="bg.js"></script>
+<script>
+const items=[
+ {t:"Akıllı Sohbet (Yanlik)",d:"Empatik, çok dilli, offline çalışır.",b:"Yeni"},
+ {t:"SEO Paketi",d:"JSON-LD, sitemap, robots, hızlı açılış.",b:"Önerilen"},
+ {t:"Güvenlik Başlıkları",d:"HSTS, XFO, CTO, Referrer-Policy."},
+ {t:"PWA",d:"Manifest + Service Worker + Offline."},
+ {t:"Performans",d:"Kritik CSS, lazy img, cache stratejisi."}
+];
+const grid=document.getElementById('grid');const q=document.getElementById('q');
+function render(list){grid.innerHTML=list.map(x=>`<article class="card" style="padding:14px"><h3>${x.t}${x.b?` <span style="font-size:.8rem;color:#ffd166">(${x.b})</span>`:''}</h3><p style="color:#9bb3cc">${x.d}</p></article>`).join('')}
+render(items);q.oninput=()=>{const s=q.value.toLowerCase();render(items.filter(i=>(i.t+i.d).toLowerCase().includes(s)))};
+</script></body></html>
