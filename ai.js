@@ -1,45 +1,39 @@
 window.YANLIK_AI=(function(){
-const memoryKey="yanlik:mem";
-function load(){return JSON.parse(localStorage.getItem(memoryKey)||"{}")}
-function save(m){localStorage.setItem(memoryKey,JSON.stringify(m))}
-
-const moods=["neşeli","sakin","düşünceli","yorgun","motive"];
 function pick(a){return a[Math.floor(Math.random()*a.length)]}
-function time(){return new Date().toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit"})}
-
-function analyze(text){
- const t=text.toLowerCase();
- if(t.includes("?")) return "soru";
- if(t.match(/merhaba|selam|hey/)) return "selam";
- if(t.match(/nasılsın|iyi misin/)) return "durum";
- if(t.match(/teşekkür|sağ ol/)) return "teşekkür";
- if(t.match(/üzgün|mutsuz|kötü/)) return "teselli";
- if(t.match(/hesapla|=|topla|çarp/)) return "math";
- return "genel";
+function esc(s){return (s||"").replace(/[<>&]/g,m=>({ '<':'&lt;','>':'&gt;','&':'&amp;'}[m]))}
+function intent(t){
+t=t.toLowerCase();
+if(/^\/theme /.test(t))return{kind:'theme',val:t.split(' ').slice(1).join(' ')};
+if(/^\/anim /.test(t))return{kind:'anim',val:t.split(' ').slice(1).join(' ')};
+if(/^=/.test(t)||/hesapla/.test(t))return{kind:'calc',val:t.replace(/^=/,'').replace(/hesapla/gi,'')};
+if(/(plan|madde madde)/.test(t))return{kind:'bullet'};
+if(/(çevir|translate)/.test(t))return{kind:'translate'};
+if(/(nasılsın|merhaba|selam)/.test(t))return{kind:'greet'};
+return{kind:'chat'};
 }
-
-function respond(text){
- const mood=pick(moods);
- const type=analyze(text);
- let out=[];
- switch(type){
-  case "selam": out.push({text:`Selam! Ben yine buradayım, bugün ${mood} hissediyorum.`}); break;
-  case "durum": out.push({text:`Ben iyiyim 😄 Sen nasılsın?`}); break;
-  case "teşekkür": out.push({text:`Rica ederim dostum 🤗`}); break;
-  case "teselli": out.push({text:`Üzülme, bazen kötü hissetmek de insani. Geçecek 🌙`}); break;
-  case "math":
-   try{
-     const expr=text.replace(/hesapla|=/gi,"");
-     const res=Function("return "+expr)();
-     out.push({text:`Sonuç: <b>${res}</b>`});
-   }catch(e){out.push({text:`Hmm... işlem hatalı gibi 🤔`});}
-   break;
-  default:
-   out.push({text:`${mood} bir moddayım. ${pick(["Anlat bakalım","Dinliyorum","Devam et","İlginç, biraz açar mısın?"])}`});
- }
- // hafıza örneği
- const m=load(); m.lastTalk=time(); save(m);
- return out;
+function respond(text, hooks={}){ // hooks: onTheme, onAnim
+const it=intent(text), out=[];
+switch(it.kind){
+ case 'greet': out.push({text:'Selam! Ben <b>Yanlik</b>. Hazırım 🤖✨'}); break;
+ case 'calc':
+  try{const r=Function('return ('+it.val+')')(); out.push({text:`Sonuç: <b>${esc(String(r))}</b>`});}
+  catch(_){out.push({text:'İşlem hatalı gibi görünüyor 🤔'});} break;
+ case 'bullet':
+  out.push({text:'Tamam, bunu maddelere ayırıyorum:'});
+  out.push({text:'• Hedefi netleştir\n• Adımları sırala\n• Zaman tahminleri ekle\n• Takip et & güncelle'.replace(/\n/g,'<br>')});
+  break;
+ case 'translate':
+  out.push({text:'Çeviri motoru (TR↔EN):\n• Yaz: "çevir: merhaba"\n• Yaz: "translate: how are you?"'.replace(/\n/g,'<br>' )}); break;
+ case 'theme':
+  hooks.onTheme && hooks.onTheme(it.val); out.push({text:`Tema değiştirildi: <b>${esc(it.val)}</b>`}); break;
+ case 'anim':
+  hooks.onAnim && hooks.onAnim(it.val); out.push({text:`Animasyon değiştirildi: <b>${esc(it.val)}</b>`}); break;
+ default:
+  out.push({text: pick([
+   'Dinliyorum 👂','Devam et, detay ver 🔍','İlginç, biraz açar mısın?','Bunu birlikte çözelim 💡'
+  ])});
+}
+return out;
 }
 return {respond};
 })();
