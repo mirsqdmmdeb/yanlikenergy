@@ -1,32 +1,25 @@
-<!doctype html>
-<html lang="tr">
-<head>
+<!doctype html><html lang="tr"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Yanlik • Üye Ol</title>
-<link rel="stylesheet" href="yanlik.css">
-</head>
-<body>
-<canvas id="bg"></canvas>
-<div class="center card" style="padding:24px;width:min(420px,90vw)">
+<title>Üye Ol • Yanlik</title><link rel="stylesheet" href="yanlik.css">
+</head><body><canvas id="bg"></canvas>
+<div class="center card" style="padding:24px;width:min(460px,92vw)">
   <h1 style="color:#00c9ff;text-shadow:0 0 20px #00c9ffaa">Üye Ol</h1>
-  <input id="user" class="input" placeholder="Kullanıcı adı">
-  <input id="disp" class="input" placeholder="Görünen ad">
-  <input id="pass" class="input" type="password" placeholder="Şifre">
-  <input id="pass2" class="input" type="password" placeholder="Şifre (tekrar)">
-  <button id="go" class="btn neon" style="width:100%;margin-top:10px">Hesap Oluştur</button>
-  <p id="msg" style="margin-top:8px;color:#ffaaaa;display:none"></p>
-  <div style="margin-top:10px"><a href="login.html" style="color:#9fd3ff">Girişe dön</a></div>
+  <label>Kullanıcı adı</label><input id="user" class="input">
+  <label>Görünen ad</label><input id="disp" class="input">
+  <label>Şifre</label><input id="pass" class="input" type="password">
+  <label>Şifre (tekrar)</label><input id="pass2" class="input" type="password">
+  <button id="go" class="btn neon" style="width:100%;margin-top:12px">Hesap Oluştur</button>
+  <p id="msg" style="display:none;margin-top:8px"></p>
 </div>
+<div class="links"><a href="index.html">Ana sayfa</a></div>
 <script src="bg.js"></script><script src="auth.js"></script>
 <script>
-const m=document.getElementById("msg");
-go.onclick=()=>{
-const u=user.value.trim(),p=pass.value,p2=pass2.value;
-if(p!==p2)return m.textContent="Şifreler eşleşmiyor",m.style.display="block";
-const r=YANLIK_AUTH.signup(u,p,disp.value.trim()||u);
-if(!r.ok)return m.textContent=r.msg,m.style.display="block";
-m.style.color="#aaffaa";m.textContent="Kayıt başarılı! Girişe yönlendiriliyorsun…";m.style.display="block";
-setTimeout(()=>location.href="login.html",1000);}
-</script>
-</body>
-</html>
+const m=msg;go.onclick=()=>{
+const u=user.value.trim(),d=disp.value.trim(),p=pass.value,p2=pass2.value;
+if(p!==p2){m.style.display='block';m.style.color='#ffb3b3';m.textContent='Şifreler eşleşmiyor';return}
+const r=YANLIK_AUTH.signup(u,p,d||u);
+if(!r.ok){m.style.display='block';m.style.color='#ffb3b3';m.textContent=r.msg;return}
+m.style.display='block';m.style.color='#aaffaa';m.textContent='Kayıt başarılı! Girişe yönlendiriliyor…';
+setTimeout(()=>location.href='login.html',800);
+};
+</script></body></html>
