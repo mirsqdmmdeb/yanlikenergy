@@ -1,26 +1,18 @@
-<!doctype html>
-<html lang="tr">
-<head>
+<!doctype html><html lang="tr"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Yanlik • Giriş</title>
-<link rel="stylesheet" href="yanlik.css">
-</head>
-<body>
-<canvas id="bg"></canvas>
-<div class="center card" style="padding:24px;width:min(400px,90vw)">
+<title>Giriş • Yanlik</title><link rel="stylesheet" href="yanlik.css">
+</head><body><canvas id="bg"></canvas>
+<div class="center card" style="padding:24px;width:min(420px,92vw)">
   <h1 style="color:#00c9ff;text-shadow:0 0 20px #00c9ffaa">Giriş Yap</h1>
-  <input id="user" class="input" placeholder="Kullanıcı adı">
-  <input id="pass" class="input" type="password" placeholder="Şifre">
+  <input id="user" class="input" placeholder="Kullanıcı adı" autocomplete="username">
+  <input id="pass" class="input" type="password" placeholder="Şifre" autocomplete="current-password" style="margin-top:8px">
   <button id="go" class="btn neon" style="width:100%;margin-top:10px">Giriş</button>
-  <p id="err" style="color:#ffaaaa;display:none;margin-top:8px"></p>
-  <div style="margin-top:10px"><a href="signup.html" style="color:#9fd3ff">Üye ol</a></div>
+  <p id="err" style="display:none;color:#ffb3b3;margin-top:8px"></p>
+  <div style="margin-top:10px"><a href="signup.html">Üye ol</a></div>
 </div>
+<div class="links"><a href="index.html">Ana sayfa</a></div>
 <script src="bg.js"></script><script src="auth.js"></script>
 <script>
-const e=document.getElementById("err");
-go.onclick=()=>{
-const ok=YANLIK_AUTH.login(user.value.trim(),pass.value.trim());
-if(ok.ok){location.href="chat.html"}else{e.textContent="Hatalı kullanıcı adı veya şifre";e.style.display="block"}}
-</script>
-</body>
-</html>
+go.onclick=()=>{const r=YANLIK_AUTH.login(user.value.trim(),pass.value.trim());
+if(r.ok)location.href='chat.html';else{err.textContent='Hatalı kullanıcı adı/şifre';err.style.display='block'}};
+</script></body></html>
