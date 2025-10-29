@@ -1,56 +1,32 @@
 <!doctype html>
 <html lang="tr">
 <head>
-<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Yanlik • Üye Ol</title>
-<style>
-:root{--c1:#00c9ff;--c2:#0077ff;--bg:#050b18;--fg:#e8f0ff}
-*{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--fg);font-family:system-ui,Segoe UI,Roboto;min-height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden}
-nav{position:fixed;top:0;left:0;right:0;display:flex;gap:18px;justify-content:center;padding:12px;background:rgba(0,0,0,.35);backdrop-filter:blur(10px);z-index:5}
-nav a{color:var(--c1);text-decoration:none;font-weight:700} nav a:hover{color:var(--c2)}
-.card{width:min(460px,92%);background:rgba(255,255,255,.06);border:1px solid #ffffff18;border-radius:16px;padding:20px;backdrop-filter:blur(10px);box-shadow:0 0 24px #00c9ff22}
-h1{margin:0 0 8px;color:var(--c1);text-shadow:0 0 18px #00c9ffaa;text-align:center}
-label{display:block;margin-top:8px;color:#a8c2d8}
-input{width:100%;background:#0f1b2e;color:var(--fg);border:1px solid #ffffff1a;border-radius:12px;padding:12px;margin-top:4px}
-.btn{width:100%;background:linear-gradient(135deg,var(--c2),var(--c1));border:none;border-radius:12px;padding:12px 16px;color:#06141c;font-weight:800;margin-top:12px}
-.msg{display:none;margin-top:8px;border-radius:10px;padding:10px 12px} .err{background:#1e0b0b;border:1px solid #ff6b6b;color:#ffdada} .ok{background:#0b1e13;border:1px solid #26d07c;color:#d8ffea}
-</style>
+<link rel="stylesheet" href="yanlik.css">
 </head>
 <body>
-<nav>
-  <a href="index.html">Ana Sayfa</a>
-  <a href="chat.html">Sohbet</a>
-  <a href="ayarlar.html">Ayarlar</a>
-  <a href="hakkinda.html">Hakkında</a>
-</nav>
-
-<div class="card">
-  <h1>Üye Ol</h1>
-  <label>Kullanıcı adı</label><input id="user">
-  <label>Görünen ad</label><input id="disp">
-  <label>Şifre</label><input id="pass" type="password">
-  <label>Şifre (tekrar)</label><input id="pass2" type="password">
-  <button class="btn" id="go">Hesap Oluştur</button>
-  <div id="mErr" class="msg err"></div>
-  <div id="mOk" class="msg ok"></div>
+<canvas id="bg"></canvas>
+<div class="center card" style="padding:24px;width:min(420px,90vw)">
+  <h1 style="color:#00c9ff;text-shadow:0 0 20px #00c9ffaa">Üye Ol</h1>
+  <input id="user" class="input" placeholder="Kullanıcı adı">
+  <input id="disp" class="input" placeholder="Görünen ad">
+  <input id="pass" class="input" type="password" placeholder="Şifre">
+  <input id="pass2" class="input" type="password" placeholder="Şifre (tekrar)">
+  <button id="go" class="btn neon" style="width:100%;margin-top:10px">Hesap Oluştur</button>
+  <p id="msg" style="margin-top:8px;color:#ffaaaa;display:none"></p>
+  <div style="margin-top:10px"><a href="login.html" style="color:#9fd3ff">Girişe dön</a></div>
 </div>
-
-<script src="bg.js"></script>
-<script src="memory.js"></script>
+<script src="bg.js"></script><script src="auth.js"></script>
 <script>
-function show(el,txt){el.textContent=txt;el.style.display='block'}
-function hide(el){el.style.display='none'}
-document.getElementById('go').onclick=()=>{
-  const u=user.value.trim(), d=disp.value.trim(), p=pass.value, p2=pass2.value;
-  hide(mErr); hide(mOk);
-  if(!/^[a-zA-Z0-9_.-]{3,}$/.test(u)) return show(mErr,'Kullanıcı adı en az 3 karakter (harf/rakam/._-)');
-  if(p.length<6) return show(mErr,'Şifre en az 6 karakter');
-  if(p!==p2) return show(mErr,'Şifreler eşleşmiyor');
-  const ok=YANLIK_MEM.signup(u,p,d||u);
-  if(!ok) return show(mErr,'Kullanıcı adı zaten alınmış');
-  show(mOk,'Kayıt başarılı! Giriş sayfasına yönlendiriliyorsun…');
-  setTimeout(()=>location.href='login.html',700);
-};
+const m=document.getElementById("msg");
+go.onclick=()=>{
+const u=user.value.trim(),p=pass.value,p2=pass2.value;
+if(p!==p2)return m.textContent="Şifreler eşleşmiyor",m.style.display="block";
+const r=YANLIK_AUTH.signup(u,p,disp.value.trim()||u);
+if(!r.ok)return m.textContent=r.msg,m.style.display="block";
+m.style.color="#aaffaa";m.textContent="Kayıt başarılı! Girişe yönlendiriliyorsun…";m.style.display="block";
+setTimeout(()=>location.href="login.html",1000);}
 </script>
 </body>
 </html>
