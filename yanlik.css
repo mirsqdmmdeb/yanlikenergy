@@ -1,23 +1,44 @@
-:root{--c1:#00c9ff;--c2:#0077ff;--bg:#050b18;--fg:#e8f0ff;--mut:#9bb3cc}
+:root{
+  --c1:#00c9ff; --c2:#0077ff; --bg:#050b18; --fg:#e8f0ff; --mut:#9bb3cc;
+  --transition: .25s ease;
+}
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;background:var(--bg);color:var(--fg);font-family:system-ui,Segoe UI,Roboto;overflow-x:hidden}
-#bg{position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(900px 600px at 0 0,#031630 0%,#000 70%)}
+html,body{height:100%;background:var(--bg);color:var(--fg);
+  font-family:system-ui,Segoe UI,Roboto;overflow-x:hidden;transition:background-color var(--transition), color var(--transition)}
 a{color:#9fd3ff;text-decoration:none}
-.btn{display:inline-block;padding:12px 18px;border-radius:12px;background:#0f1b2e;border:1px solid #ffffff1a;color:var(--c1);font-weight:700}
-.btn.neon{background:linear-gradient(135deg,var(--c2),var(--c1));color:#06141c;box-shadow:0 0 24px #00c9ffaa}
-.card{background:rgba(255,255,255,.06);border:1px solid #ffffff18;border-radius:16px;backdrop-filter:blur(10px);box-shadow:0 0 24px #00c9ff22}
+#bg{position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(900px 600px at 0 0,#031630 0%,#000 70%)}
+.btn{display:inline-block;padding:12px 18px;border-radius:12px;background:#0f1b2e;
+  border:1px solid #ffffff1a;color:var(--c1);font-weight:700;transition:transform var(--transition), box-shadow var(--transition), background var(--transition)}
+.btn:hover{transform:translateY(-1px)}
+.btn.neon{background:linear-gradient(135deg,var(--c2),var(--c1));color:#06141c;box-shadow:0 0 24px color-mix(in oklab, var(--c1) 60%, transparent)}
+.card{background:rgba(255,255,255,.06);border:1px solid #ffffff18;border-radius:16px;
+  backdrop-filter:blur(10px);box-shadow:0 0 24px #00c9ff22}
 .input{width:100%;padding:12px;border-radius:12px;border:1px solid #ffffff1a;background:#0f1b2e;color:var(--fg)}
 .center{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);text-align:center}
-.logo{font-size:3rem;color:var(--c1);text-shadow:0 0 24px #00c9ffaa,0 0 48px #0077ff55}
+.logo{font-size:3rem;color:var(--c1);text-shadow:0 0 24px color-mix(in oklab, var(--c1) 80%, transparent),0 0 48px color-mix(in oklab, var(--c2) 50%, transparent)}
 .desc{margin:10px 0 20px;color:var(--mut)}
 .links{position:fixed;left:10px;bottom:12px;display:flex;gap:10px;z-index:10}
 .links a{background:#0f1b2eaa;border:1px solid #ffffff22;padding:8px 12px;border-radius:10px}
-.page{max-width:960px;margin:70px auto;padding:0 16px}
-.grid{display:grid;gap:12px}
-@media(min-width:980px){.grid.cols-3{grid-template-columns:repeat(3,1fr)}}
-.msg{max-width:780px;margin:10px 0;padding:12px 14px;border-radius:12px;border:1px solid #ffffff18;background:rgba(255,255,255,.06);box-shadow:0 8px 24px rgba(0,0,0,.35)}
-.msg.me{margin-left:auto;background:linear-gradient(135deg,var(--c2),var(--c1));color:#06141c;border:0}
-.meta{font-size:12px;color:#9bb3cc;margin-bottom:6px}
+.page{max-width:980px;margin:70px auto;padding:0 16px}
 footer.chat{position:sticky;bottom:0;background:rgba(0,0,0,.38);backdrop-filter:blur(10px);border-top:1px solid #ffffff18;padding:10px}
 .chatbar{max-width:980px;margin:0 auto;display:flex;gap:8px}
-#typing{display:none;color:#9bb3cc;margin:6px 2px}
+.msg{max-width:780px;margin:10px 0;padding:12px 14px;border-radius:12px;border:1px solid #ffffff18;
+  background:rgba(255,255,255,.06);box-shadow:0 8px 24px rgba(0,0,0,.35);animation:pop .18s ease}
+.msg.me{margin-left:auto;background:linear-gradient(135deg,var(--c2),var(--c1));color:#06141c;border:0}
+.meta{font-size:12px;color:#9bb3cc;margin-bottom:6px}
+@keyframes pop{from{transform:scale(.98);opacity:.6}to{transform:scale(1);opacity:1}}
+
+/* Yazma animasyonu (… üç nokta) */
+.typing{display:inline-flex;gap:4px;align-items:center}
+.typing i{width:6px;height:6px;border-radius:50%;background:#9bb3cc;opacity:.4;animation:blink 1.2s infinite}
+.typing i:nth-child(2){animation-delay:.2s}
+.typing i:nth-child(3){animation-delay:.4s}
+@keyframes blink{0%,80%,100%{opacity:.2}40%{opacity:1}}
+
+/* Tema varyasyonları (JS, CSS değişkenleriyle) */
+html.theme-altin{--c1:#ffd166;--c2:#ffb703;--bg:#0e0a00}
+html.theme-mor{--c1:#c77dff;--c2:#7b2cbf;--bg:#0a0611}
+html.theme-yesil{--c1:#7ae582;--c2:#00a884;--bg:#04120e}
+html.theme-pembe{--c1:#ff85c0;--c2:#ff3d81;--bg:#19040d}
+html.theme-neon-mavi{--c1:#00c9ff;--c2:#0077ff;--bg:#050b18}
+html.theme-neon-mor{--c1:#b5179e;--c2:#560bad;--bg:#0a0612}
