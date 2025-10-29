@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://yanlik.vercel.app/</loc></url>
-  <url><loc>https://yanlik.vercel.app/settings.html</loc></url>
+ <url><loc>https://yanlikai.vercel.app/</loc></url>
+ <url><loc>https://yanlikai.vercel.app/hakkinda.html</loc></url>
+ <url><loc>https://yanlikai.vercel.app/urunler.html</loc></url>
+ <url><loc>https://yanlikai.vercel.app/iletisim.html</loc></url>
+ <url><loc>https://yanlikai.vercel.app/sss.html</loc></url>
+ <url><loc>https://yanlikai.vercel.app/gizlilik.html</loc></url>
+ <url><loc>https://yanlikai.vercel.app/kullanim.html</loc></url>
 </urlset>
