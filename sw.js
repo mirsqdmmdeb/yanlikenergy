@@ -1,8 +1,3 @@
-const CACHE="yanlik-v2";
-const FILES=["./index.html","./settings.html","./style.css","./chat.js","./state.js","./i18n.js","./lang_tr.json","./lang_en.json","./lang_de.json","./manifest.json"];
-self.addEventListener("install",e=>{ e.waitUntil(caches.open(CACHE).then(c=>c.addAll(FILES))); });
-self.addEventListener("activate",e=>{ e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k))))); });
-self.addEventListener("fetch",e=>{
-  if(e.request.method!=="GET") return;
-  e.respondWith(caches.match(e.request).then(hit=>hit||fetch(e.request).then(res=>{ const copy=res.clone(); caches.open(CACHE).then(c=>c.put(e.request,copy)); return res; }).catch(()=>hit)));
-});
+const CACHE='yanlik-v1';const ASSETS=['/','/index.html','/yanlik.css','/bg.js','/login.html','/signup.html','/chat.html','/ayarlar.html','/hakkinda.html','/iletisim.html','/urunler.html','/sss.html','/gizlilik.html','/kullanim.html','/kvkk.html'];
+self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)))});
+self.addEventListener('fetch',e=>{e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).then(res=>{const c=res.clone();caches.open(CACHE).then(cc=>cc.put(e.request,c));return res}).catch(()=>caches.match('/index.html'))))});
