@@ -6,7 +6,7 @@
 <title>Yanlik • Sohbet</title>
 <link rel="stylesheet" href="yanlik.css">
 <style>
-  main{height:calc(100vh - 104px);overflow:auto;padding:16px}
+  main{height:calc(100vh - 112px);overflow:auto;padding:16px}
   .topbar{position:fixed;top:10px;right:10px;z-index:2;background:rgba(0,0,0,.45);
     border:1px solid #ffffff22;backdrop-filter:blur(10px);padding:8px;border-radius:12px;display:flex;gap:8px;align-items:center}
   .topbar select{padding:6px 8px}
@@ -17,7 +17,7 @@
 
 <div class="topbar">
   <span style="color:#9fd3ff;font-size:.9rem">Animasyon</span>
-  <select id="animPick" class="input" style="width:170px;padding:6px 8px">
+  <select id="animPick" class="input" style="width:160px;padding:6px 8px">
     <option value="neon">Neon Ağ (Eski)</option>
     <option value="stars">Yıldız Alanı</option>
     <option value="wave">Dalga Alanı</option>
@@ -26,11 +26,24 @@
     <option value="gridflow">Grid Akışı</option>
     <option value="triangulate">Üçgen Ağ</option>
   </select>
+  <span style="color:#9fd3ff;font-size:.9rem;margin-left:6px">Tema</span>
+  <select id="themePick" class="input" style="width:150px;padding:6px 8px">
+    <option value="mavi">mavi</option>
+    <option value="altın">altın</option>
+    <option value="mor">mor</option>
+    <option value="yeşil">yeşil</option>
+    <option value="pembe">pembe</option>
+    <option value="neon-mavi">neon-mavi</option>
+    <option value="neon-mor">neon-mor</option>
+  </select>
+  <button id="clearBtn" class="btn" title="Sohbeti temizle">Temizle</button>
 </div>
 
 <main id="scroll">
   <div id="area" class="page" style="max-width:980px"></div>
-  <div id="typing" class="page" style="max-width:980px;display:none;color:#9bb3cc">Yanlik yazıyor… • • •</div>
+  <div id="typing" class="page" style="max-width:980px;display:none">
+    <span class="typing"><i></i><i></i><i></i></span> Yanlik yazıyor…
+  </div>
 </main>
 
 <footer class="chat">
@@ -46,169 +59,136 @@
 
 <script src="bg.js"></script>
 <script>
-// ----- basit auth guard (opsiyonel) -----
-// if(!localStorage.getItem('yanlik:session')) location.replace('login.html');
-
-// ----- UI helpers -----
-const area = document.getElementById('area');
-const typing = document.getElementById('typing');
-const scrollBox = document.getElementById('scroll');
-function now(){return new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})}
-function push(role, html){
-  const d=document.createElement('div');
-  d.className='msg '+(role==='me'?'me':'bot');
-  d.innerHTML = `<div class="meta">${now()} • ${role==='me'?'Ben':'Yanlik'}</div>${html}`;
-  area.appendChild(d);
-  scrollBox.scrollTop = scrollBox.scrollHeight;
+/* ---------- Kalıcı tema & anim ---------- */
+function applyThemeClass(name){
+  document.documentElement.classList.remove(
+    'theme-altin','theme-mor','theme-yesil','theme-pembe','theme-neon-mavi','theme-neon-mor'
+  );
+  switch(name){
+    case 'altın': document.documentElement.classList.add('theme-altin'); break;
+    case 'mor': document.documentElement.classList.add('theme-mor'); break;
+    case 'yeşil': document.documentElement.classList.add('theme-yesil'); break;
+    case 'pembe': document.documentElement.classList.add('theme-pembe'); break;
+    case 'neon-mavi': document.documentElement.classList.add('theme-neon-mavi'); break;
+    case 'neon-mor': document.documentElement.classList.add('theme-neon-mor'); break;
+    default: /* mavi */ document.documentElement.classList.remove('theme-altin','theme-mor','theme-yesil','theme-pembe','theme-neon-mavi','theme-neon-mor');
+  }
 }
 
-// ----- animasyon seçici -----
 const animSel = document.getElementById('animPick');
+const themeSel = document.getElementById('themePick');
 const savedAnim = localStorage.getItem('yanlik:anim') || 'neon';
-animSel.value = savedAnim;
+const savedTheme = localStorage.getItem('yanlik:theme') || 'mavi';
+animSel.value = savedAnim; themeSel.value = savedTheme;
+applyThemeClass(savedTheme);
 window.YANLIK_BG && YANLIK_BG.setAnimation(savedAnim);
+
 animSel.onchange = () => {
   localStorage.setItem('yanlik:anim', animSel.value);
   window.YANLIK_BG && YANLIK_BG.setAnimation(animSel.value);
 };
+themeSel.onchange = () => {
+  localStorage.setItem('yanlik:theme', themeSel.value);
+  applyThemeClass(themeSel.value);
+};
 
-// ----- Konuşma Motoru (geliştirilmiş rule-based) -----
-const YanlikAI = (()=>{
-
-  const moods = ['neşeli','sakin','fokus','meraklı','motive','düşünceli'];
-  const starters = [
-    'Dinliyorum 👂', 'Devam et 🔍', 'Detay verebilir misin?', 'Bunu birlikte çözelim 💡',
-    'İlginç, biraz daha açar mısın?', 'Pekala, madde madde ilerleyelim.'
-  ];
-
-  function pick(a){ return a[Math.floor(Math.random()*a.length)] }
-  function esc(s){ return (s||"").replace(/[<>&]/g,m=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[m])) }
-
-  function detectIntent(t){
-    const x=t.toLowerCase().trim();
-    if(x.startsWith('/theme ')) return {k:'theme',v:x.slice(7).trim()};
-    if(x.startsWith('/anim '))  return {k:'anim',v:x.slice(6).trim()};
-    if(x.startsWith('=') || /(^|\s)hesapla(\s|:)/.test(x)) return {k:'calc',v:x.replace(/^=/,'').replace(/(^|\s)hesapla(\s|:)?/,' ').trim()};
-    if(/(plan|madde madde|listele)/.test(x)) return {k:'plan'};
-    if(/(çevir:|translate:)/.test(x)) return {k:'translate',v:x.replace(/(çevir:|translate:)/i,'').trim()};
-    if(/(özetle|kısalt|shorten)/.test(x)) return {k:'summ'};
-    if(/(merhaba|selam|hey)/.test(x)) return {k:'greet'};
-    if(/(üzgün|moral|kötü hissediyorum)/.test(x)) return {k:'support'};
-    return {k:'chat'};
-  }
-
-  function calc(expr){
-    try{ const out = Function('return ('+expr+')')(); return 'Sonuç: <b>'+esc(String(out))+'</b>'; }
-    catch{ return 'İşlem hatalı görünüyor 🤔'; }
-  }
-
-  function translateAuto(s){
-    // mini sözlük + çok basit kural (demo)
-    const dict = { 'merhaba':'hello', 'nasılsın':'how are you', 'teşekkürler':'thanks', 'evet':'yes', 'hayır':'no' };
-    // TR→EN
-    if(/[ığüşöç]/i.test(s)) {
-      return s.split(/\s+/).map(w=>dict[w.toLowerCase()]||w).join(' ');
-    }
-    // EN→TR
-    const rev = Object.fromEntries(Object.entries(dict).map(([tr,en])=>[en,tr]));
-    return s.split(/\s+/).map(w=>rev[w.toLowerCase()]||w).join(' ');
-  }
-
-  function bullets(text){
-    const parts = text.split(/[.,;•\-–—]\s+/).filter(Boolean).slice(0,6);
-    if(!parts.length) return '• Hedefi netleştir<br>• Adımları sırala<br>• Zaman tahminleri ekle';
-    return parts.map(p=>'• '+esc(p)).join('<br>');
-  }
-
-  function respond(input, hooks={}){
-    const it = detectIntent(input);
-    const out = [];
-
-    switch(it.k){
-      case 'greet':
-        out.push({text:`Selam! Ben <b>Yanlik</b>. Bugün ${pick(moods)} moddayım 😎`});
-        break;
-
-      case 'support':
-        out.push({text:`Zor bir gün gibi… Birlikte nefes alalım: 4 sn al ➝ 4 sn tut ➝ 6 sn ver. İstersen konuşuruz 🌙`});
-        break;
-
-      case 'calc':
-        out.push({text: calc(it.v) });
-        break;
-
-      case 'plan':
-        out.push({text:'Tamam, madde madde yazıyorum:'});
-        out.push({text: bullets(input) });
-        break;
-
-      case 'translate':
-        out.push({text:'Çeviri: <i>'+esc(translateAuto(it.v))+'</i>'});
-        break;
-
-      case 'summ':
-        // demo: cümle kısaltma
-        const short = input.split(/[.!?]/).map(s=>s.trim()).filter(Boolean).slice(0,2).join('. ') + '.';
-        out.push({text:'Kısa özet: '+esc(short)});
-        break;
-
-      case 'theme':
-        hooks.onTheme && hooks.onTheme(it.v);
-        out.push({text:`Tema değiştirildi: <b>${esc(it.v)}</b>`});
-        break;
-
-      case 'anim':
-        hooks.onAnim && hooks.onAnim(it.v);
-        out.push({text:`Animasyon değiştirildi: <b>${esc(it.v)}</b>`});
-        break;
-
-      default:
-        out.push({text: pick(starters) });
-    }
-
-    return out;
-  }
-
-  return {respond};
-})();
-
-// ----- mesaj akışı -----
-const msg = document.getElementById('msg');
-const send = document.getElementById('send');
-
-function setTheme(name){
-  // örnek: sadece altın temayı gösteriyoruz; istersen genişletirsin
-  if(name==='altın'){
-    document.documentElement.style.setProperty('--c1','#ffd166');
-    document.documentElement.style.setProperty('--c2','#ffcc66');
-  } else {
-    document.documentElement.style.setProperty('--c1','#00c9ff');
-    document.documentElement.style.setProperty('--c2','#0077ff');
-  }
+/* ---------- Ses: kısa “blip” ---------- */
+let audioCtx;
+function blip(){
+  try{
+    audioCtx = audioCtx || new (window.AudioContext||window.webkitAudioContext)();
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.type='sine'; o.frequency.value=880;
+    g.gain.setValueAtTime(0.07,audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.00001,audioCtx.currentTime+0.08);
+    o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime+0.09);
+  }catch(e){}
 }
-function setAnim(name){
+
+/* ---------- Mesaj akışı + kalıcı geçmiş ---------- */
+const KEY='yanlik:chatlog';
+const area=document.getElementById('area'), typing=document.getElementById('typing'), box=document.getElementById('scroll');
+const msg=document.getElementById('msg'), send=document.getElementById('send'), clearBtn=document.getElementById('clearBtn');
+
+function now(){return new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})}
+function push(role, html, save=true){
+  const d=document.createElement('div');
+  d.className='msg '+(role==='me'?'me':'bot');
+  d.innerHTML=`<div class="meta">${now()} • ${role==='me'?'Ben':'Yanlik'}</div>${html}`;
+  area.appendChild(d); box.scrollTop=box.scrollHeight;
+  if(save){ const log = JSON.parse(localStorage.getItem(KEY)||'[]'); log.push({role,html,time:Date.now()}); localStorage.setItem(KEY, JSON.stringify(log)); }
+}
+function loadHistory(){
+  const log = JSON.parse(localStorage.getItem(KEY)||'[]');
+  for(const it of log){ push(it.role,it.html,false); }
+}
+function clearHistory(){ localStorage.removeItem(KEY); area.innerHTML=''; push('bot','Temizlendi ✅'); }
+
+loadHistory();
+if(!JSON.parse(localStorage.getItem(KEY)||'[]').length){
+  push('bot','Selam! Ben <b>Yanlik</b>. Komutlar: <code>= 2+3*5</code>, <code>plan</code>, <code>çevir: merhaba dünya</code>, <code>/theme altın</code>, <code>/anim matrix</code>.');
+}
+
+function setThemeByName(name){
+  localStorage.setItem('yanlik:theme', name);
+  applyThemeClass(name);
+}
+function setAnimByName(name){
   localStorage.setItem('yanlik:anim', name);
   window.YANLIK_BG && YANLIK_BG.setAnimation(name);
 }
 
 async function handleSend(){
-  const t = msg.value.trim(); if(!t) return;
-  push('me', t);
-  msg.value=''; typing.style.display='block';
+  const t=msg.value.trim(); if(!t) return;
+  push('me', t); blip(); msg.value=''; typing.style.display='block';
 
-  const replies = YanlikAI.respond(t, {onTheme:setTheme, onAnim:setAnim});
+  const replies = YanlikAI.respond(t,{
+    onTheme: setThemeByName,
+    onAnim:  setAnimByName
+  });
   await new Promise(r=>setTimeout(r, 350));
   typing.style.display='none';
   replies.forEach(r=>push('bot', r.text));
 }
-send.onclick = handleSend;
-msg.addEventListener('keydown', e=>{
-  if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); handleSend(); }
-});
+send.onclick=handleSend;
+msg.addEventListener('keydown',e=>{ if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); handleSend(); }});
+clearBtn.onclick=clearHistory;
 
-// açılış mesajı
-push('bot','Selam! Ben <b>Yanlik</b>. Örnek komutlar: <code>= 2+3*5</code>, <code>plan</code>, <code>çevir: merhaba dünya</code>, <code>/theme altın</code>, <code>/anim matrix</code>.');
-
+/* ---------- Basit kural tabanlı “motor” ---------- */
+const YanlikAI = (()=>{
+  function pick(a){return a[Math.floor(Math.random()*a.length)]}
+  function esc(s){return (s||"").replace(/[<>&]/g,m=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[m]))}
+  function detect(t){
+    const x=t.toLowerCase().trim();
+    if(x.startsWith('/theme ')) return {k:'theme',v:x.slice(7).trim()};
+    if(x.startsWith('/anim '))  return {k:'anim',v:x.slice(6).trim()};
+    if(x.startsWith('=') || /(^|\s)hesapla(\s|:)/.test(x)) return {k:'calc',v:x.replace(/^=/,'').replace(/(^|\s)hesapla(\s|:)?/,' ').trim()};
+    if(/(plan|madde madde|listele)/.test(x)) return {k:'plan',v:t};
+    if(/(çevir:|translate:)/.test(x)) return {k:'tr',v:t.replace(/(çevir:|translate:)/i,'').trim()};
+    if(/(özetle|kısalt|shorten)/.test(x)) return {k:'sum',v:t};
+    if(/(merhaba|selam|hey)/.test(x)) return {k:'hi'};
+    return {k:'chat'};
+  }
+  function calc(expr){ try{return 'Sonuç: <b>'+esc(String(Function('return ('+expr+')')()))+'</b>'}catch{ return 'İşlem hatalı görünüyor 🤔'} }
+  function bullets(s){ const parts=s.split(/[.,;•\-–—]\s+/).filter(Boolean).slice(0,6); return (parts.length?parts:['Hedefi netleştir','Adımları sırala','Zaman planı yap']).map(p=>'• '+esc(p)).join('<br>'); }
+  function trAuto(s){ const d={'merhaba':'hello','nasılsın':'how are you','teşekkürler':'thanks','evet':'yes','hayır':'no'}; if(/[ığüşöç]/i.test(s)){return s.split(/\s+/).map(w=>d[w.toLowerCase()]||w).join(' ');} const r=Object.fromEntries(Object.entries(d).map(([a,b])=>[b,a]));return s.split(/\s+/).map(w=>r[w.toLowerCase()]||w).join(' ');}
+  function respond(t,hooks={}){
+    const it=detect(t), out=[];
+    switch(it.k){
+      case 'hi': out.push({text:'Selam! Ben <b>Yanlik</b>. Hazırım 😎'}); break;
+      case 'calc': out.push({text:calc(it.v)}); break;
+      case 'plan': out.push({text:'Tamam, planı maddeliyorum:'}); out.push({text:bullets(it.v)}); break;
+      case 'tr': out.push({text:'Çeviri: <i>'+esc(trAuto(it.v))+'</i>'}); break;
+      case 'sum': { const s=t.split(/[.!?]/).map(x=>x.trim()).filter(Boolean).slice(0,2).join('. ')+'.'; out.push({text:'Kısa özet: '+esc(s)}); } break;
+      case 'theme': hooks.onTheme && hooks.onTheme(it.v); out.push({text:`Tema değiştirildi: <b>${esc(it.v)}</b>`}); break;
+      case 'anim': hooks.onAnim && hooks.onAnim(it.v); out.push({text:`Animasyon değiştirildi: <b>${esc(it.v)}</b>`}); break;
+      default: out.push({text:pick(['Dinliyorum 👂','Devam et 🔍','Biraz daha detay verir misin?','Bunu çözelim 💡'])});
+    }
+    return out;
+  }
+  return {respond};
+})();
 </script>
 </body>
 </html>
