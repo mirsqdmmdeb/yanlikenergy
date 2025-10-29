@@ -1,22 +1,16 @@
 <!doctype html>
 <html lang="tr">
 <head>
-<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>404 • Yanlik</title>
-<style>
-:root{--c1:#00c9ff;--c2:#0077ff;--bg:#050b18;--fg:#e8f0ff}
-*{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--fg);font-family:system-ui,Segoe UI,Roboto;min-height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden;text-align:center}
-h1{font-size:5rem;margin:0;color:var(--c1);text-shadow:0 0 28px #00c9ffaa;animation:pulse 2.8s ease-in-out infinite alternate}
-p{color:#9bb3cc;margin:8px 0 16px}
-a{display:inline-block;background:linear-gradient(135deg,var(--c2),var(--c1));color:#06141c;text-decoration:none;font-weight:800;padding:10px 16px;border-radius:12px}
-@keyframes pulse{from{transform:scale(1)}to{transform:scale(1.05)}}
-</style>
+<link rel="stylesheet" href="yanlik.css">
 </head>
 <body>
-<div>
-  <h1>404</h1>
-  <p>Üzgünüz, aradığınız sayfa bulunamadı.</p>
-  <a href="index.html">Ana sayfaya dön</a>
+<canvas id="bg"></canvas>
+<div class="center">
+  <h1 class="logo">404</h1>
+  <p>Aradığın sayfa neonlar arasında kayboldu 💫</p>
+  <a href="index.html" class="btn neon" style="margin-top:10px">Ana Sayfa</a>
 </div>
 <script src="bg.js"></script>
 </body>
