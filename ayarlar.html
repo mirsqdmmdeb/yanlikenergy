@@ -1,127 +1,37 @@
 <!doctype html>
 <html lang="tr">
 <head>
-<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Ayarlar • Yanlik</title>
-<style>
-:root{--c1:#00c9ff;--c2:#0077ff;--bg:#050b18;--fg:#e8f0ff}
-*{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--fg);font-family:system-ui,Segoe UI,Roboto;min-height:100vh;overflow:hidden}
-nav{position:fixed;top:0;left:0;right:0;display:flex;gap:18px;justify-content:center;padding:12px;background:rgba(0,0,0,.35);backdrop-filter:blur(10px);z-index:5}
-nav a{color:var(--c1);text-decoration:none;font-weight:700} nav a:hover{color:var(--c2)}
-main{margin:90px auto 40px;width:min(780px,92%);display:grid;gap:14px;grid-template-columns:1fr 1fr}
-.card{background:rgba(255,255,255,.06);border:1px solid #ffffff18;border-radius:16px;padding:16px;backdrop-filter:blur(10px);box-shadow:0 0 24px #00c9ff22}
-.card h3{margin:0 0 10px;color:var(--c1)}
-label{display:block;margin-top:10px;color:#a8c2d8}
-input,select,textarea{width:100%;background:#0f1b2e;color:var(--fg);border:1px solid #ffffff1a;border-radius:10px;padding:10px;margin-top:4px}
-button{margin-top:12px;background:linear-gradient(135deg,var(--c2),var(--c1));border:none;border-radius:12px;padding:10px 14px;font-weight:800;color:#06141c}
-button:hover{box-shadow:0 0 20px #00c9ffaa}
-.full{grid-column:1/-1}
-.small{font-size:.9rem;color:#9bb3cc}
-</style>
+<link rel="stylesheet" href="yanlik.css">
 </head>
 <body>
-<nav>
-  <a href="index.html">Ana Sayfa</a>
-  <a href="chat.html">Sohbet</a>
-  <a href="ayarlar.html">Ayarlar</a>
-  <a href="hakkinda.html">Hakkında</a>
-</nav>
+<canvas id="bg"></canvas>
 
-<main>
-  <div class="card">
-    <h3>Profil</h3>
-    <label>Görünen Ad</label><input id="display">
-    <label>Dil Tercihi</label>
-    <select id="lang"><option value="auto">Otomatik</option><option value="tr">Türkçe</option><option value="en">English</option></select>
-    <button id="saveProfile">Kaydet</button>
-    <p class="small">Dil: “Otomatik” ise Yanlik mesaj diline göre TR/EN seçer.</p>
-  </div>
+<div class="center card" style="width:min(500px,90vw);padding:24px;text-align:left">
+  <h1 style="color:#00c9ff;text-shadow:0 0 20px #00c9ffaa">Ayarlar</h1>
+  <label>Görünen Ad</label><input id="name" class="input">
+  <label>Mod</label>
+  <select id="persona" class="input">
+    <option>Arkadaş</option>
+    <option>Asistan</option>
+    <option>Koç</option>
+  </select>
+  <button id="save" class="btn neon" style="margin-top:12px;width:100%">Kaydet</button>
+</div>
+<div class="links">
+  <a href="index.html">🏠 Ana Sayfa</a>
+  <a href="chat.html">💬 Sohbet</a>
+</div>
 
-  <div class="card">
-    <h3>Kişilik (Persona)</h3>
-    <label>Mod</label>
-    <select id="persona">
-      <option value="friend">Arkadaş</option>
-      <option value="assistant">Asistan</option>
-      <option value="coach">Koç</option>
-      <option value="mentor">Mentor</option>
-    </select>
-    <button id="savePersona">Kaydet</button>
-  </div>
-
-  <div class="card full">
-    <h3>Notlar</h3>
-    <textarea id="notes" rows="6" placeholder="Yanlik için genel notlar…"></textarea>
-    <div>
-      <button id="notesSave">Kaydet</button>
-      <button id="notesClear">Temizle</button>
-    </div>
-  </div>
-
-  <div class="card full">
-    <h3>Yapılacaklar</h3>
-    <div style="display:flex;gap:8px">
-      <input id="todoInput" placeholder="Bir görev yaz…">
-      <button id="todoAdd">Ekle</button>
-    </div>
-    <div id="todoList" style="margin-top:8px;color:#cfe2ff"></div>
-    <button id="todoClear" style="margin-top:10px">Hepsini Temizle</button>
-  </div>
-
-  <div class="card full">
-    <h3>Veri</h3>
-    <button id="exportBtn">Dışa aktar (.json)</button>
-    <button id="clearAll" style="margin-left:8px">Tüm Veriyi Sil</button>
-  </div>
-</main>
-
-<script src="bg.js"></script>
-<script src="memory.js"></script>
+<script src="bg.js"></script><script src="memory.js"></script>
 <script>
-const prof = YANLIK_MEM.loadProfile();
-document.getElementById('display').value = prof.display||'';
-document.getElementById('lang').value = prof.lang||'auto';
-document.getElementById('persona').value = prof.persona||'friend';
-document.getElementById('notes').value = (YANLIK_MEM.loadMemory()._notesText||'');
-
-function renderTodos(){
-  const m=YANLIK_MEM.loadMemory(); const t=m.todos||[];
-  document.getElementById('todoList').innerHTML = t.length? t.map(x=>`${x.done?'[x]':'[ ]'} ${x.text}`).join('<br>') : '<span style="opacity:.7">Boş.</span>';
-}
-renderTodos();
-
-document.getElementById('saveProfile').onclick=()=>{
-  const p=YANLIK_MEM.loadProfile();
-  p.display=document.getElementById('display').value.trim()||'Kullanıcı';
-  p.lang=document.getElementById('lang').value;
-  YANLIK_MEM.saveProfile(p); alert('✅ Profil kaydedildi');
-};
-document.getElementById('savePersona').onclick=()=>{
-  const p=YANLIK_MEM.loadProfile();
-  p.persona=document.getElementById('persona').value;
-  YANLIK_MEM.saveProfile(p); alert('✅ Persona kaydedildi');
-};
-document.getElementById('notesSave').onclick=()=>{
-  const m=YANLIK_MEM.loadMemory(); m._notesText=document.getElementById('notes').value; YANLIK_MEM.saveMemory(m); alert('🧾 Not kaydedildi');
-};
-document.getElementById('notesClear').onclick=()=>{
-  const m=YANLIK_MEM.loadMemory(); delete m._notesText; YANLIK_MEM.saveMemory(m); document.getElementById('notes').value=''; alert('🧹 Notlar temizlendi');
-};
-document.getElementById('todoAdd').onclick=()=>{
-  const v=document.getElementById('todoInput').value.trim(); if(!v) return;
-  const m=YANLIK_MEM.loadMemory(); m.todos=m.todos||[]; m.todos.push({id:Date.now(),text:v,done:false}); YANLIK_MEM.saveMemory(m);
-  document.getElementById('todoInput').value=''; renderTodos();
-};
-document.getElementById('todoClear').onclick=()=>{
-  const m=YANLIK_MEM.loadMemory(); m.todos=[]; YANLIK_MEM.saveMemory(m); renderTodos();
-};
-document.getElementById('exportBtn').onclick=()=>{
-  const blob=new Blob([YANLIK_MEM.exportAll()],{type:"application/json"});
-  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download="yanlik_export.json"; a.click(); URL.revokeObjectURL(a.href);
-};
-document.getElementById('clearAll').onclick=()=>{
-  if(confirm('Tüm verileri silmek istediğine emin misin?')){ localStorage.clear(); location.reload(); }
-};
+const p=YANLIK_MEM.loadProfile();
+name.value=p.name||""; persona.value=p.persona||"Arkadaş";
+save.onclick=()=>{
+YANLIK_MEM.saveProfile({name:name.value,persona:persona.value});
+alert("Kaydedildi ✅");}
 </script>
 </body>
 </html>
