@@ -1,51 +1,26 @@
 <!doctype html>
 <html lang="tr">
 <head>
-<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Yanlik • Giriş</title>
-<style>
-:root{--c1:#00c9ff;--c2:#0077ff;--fg:#e8f0ff}
-*{box-sizing:border-box} body{margin:0;height:100svh;display:flex;align-items:center;justify-content:center;
-font-family:system-ui,Segoe UI,Roboto;color:var(--fg);overflow:hidden}
-#bg{position:fixed;inset:0;z-index:-1;background:radial-gradient(1000px 600px at 0 0,#031630 0%,#000 70%)}
-.card{width:min(430px,92vw);padding:22px;background:rgba(255,255,255,.06);border:1px solid #ffffff18;border-radius:18px;
-backdrop-filter:blur(10px);box-shadow:0 0 30px #00c9ff22}
-h1{margin:0 0 10px;color:var(--c1);text-shadow:0 0 18px #00c9ffaa}
-input{width:100%;margin:8px 0;padding:12px;border-radius:12px;border:1px solid #ffffff1a;background:#0f1b2e;color:var(--fg)}
-.btn{width:100%;padding:12px 16px;border:0;border-radius:12px;background:linear-gradient(135deg,var(--c2),var(--c1));
-color:#06141c;font-weight:800}
-.links{margin-top:10px;display:flex;justify-content:space-between;font-size:.95rem}
-.links a{color:var(--c1);text-decoration:none}
-.err{display:none;margin-top:8px;background:#1e0b0b;border:1px solid #ff6b6b;color:#ffdada;border-radius:10px;padding:10px}
-</style>
+<link rel="stylesheet" href="yanlik.css">
 </head>
 <body>
 <canvas id="bg"></canvas>
-
-<div class="card">
-  <h1>Giriş Yap</h1>
-  <input id="user" placeholder="Kullanıcı adı" autocomplete="username">
-  <input id="pass" type="password" placeholder="Şifre" autocomplete="current-password">
-  <button id="go" class="btn">Giriş</button>
-  <div id="m" class="err"></div>
-  <div class="links">
-    <a href="index.html">Ana sayfa</a>
-    <a href="signup.html">Üye ol</a>
-  </div>
+<div class="center card" style="padding:24px;width:min(400px,90vw)">
+  <h1 style="color:#00c9ff;text-shadow:0 0 20px #00c9ffaa">Giriş Yap</h1>
+  <input id="user" class="input" placeholder="Kullanıcı adı">
+  <input id="pass" class="input" type="password" placeholder="Şifre">
+  <button id="go" class="btn neon" style="width:100%;margin-top:10px">Giriş</button>
+  <p id="err" style="color:#ffaaaa;display:none;margin-top:8px"></p>
+  <div style="margin-top:10px"><a href="signup.html" style="color:#9fd3ff">Üye ol</a></div>
 </div>
-
-<script src="bg.js"></script>
-<script src="memory.js"></script>
+<script src="bg.js"></script><script src="auth.js"></script>
 <script>
-const m=document.getElementById('m');
-document.getElementById('go').onclick=login;
-document.addEventListener('keydown',e=>{if(e.key==='Enter')login();});
-function login(){
-  const u=user.value.trim(), p=pass.value.trim();
-  const ok = YANLIK_MEM.login(u,p);
-  if(ok) location.href='chat.html';
-  else { m.textContent='Hatalı kullanıcı adı veya şifre'; m.style.display='block'; }
-}
+const e=document.getElementById("err");
+go.onclick=()=>{
+const ok=YANLIK_AUTH.login(user.value.trim(),pass.value.trim());
+if(ok.ok){location.href="chat.html"}else{e.textContent="Hatalı kullanıcı adı veya şifre";e.style.display="block"}}
 </script>
 </body>
 </html>
