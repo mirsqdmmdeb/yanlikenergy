@@ -1,60 +1,28 @@
 <!doctype html><html lang="tr"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>İletişim • Yanlik Energy</title>
-<link rel="stylesheet" href="yanlik.css"><script src="bg.js"></script>
-<meta name="description" content="Yanlik Energy iletişim: e-posta ve Instagram bağlantısı.">
+<title>İletişim • Yanlik</title><link rel="stylesheet" href="yanlik.css">
 </head><body><canvas id="bg"></canvas>
-
-<main class="card contact" style="max-width:720px;margin:60px auto;padding:24px">
-  <h1 style="color:#00c9ff;text-shadow:0 0 20px #00c9ffaa">İletişim</h1>
+<main class="page card" style="padding:24px;max-width:720px">
+  <h1>İletişim</h1>
   <p style="line-height:1.8">
     E-posta: <a href="mailto:mirsadmirbey@gmail.com">mirsadmirbey@gmail.com</a><br>
-    Instagram: <a href="https://instagram.com/mirsqdmmdevs" target="_blank" rel="noopener">@mirsqdmmdevs</a><br>
-    Konum: İzmir
+    Instagram: <a href="https://instagram.com/mirsqdmmdevs" target="_blank" rel="noopener">@mirsqdmmdevs</a>
   </p>
-
-  <h2 style="margin-top:18px">Mesaj Gönder</h2>
+  <h2>Mesaj Gönder</h2>
   <label>Ad Soyad</label><input id="ad" class="input" required>
   <label>E-posta</label><input id="eposta" class="input" type="email" required>
   <label>Konu</label><input id="konu" class="input">
   <label>Mesaj</label><textarea id="mesaj" class="input" rows="5" required></textarea>
-
   <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
     <button id="gonder" class="btn neon">E-posta Uygulamasıyla Gönder</button>
     <button id="kopya" class="btn">Mesajı Panoya Kopyala</button>
   </div>
   <p id="ok" style="display:none;color:#aaffaa;margin-top:8px">Kopyalandı ✅</p>
 </main>
-
-<div class="links" aria-label="Gezinme">
-  <a href="index.html">Ana sayfa</a>
-  <a href="urunler.html">Ürünler</a>
-  <a href="hakkinda.html">Hakkımızda</a>
-</div>
-
-<!-- JSON-LD: Contact info -->
-<script type="application/ld+json">
-{
- "@context":"https://schema.org",
- "@type":"Organization",
- "name":"Yanlik Energy",
- "url":"https://yanlikai.vercel.app",
- "contactPoint":[{"@type":"ContactPoint","email":"mirsadmirbey@gmail.com","contactType":"customer support","areaServed":"TR"}],
- "sameAs":["https://instagram.com/mirsqdmmdevs"]
-}
-</script>
-
+<div class="links"><a href="index.html">Ana sayfa</a><a href="urunler.html">Ürünler</a></div>
+<script src="bg.js"></script>
 <script>
-gonder.onclick=()=>{
-  const to   = "mirsadmirbey@gmail.com";
-  const subj = encodeURIComponent("[Yanlik] " + (konu.value || "Mesaj"));
-  const body = encodeURIComponent(`Ad: ${ad.value}\nE-posta: ${eposta.value}\n\n${mesaj.value}`);
-  location.href = `mailto:${to}?subject=${subj}&body=${body}`;
-};
-kopya.onclick=async()=>{
-  const txt = `Ad: ${ad.value}\nE-posta: ${eposta.value}\nKonu: ${konu.value}\n\n${mesaj.value}`;
-  await navigator.clipboard.writeText(txt);
-  ok.style.display='block'; setTimeout(()=>ok.style.display='none',1200);
-};
-</script>
-</body></html>
+gonder.onclick=()=>{const to='mirsadmirbey@gmail.com';const subject=encodeURIComponent('[Yanlik] '+(konu.value||'Mesaj'));
+const body=encodeURIComponent(`Ad: ${ad.value}\nE-posta: ${eposta.value}\n\n${mesaj.value}`);location.href=`mailto:${to}?subject=${subject}&body=${body}`};
+kopya.onclick=async()=>{await navigator.clipboard.writeText(`Ad: ${ad.value}\nE-posta: ${eposta.value}\nKonu: ${konu.value}\n\n${mesaj.value}`);ok.style.display='block';setTimeout(()=>ok.style.display='none',1200)}
+</script></body></html>
