@@ -1,36 +1,22 @@
 <!doctype html>
 <html lang="tr">
 <head>
-<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Hakkında • Yanlik</title>
-<style>
-:root{--c1:#00c9ff;--c2:#0077ff;--bg:#050b18;--fg:#e8f0ff}
-*{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--fg);font-family:system-ui,Segoe UI,Roboto;min-height:100vh;overflow:hidden}
-nav{position:fixed;top:0;left:0;right:0;display:flex;gap:18px;justify-content:center;padding:12px;background:rgba(0,0,0,.35);backdrop-filter:blur(10px);z-index:5}
-nav a{color:var(--c1);text-decoration:none;font-weight:700} nav a:hover{color:var(--c2)}
-main{margin:90px auto 40px;width:min(820px,92%);background:rgba(255,255,255,.06);border:1px solid #ffffff18;border-radius:16px;padding:20px;backdrop-filter:blur(10px);box-shadow:0 0 24px #00c9ff22}
-h1{margin:0 0 12px;color:var(--c1);text-shadow:0 0 20px #00c9ffaa}
-p{color:#9bb3cc;line-height:1.65}
-hr{border:0;height:1px;background:#ffffff18;margin:16px 0}
-small{color:#7ea6c9}
-</style>
+<link rel="stylesheet" href="yanlik.css">
 </head>
 <body>
-<nav>
-  <a href="index.html">Ana Sayfa</a>
-  <a href="chat.html">Sohbet</a>
-  <a href="ayarlar.html">Ayarlar</a>
-  <a href="hakkinda.html">Hakkında</a>
-</nav>
-<main>
-  <h1>Yanlik 🤖</h1>
-  <p><b>Yanlik</b>, tamamen tarayıcı içinde çalışan, çok dilli ve empatik bir sohbet sistemidir. Veri gizliliği için her şey <i>localStorage</i>’da saklanır.</p>
-  <hr/>
-  <p><b>Özellikler:</b> intent yakalama (plan, todo, timer, hesap, özet, liste, çeviri), kişilik modları (Arkadaş/Asistan/Koç/Mentor), hafıza (profil, not, todo), TR–EN otomatik dil.</p>
-  <p><b>Tema:</b> Neon ağ animasyonu, cam-blur kartlar, mavi parıltı.</p>
-  <hr/>
-  <small>© 2025 Yanlik Energy — Geliştirici: mirsqdmmdevs</small>
-</main>
+<canvas id="bg"></canvas>
+<div class="center card" style="padding:24px;width:min(600px,90vw);text-align:center">
+  <h1 style="color:#00c9ff;text-shadow:0 0 20px #00c9ffaa">Yanlik Energy v3</h1>
+  <p><b>Yanlik</b>, senin tarayıcında çalışan empatik, mizahi yapay zekâdır.</p>
+  <p>Tüm veriler cihazında saklanır, hiçbir şey sunucuya gitmez.</p>
+  <p>Geliştirici: <b>mirsqdmmdevs</b></p>
+</div>
+<div class="links">
+  <a href="index.html">🏠 Ana Sayfa</a>
+  <a href="chat.html">💬 Sohbet</a>
+</div>
 <script src="bg.js"></script>
 </body>
 </html>
