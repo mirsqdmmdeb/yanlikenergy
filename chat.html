@@ -1,58 +1,28 @@
-<!doctype html>
-<html lang="tr">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Yanlik • Sohbet</title>
-<link rel="stylesheet" href="yanlik.css">
-</head>
-<body>
-<canvas id="bg"></canvas>
-
-<main id="chatMain">
-  <div id="messages"></div>
-  <div id="typing">Yanlik yazıyor...</div>
+<!doctype html><html lang="tr"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Sohbet • Yanlik</title><link rel="stylesheet" href="yanlik.css">
+</head><body><canvas id="bg"></canvas>
+<main style="height:calc(100vh - 80px);overflow:auto;padding:14px 10px">
+  <div id="area" class="page" style="max-width:980px"></div>
+  <div id="typing" class="page" style="max-width:980px">Yanlik yazıyor… • • •</div>
 </main>
-
-<footer>
+<footer class="chat">
   <div class="chatbar">
-    <input id="msg" class="input" placeholder="Mesaj yaz..." autocomplete="off">
+    <input id="msg" class="input" placeholder='Mesaj yaz… (örn: "= 2+3*5", "/theme altın", "/anim matrix")'>
     <button id="send" class="btn neon">Gönder</button>
   </div>
-  <div class="links">
-    <a href="index.html">🏠 Ana Sayfa</a>
-    <a href="ayarlar.html">⚙️ Ayarlar</a>
-  </div>
+  <div class="links"><a href="index.html">Ana sayfa</a><a href="ayarlar.html">Ayarlar</a></div>
 </footer>
-
-<script src="bg.js"></script>
-<script src="auth.js"></script>
-<script src="memory.js"></script>
-<script src="ai.js"></script>
-
+<script src="bg.js"></script><script src="auth.js"></script><script src="memory.js"></script><script src="ai.js"></script>
 <script>
-if(!YANLIK_AUTH.requireAuth("login.html")) return;
-const area=document.getElementById("messages"),typing=document.getElementById("typing"),
-input=document.getElementById("msg"),send=document.getElementById("send");
-
-function push(role,text){
- const d=document.createElement("div");
- d.className="msg "+(role==="me"?"me":"bot");
- d.innerHTML=`<div class='meta'>${new Date().toLocaleTimeString()} • ${role==="me"?"Ben":"Yanlik"}</div>${text}`;
- area.appendChild(d); area.scrollTop=area.scrollHeight;
-}
-
-async function handleSend(){
- const t=input.value.trim(); if(!t) return;
- push("me",t); input.value=""; typing.style.display="block";
- const replies=YANLIK_AI.respond(t);
- await new Promise(r=>setTimeout(r,500));
- typing.style.display="none";
- replies.forEach(r=>push("bot",r.text));
-}
-send.onclick=handleSend;
-input.addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();handleSend();}});
-push("bot","Selam! Ben <b>Yanlik</b>. Hadi konuşalım 🔥");
-</script>
-</body>
-</html>
+if(!YANLIK_AUTH.requireAuth('login.html')){throw new Error('auth')}
+const area=document.getElementById('area'), typing=document.getElementById('typing');
+function time(){return new Date().toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})}
+function push(role,html){const d=document.createElement('div');d.className='msg '+(role==='me'?'me':'bot');d.innerHTML=`<div class="meta">${time()} • ${role==='me'?'Ben':'Yanlik'}</div>${html}`;area.appendChild(d);area.parentElement.scrollTop=area.parentElement.scrollHeight}
+function setTheme(v){document.documentElement.style.setProperty('--c1',v==='altın'?'#ffd166':'#00c9ff');}
+function setAnim(_){/* tek animasyon var; gelecekte genişletilebilir */}
+async function handle(){const t=msg.value.trim();if(!t)return;push('me',t);msg.value='';typing.style.display='block';
+const reps=YANLIK_AI.respond(t,{onTheme:setTheme,onAnim:setAnim});await new Promise(r=>setTimeout(r,300));typing.style.display='none';reps.forEach(r=>push('bot',r.text))}
+send.onclick=handle;msg.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();handle();}});
+push('bot','Selam! Ben <b>Yanlik</b>. Komutlar: <code>/theme altın</code>, <code>/anim matrix</code>, <code>= 2+3*5</code>, <code>plan</code>.');
+</script></body></html>
