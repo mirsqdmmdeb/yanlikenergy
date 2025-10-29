@@ -1,26 +1,66 @@
-<!doctype html><html lang="tr"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Yanlik Energy • Neon gücünde web + sohbet</title>
-<link rel="stylesheet" href="yanlik.css"><link rel="manifest" href="manifest.json">
-<meta name="description" content="Net, hızlı, güvenli; neon gücünde modern web + empatik sohbet.">
-</head><body><canvas id="bg"></canvas>
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Yanlik • Neon gücünde web + sohbet</title>
+<link rel="stylesheet" href="yanlik.css">
+<link rel="manifest" href="manifest.json">
+<meta name="description" content="Modern web + akıllı sohbet. Hızlı, güvenli, neon animasyonlu.">
+<style>
+  .hero{position:relative;z-index:1; text-align:center; max-width:960px; margin:16vh auto 8vh}
+  .hero h1{font-size:3rem;color:#00c9ff;text-shadow:0 0 24px #00c9ffaa,0 0 48px #0077ff55}
+  .hero p{color:#9bb3cc;margin:10px 0 18px}
+  .actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+  .panel{position:fixed;right:12px;top:12px;z-index:2;background:rgba(0,0,0,.4);
+    border:1px solid #ffffff22;backdrop-filter:blur(10px);padding:10px;border-radius:12px}
+  .panel label{font-size:.9rem;color:#9fd3ff;margin-right:6px}
+  select{appearance:none}
+</style>
+</head>
+<body>
+<canvas id="bg"></canvas>
 
-<div class="center">
-  <h1 class="logo">Yanlik<span style="color:#fff">Energy</span></h1>
-  <p class="desc">Modern web + akıllı sohbet. Hızlı, güvenli, tamamen tarayıcıda.</p>
-  <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
-    <a class="btn" href="login.html">Giriş Yap</a>
-    <a class="btn" href="signup.html">Üye Ol</a>
-    <a class="btn neon" href="chat.html">Sohbete Başla</a>
-  </div>
+<div class="panel">
+  <label>Animasyon</label>
+  <select id="animPick" class="input" style="padding:8px 10px;width:190px">
+    <option value="neon">Neon Ağ (Eski)</option>
+    <option value="stars">Yıldız Alanı</option>
+    <option value="wave">Dalga Alanı</option>
+    <option value="matrix">Matrix Yağmuru</option>
+    <option value="orbs">Gezinen Küreler</option>
+    <option value="gridflow">Grid Akışı</option>
+    <option value="triangulate">Üçgen Ağ</option>
+  </select>
 </div>
 
+<section class="hero">
+  <h1>Yanlik<span style="color:#fff">Energy</span></h1>
+  <p>Hızlı, güvenli ve tamamen tarayıcıda çalışan akıllı sohbet deneyimi.</p>
+  <div class="actions">
+    <a href="login.html" class="btn">Giriş Yap</a>
+    <a href="signup.html" class="btn">Üye Ol</a>
+    <a href="chat.html" class="btn neon">Sohbete Başla</a>
+  </div>
+</section>
+
 <div class="links" aria-label="Gezinme">
-  <a href="urunler.html">Ürünler</a><a href="hakkinda.html">Hakkımızda</a><a href="iletisim.html">İletişim</a>
+  <a href="hakkinda.html">Hakkımızda</a>
+  <a href="urunler.html">Ürünler</a>
+  <a href="iletisim.html">İletişim</a>
 </div>
 
 <script src="bg.js"></script>
-<script>if('serviceWorker'in navigator){navigator.serviceWorker.register('/sw.js')}</script>
-<!-- JSON-LD -->
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"Yanlik Energy","url":"https://yanlikai.vercel.app","sameAs":["https://instagram.com/mirsqdmmdevs"],"contactPoint":[{"@type":"ContactPoint","email":"mirsadmirbey@gmail.com","contactType":"support","areaServed":"TR"}]}</script>
-</body></html>
+<script>
+  // animasyon seçimi kalıcı
+  const sel = document.getElementById('animPick');
+  const saved = localStorage.getItem('yanlik:anim') || 'neon';
+  sel.value = saved;
+  window.YANLIK_BG && YANLIK_BG.setAnimation(saved);
+  sel.onchange = () => {
+    localStorage.setItem('yanlik:anim', sel.value);
+    window.YANLIK_BG && YANLIK_BG.setAnimation(sel.value);
+  };
+</script>
+</body>
+</html>
