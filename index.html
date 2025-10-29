@@ -1,37 +1,31 @@
 <!doctype html>
 <html lang="tr">
 <head>
-<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Yanlik Energy v2</title>
-<style>
-:root{--c1:#00c9ff;--c2:#0077ff;--bg:#050b18;--fg:#e8f0ff}
-*{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--fg);
-font-family:system-ui,Segoe UI,Roboto;min-height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden}
-nav{position:fixed;top:0;left:0;right:0;display:flex;gap:18px;justify-content:center;padding:12px;background:rgba(0,0,0,.35);backdrop-filter:blur(10px);z-index:5}
-nav a{color:var(--c1);text-decoration:none;font-weight:700} nav a:hover{color:var(--c2)}
-.wrap{text-align:center;padding:24px;background:rgba(255,255,255,.05);border:1px solid #ffffff18;border-radius:18px;backdrop-filter:blur(10px);box-shadow:0 0 30px #00c9ff22}
-h1{margin:0 0 8px;color:var(--c1);text-shadow:0 0 20px #00c9ffaa;font-size:2.6rem}
-p{margin:6px 0 20px;color:#9bb3cc}
-.btns a{display:inline-block;margin:6px;padding:12px 18px;border-radius:14px;background:linear-gradient(135deg,var(--c2),var(--c1));color:#06141c;font-weight:800;text-decoration:none;box-shadow:0 0 25px #00c9ff44}
-.btns a:hover{transform:translateY(-2px);box-shadow:0 0 35px #00c9ffaa}
-</style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Yanlik Energy v3 – Neon Reactor</title>
+<link rel="stylesheet" href="yanlik.css">
 </head>
 <body>
-<nav>
-  <a href="index.html">Ana Sayfa</a>
-  <a href="chat.html">Sohbet</a>
-  <a href="ayarlar.html">Ayarlar</a>
-  <a href="hakkinda.html">Hakkında</a>
-</nav>
-<div class="wrap">
-  <h1>Yanlik 🤖</h1>
-  <p>Neon gücüyle akıllı, empatik ve çok dilli sohbet.</p>
-  <div class="btns">
-    <a href="login.html">Giriş Yap</a>
-    <a href="signup.html">Üye Ol</a>
-    <a href="chat.html">Sohbete Başla</a>
+<canvas id="bg"></canvas>
+
+<div class="center">
+  <h1 class="logo">Yanlik<span>Energy</span></h1>
+  <p class="desc">Neon gücüyle çalışan yapay zekâ dostun 🤖</p>
+  <div class="buttons">
+    <a href="login.html" class="btn">Giriş Yap</a>
+    <a href="signup.html" class="btn">Üye Ol</a>
+    <a href="chat.html" class="btn neon">Sohbete Başla</a>
   </div>
 </div>
+
+<footer>
+  <div class="links">
+    <a href="ayarlar.html">⚙️ Ayarlar</a>
+    <a href="hakkinda.html">ℹ️ Hakkında</a>
+  </div>
+</footer>
+
 <script src="bg.js"></script>
 </body>
 </html>
