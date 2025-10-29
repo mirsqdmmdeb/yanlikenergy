@@ -1,31 +1,26 @@
-<!doctype html>
-<html lang="tr">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Yanlik Energy v3 – Neon Reactor</title>
-<link rel="stylesheet" href="yanlik.css">
-</head>
-<body>
-<canvas id="bg"></canvas>
+<!doctype html><html lang="tr"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Yanlik Energy • Neon gücünde web + sohbet</title>
+<link rel="stylesheet" href="yanlik.css"><link rel="manifest" href="manifest.json">
+<meta name="description" content="Net, hızlı, güvenli; neon gücünde modern web + empatik sohbet.">
+</head><body><canvas id="bg"></canvas>
 
 <div class="center">
-  <h1 class="logo">Yanlik<span>Energy</span></h1>
-  <p class="desc">Neon gücüyle çalışan yapay zekâ dostun 🤖</p>
-  <div class="buttons">
-    <a href="login.html" class="btn">Giriş Yap</a>
-    <a href="signup.html" class="btn">Üye Ol</a>
-    <a href="chat.html" class="btn neon">Sohbete Başla</a>
+  <h1 class="logo">Yanlik<span style="color:#fff">Energy</span></h1>
+  <p class="desc">Modern web + akıllı sohbet. Hızlı, güvenli, tamamen tarayıcıda.</p>
+  <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+    <a class="btn" href="login.html">Giriş Yap</a>
+    <a class="btn" href="signup.html">Üye Ol</a>
+    <a class="btn neon" href="chat.html">Sohbete Başla</a>
   </div>
 </div>
 
-<footer>
-  <div class="links">
-    <a href="ayarlar.html">⚙️ Ayarlar</a>
-    <a href="hakkinda.html">ℹ️ Hakkında</a>
-  </div>
-</footer>
+<div class="links" aria-label="Gezinme">
+  <a href="urunler.html">Ürünler</a><a href="hakkinda.html">Hakkımızda</a><a href="iletisim.html">İletişim</a>
+</div>
 
 <script src="bg.js"></script>
-</body>
-</html>
+<script>if('serviceWorker'in navigator){navigator.serviceWorker.register('/sw.js')}</script>
+<!-- JSON-LD -->
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"Yanlik Energy","url":"https://yanlikai.vercel.app","sameAs":["https://instagram.com/mirsqdmmdevs"],"contactPoint":[{"@type":"ContactPoint","email":"mirsadmirbey@gmail.com","contactType":"support","areaServed":"TR"}]}</script>
+</body></html>
